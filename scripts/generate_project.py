@@ -78,8 +78,5 @@ scheme=f'''<?xml version="1.0" encoding="UTF-8"?>
 personal_scheme = scheme.replace(uid('target:MyHabitsTests'), uid('target:MyHabitsPersonalTests')).replace(uid('target:MyHabits'), uid('target:MyHabitsPersonal'))
 personal_scheme = personal_scheme.replace('BlueprintName="MyHabitsTests"', 'BlueprintName="MyHabitsPersonalTests"').replace('BuildableName="MyHabitsTests.xctest"', 'BuildableName="MyHabitsPersonalTests.xctest"')
 personal_scheme = personal_scheme.replace('BlueprintName="MyHabits"', 'BlueprintName="MyHabitsPersonal"').replace('BuildableName="MyHabits.app"', 'BuildableName="MyHabitsPersonal.app"')
-# Personal Team users install this scheme for daily use on their phones.
-# Keep tests in Debug, but run an optimised app without an attached debugger.
-personal_scheme = personal_scheme.replace('<LaunchAction buildConfiguration="Debug" selectedDebuggerIdentifier="Xcode.DebuggerFoundation.Debugger.LLDB" selectedLauncherIdentifier="Xcode.IDEFoundation.Launcher.LLDB"', '<LaunchAction buildConfiguration="Release" selectedDebuggerIdentifier="" selectedLauncherIdentifier="Xcode.IDEFoundation.Launcher.PosixSpawn"')
 (root/'MyHabits.xcodeproj/xcshareddata/xcschemes/MyHabitsPersonal.xcscheme').write_text(personal_scheme)
 print('Generated project and shared MyHabits / MyHabitsPersonal schemes.')

@@ -40,12 +40,9 @@ final class ReminderScheduler {
     private init() { center.delegate = notificationDelegate }
 
     static func definitions(_ habits: [Habit]) -> [ReminderDefinition] {
-        var result: [ReminderDefinition] = []
-        for habit in habits where !habit.archived {
-            let settings = habit.reminders
-            if settings.enabled { result.append(ReminderDefinition(id: habit.id, name: habit.name, settings: settings)) }
+        habits.filter { !$0.archived && $0.reminders.enabled }.map {
+            ReminderDefinition(id: $0.id, name: $0.name, settings: $0.reminders)
         }
-        return result
     }
     static func validateCapacity(_ definitions: [ReminderDefinition]) throws {
         for definition in definitions {
@@ -77,18 +74,6 @@ final class ReminderScheduler {
             }
         }
         return requests
-    }
-    static func requestsNeedingUpdate(_ requested: [UNNotificationRequest], existing: [UNNotificationRequest]) -> [UNNotificationRequest] {
-        let previous = Dictionary(uniqueKeysWithValues: existing.map { ($0.identifier, $0) })
-        return requested.filter { request in
-            guard let old = previous[request.identifier],
-                  let oldTrigger = old.trigger as? UNCalendarNotificationTrigger,
-                  let newTrigger = request.trigger as? UNCalendarNotificationTrigger else { return true }
-            let sameContent = old.content.title == request.content.title
-                && old.content.body == request.content.body && old.content.sound == request.content.sound
-            let sameTiming = oldTrigger.repeats == newTrigger.repeats && oldTrigger.dateComponents == newTrigger.dateComponents
-            return !sameContent || !sameTiming
-        }
     }
     func refreshAuthorization() async {
         authorization = await center.notificationSettings().authorizationStatus
@@ -136,8 +121,7 @@ final class ReminderScheduler {
         let wanted = Set(requests.map(\.identifier))
         center.removePendingNotificationRequests(withIdentifiers: existing.map(\.identifier).filter { !wanted.contains($0) })
         do {
-            let updates = Self.requestsNeedingUpdate(requests, existing: existing)
-            for request in updates { try await center.add(request) }
+            for request in requests { try await center.add(request) }
             return nil
         } catch {
             return "Habit saved, but some reminders could not be scheduled. Reopen MyHabits to retry. \(error.localizedDescription)"
