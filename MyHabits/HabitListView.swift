@@ -17,7 +17,7 @@ struct HabitListView: View {
                 Section {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(now, format: .dateTime.weekday(.wide).month(.wide).day()).font(.subheadline).foregroundStyle(.secondary)
-                        Text("Small steps. Lasting change.").font(.title2.bold())
+                        Text("Another Day, Another Opportunity.").font(.title2.bold())
                         Text("\(visible.filter { $0.isComplete(now) }.count) of \(visible.count) complete today").font(.subheadline).foregroundStyle(.secondary)
                     }.padding(.vertical, 8)
                 }.listRowBackground(Color.clear).listRowSeparator(.hidden)
