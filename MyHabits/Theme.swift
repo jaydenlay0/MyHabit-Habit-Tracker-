@@ -23,18 +23,18 @@ enum AppAppearance: String, CaseIterable, Identifiable {
 
 enum Palette {
     static let defaultColor = "63D6A3"
-    // Twenty hues in rainbow order; existing saved colours remain in the palette.
+    // Twenty-four hues in rainbow order; existing saved colours remain in the palette.
     static let colors = [
-        "FF6B6B", "FF8B66", "FFB86C", "FFC857", "F0D66E",
-        "D4E76C", "A5DC74", "77D98B", "63D6A3", "50C9BC",
-        "53C9DC", "66C4F5", "73B5FF", "8295F2", "9C87F5",
-        "B79CFF", "CA8DE8", "E68BCB", "F787A5", "F57589"
+        "FF6B6B", "FF8B66", "FF9F43", "FFB86C", "FFC857", "F0D66E",
+        "D4E76C", "A5DC74", "77D98B", "63D6A3", "2FBF9B", "50C9BC",
+        "53C9DC", "66C4F5", "73B5FF", "5A82E8", "8295F2", "9C87F5",
+        "B79CFF", "CA8DE8", "E68BCB", "E56AB5", "F787A5", "F57589"
     ]
     static let colorNames = [
-        "Red", "Coral", "Peach", "Amber", "Yellow",
-        "Lime", "Spring green", "Green", "Mint", "Teal",
-        "Turquoise", "Sky blue", "Blue", "Indigo", "Violet",
-        "Lavender", "Purple", "Orchid", "Pink", "Rose"
+        "Red", "Coral", "Orange", "Peach", "Amber", "Yellow",
+        "Lime", "Spring green", "Green", "Mint", "Emerald", "Teal",
+        "Turquoise", "Sky blue", "Blue", "Cobalt", "Indigo", "Violet",
+        "Lavender", "Purple", "Orchid", "Magenta", "Pink", "Rose"
     ]
     static let symbols = [
         "checkmark", "figure.walk", "book.closed", "drop", "moon", "leaf",
