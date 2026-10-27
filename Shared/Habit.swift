@@ -10,16 +10,18 @@ final class Habit {
     var createdAt: Date
     var order: Int
     var archived: Bool
-    // A stored default allows existing SwiftData stores to migrate additively.
+    // Keep the stored default for existing installations; zero means no goal.
     var streakGoal: Int = 30
     // Day keys follow the user's local calendar; travel never shifts past check-ins.
     var days: [String]
 
-    init(id: UUID = UUID(), name: String, symbol: String = "checkmark", colorHex: String = "63D6A3", createdAt: Date = .now, order: Int = 0, archived: Bool = false, days: [String] = [], streakGoal: Int = 30) {
+    init(id: UUID = UUID(), name: String, symbol: String = "checkmark", colorHex: String = "63D6A3", createdAt: Date = .now, order: Int = 0, archived: Bool = false, days: [String] = [], streakGoal: Int = 0) {
         self.id = id; self.name = name; self.symbol = symbol; self.colorHex = colorHex
         self.createdAt = createdAt; self.order = order; self.archived = archived; self.days = days
         self.streakGoal = streakGoal
     }
+    var hasStreakGoal: Bool { streakGoal > 0 }
+
     func isComplete(_ date: Date = .now) -> Bool { days.contains(Day.key(date)) }
     func toggle(_ date: Date = .now) {
         let key = Day.key(date)

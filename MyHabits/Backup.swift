@@ -13,7 +13,7 @@ struct HabitRecord: Codable {
     var order: Int
     var archived: Bool
     var days: [String]
-    // Optional for compatibility with backups exported before streak goals.
+    // Missing means a legacy 30-day goal; explicit zero means no goal.
     var streakGoal: Int?
     var resolvedStreakGoal: Int { streakGoal ?? 30 }
     init(_ habit: Habit) {
@@ -38,7 +38,7 @@ struct HabitBackup: Codable {
                   Palette.symbols.contains(habit.symbol),
                   habit.colorHex.range(of: "^[0-9A-Fa-f]{6}$", options: .regularExpression) != nil,
                   habit.createdAt <= Date.now,
-                  (1...3650).contains(habit.resolvedStreakGoal),
+                  (0...3650).contains(habit.resolvedStreakGoal),
                   Set(habit.days).count == habit.days.count else { throw BackupError.invalid("Invalid habit fields.") }
             for day in habit.days {
                 guard day.range(of: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$", options: .regularExpression) != nil,

@@ -24,10 +24,10 @@ struct HabitDetailView: View {
                     Button { habit.toggle(now); save() } label: { Label(habit.isComplete(now) ? "Completed today · Undo" : "Check in today", systemImage: habit.isComplete(now) ? "checkmark.circle.fill" : "circle") }.tint(Color(habitHex: habit.colorHex))
                 }
             }
-            Section("Streak goal") {
+            Section(habit.hasStreakGoal ? "Streak goal" : "Current streak") {
                 StreakGoalView(current: stats.current, goal: habit.streakGoal, colorHex: habit.colorHex)
                     .padding(.vertical, 6)
-                Button("Change goal") { editing = true }
+                Button(habit.hasStreakGoal ? "Change or remove goal" : "Add a goal (optional)") { editing = true }
             }
             Section("Your rhythm") {
                 Picker("View", selection: $weekly) { Text("Daily").tag(false); Text("Weekly").tag(true) }.pickerStyle(.segmented)

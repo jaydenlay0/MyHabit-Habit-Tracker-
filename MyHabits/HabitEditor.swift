@@ -9,6 +9,7 @@ struct HabitEditor: View {
     let nextOrder: Int
     @State private var name: String
     @State private var symbol: String
+    @State private var hasStreakGoal: Bool
     @State private var streakGoal: Int
     @State private var color: String
     @State private var failure: String?
@@ -16,7 +17,8 @@ struct HabitEditor: View {
         self.habit = habit; self.nextOrder = nextOrder
         _name = State(initialValue: habit?.name ?? "")
         _symbol = State(initialValue: habit?.symbol ?? "checkmark")
-        _streakGoal = State(initialValue: habit?.streakGoal ?? 30)
+        _hasStreakGoal = State(initialValue: habit?.hasStreakGoal ?? false)
+        _streakGoal = State(initialValue: habit.flatMap { $0.hasStreakGoal ? $0.streakGoal : nil } ?? 30)
         _color = State(initialValue: habit?.colorHex ?? Palette.defaultColor)
     }
     var body: some View {
@@ -26,20 +28,23 @@ struct HabitEditor: View {
                     TextField("Habit name", text: $name).onChange(of: name) { _, value in name = String(value.prefix(80)) }
                 }
                 Section {
-                    Stepper("\(streakGoal)-day streak", value: $streakGoal, in: 1...3650)
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 48))]) {
-                        ForEach([7, 14, 30, 60, 90], id: \.self) { days in
-                            Button("\(days)") { streakGoal = days }
-                                .buttonStyle(.bordered)
-                                .tint(streakGoal == days ? Color(habitHex: color) : .secondary)
-                                .accessibilityLabel("Set streak goal to \(days) days")
-                                .accessibilityAddTraits(streakGoal == days ? .isSelected : [])
+                    Toggle("Set a streak goal", isOn: $hasStreakGoal)
+                    if hasStreakGoal {
+                        Stepper("\(streakGoal)-day streak", value: $streakGoal, in: 1...3650)
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 48))]) {
+                            ForEach([7, 14, 30, 60, 90], id: \.self) { days in
+                                Button("\(days)") { streakGoal = days }
+                                    .buttonStyle(.bordered)
+                                    .tint(streakGoal == days ? Color(habitHex: color) : .secondary)
+                                    .accessibilityLabel("Set streak goal to \(days) days")
+                                    .accessibilityAddTraits(streakGoal == days ? .isSelected : [])
+                            }
                         }
                     }
                 } header: {
                     Text("Streak goal")
                 } footer: {
-                    Text("Aim for consecutive days. Your goal appears on the habit card. Missing a full day restarts your current streak, but keeps your longest streak.")
+                    Text("Goals are optional. Your streak is tracked either way. You can add, change or remove a goal later without losing check-ins.")
                 }
                 Section("Colour") {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 44))], spacing: 8) {
@@ -76,8 +81,9 @@ struct HabitEditor: View {
     }
     private func save() {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        if let habit { habit.name = trimmed; habit.symbol = symbol; habit.colorHex = color; habit.streakGoal = streakGoal }
-        else { context.insert(Habit(name: trimmed, symbol: symbol, colorHex: color, order: nextOrder, streakGoal: streakGoal)) }
+        let savedGoal = hasStreakGoal ? streakGoal : 0
+        if let habit { habit.name = trimmed; habit.symbol = symbol; habit.colorHex = color; habit.streakGoal = savedGoal }
+        else { context.insert(Habit(name: trimmed, symbol: symbol, colorHex: color, order: nextOrder, streakGoal: savedGoal)) }
         do { try context.save(); WidgetCenter.shared.reloadAllTimelines(); dismiss() }
         catch { context.rollback(); failure = error.localizedDescription }
     }

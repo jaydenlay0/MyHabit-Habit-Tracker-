@@ -105,10 +105,40 @@ final class MyHabitsTests: XCTestCase {
         let imported = try JSONDecoder().decode(HabitBackup.self, from: legacyData).validated()
         XCTAssertEqual(imported.habits[0].model().streakGoal, 30)
         var invalid = backup
-        for goal in [0, -1, 3651] {
+        for goal in [-1, 3651] {
             invalid.habits[0].streakGoal = goal
             XCTAssertThrowsError(try invalid.validated())
         }
+    }
+
+    func testNewHabitNeedsNoGoalAndGoalRemovalKeepsHistory() {
+        let habit = Habit(name: "Walk", createdAt: date(-1))
+        XCTAssertFalse(habit.hasStreakGoal)
+        XCTAssertEqual(habit.streakGoal, 0)
+        habit.toggle(date(-1)); habit.toggle()
+        habit.streakGoal = 7
+        XCTAssertTrue(habit.hasStreakGoal)
+        let history = habit.days
+        habit.streakGoal = 0
+        XCTAssertFalse(habit.hasStreakGoal)
+        XCTAssertEqual(habit.days, history)
+        XCTAssertEqual(HabitStats(habit: habit).current, 2)
+    }
+    @MainActor func testNoGoalSurvivesPersistenceAndBackup() throws {
+        let container = try ModelContainer(for: Habit.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let context = ModelContext(container)
+        let habit = Habit(name: "Meditate")
+        habit.toggle(); context.insert(habit); try context.save()
+        let otherContext = ModelContext(container)
+        let saved = try XCTUnwrap(otherContext.fetch(FetchDescriptor<Habit>()).first)
+        XCTAssertFalse(saved.hasStreakGoal); XCTAssertTrue(saved.isComplete())
+        let backup = HabitBackup(habits: [HabitRecord(saved)])
+        let data = try JSONEncoder().encode(backup)
+        let decoded = try JSONDecoder().decode(HabitBackup.self, from: data).validated()
+        let imported = decoded.habits[0].model()
+        XCTAssertEqual(imported.streakGoal, 0)
+        XCTAssertFalse(imported.hasStreakGoal)
+        XCTAssertEqual(imported.days, saved.days)
     }
 
 }
