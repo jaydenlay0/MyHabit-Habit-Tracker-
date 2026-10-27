@@ -70,6 +70,10 @@ struct HabitCompletionIcon: View {
     }
 }
 
+private enum CelebrationTiming {
+    static let duration: TimeInterval = 3.4
+}
+
 struct CompletionCelebration: View {
     @Environment(CompletionFeedback.self) private var feedback
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -86,7 +90,7 @@ struct CompletionCelebration: View {
                         Spacer()
                     }.padding(.top, 12)
                 } else {
-                    ConfettiBurst(startedAt: burst.startedAt).id(burst.id)
+                    ConfettiRain(startedAt: burst.startedAt).id(burst.id).ignoresSafeArea()
                 }
             }
         }
@@ -94,29 +98,33 @@ struct CompletionCelebration: View {
         .accessibilityHidden(true)
         .task(id: feedback.burst?.id) {
             guard let burst = feedback.burst else { return }
-            do { try await Task.sleep(for: .seconds(2.2)) }
+            do { try await Task.sleep(for: .seconds(CelebrationTiming.duration)) }
             catch { return }
             feedback.finishBurst(token: burst.id)
         }
     }
 }
 
-private struct ConfettiBurst: View {
+private struct ConfettiRain: View {
     let startedAt: Date
     private let colors = ["FF6B6B", "73B5FF", "63D6A3", "F0D66E", "F787A5", "B79CFF"]
     var body: some View {
         TimelineView(.animation) { timeline in
             Canvas { context, size in
                 let elapsed = max(0, timeline.date.timeIntervalSince(startedAt))
-                guard elapsed < 2.2 else { return }
+                guard elapsed < CelebrationTiming.duration else { return }
                 for index in 0..<48 {
-                    let angle = Double(index) * 2.39996
-                    let horizontalSpeed = cos(angle) * (80 + Double(index % 5) * 35)
-                    let verticalSpeed = 140 + Double(index % 7) * 32
-                    let x = size.width / 2 + CGFloat(horizontalSpeed * elapsed)
-                    let y = size.height * 0.38 + CGFloat(-verticalSpeed * elapsed + 250 * elapsed * elapsed)
+                    let delay = Double(index % 8) * 0.04
+                    let fallDuration = 2.6 + Double(index % 5) * 0.1
+                    let progress = (elapsed - delay) / fallDuration
+                    guard progress >= 0 && progress <= 1 else { continue }
+                    // Distribute flakes across the top and let each cross the full screen.
+                    let startX = CGFloat((index * 37) % 101) / 100 * size.width
+                    let drift = CGFloat(sin(elapsed * 3 + Double(index)) * 16)
+                    let x = startX + drift
+                    let y = -24 + (size.height + 48) * CGFloat(progress)
                     var particle = context
-                    particle.opacity = min(1, max(0, (2.2 - elapsed) / 0.6))
+                    particle.opacity = min(1, max(0, (1 - progress) * 8))
                     particle.translateBy(x: x, y: y)
                     particle.rotate(by: .degrees(Double(index) * 23 + elapsed * 190))
                     let rect = CGRect(x: -3, y: -5, width: 6, height: 10)

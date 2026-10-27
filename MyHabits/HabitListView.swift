@@ -15,51 +15,56 @@ struct HabitListView: View {
     private var visible: [Habit] { habits.filter { !$0.archived } }
     var body: some View {
         NavigationStack {
-            List {
-                Section {
-                    VStack(alignment: .center, spacing: 8) {
-                        Text("MyHabits")
-                            .font(.largeTitle.bold())
-                            .accessibilityAddTraits(.isHeader)
-                            .padding(.bottom, 20)
-                        Text(now, format: .dateTime.weekday(.wide).month(.wide).day()).font(.subheadline).foregroundStyle(.secondary)
-                        Text("Another Day, Another Opportunity.")
-                            .font(.title2.bold())
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.4)
-                            .allowsTightening(true)
-                        Text("\(visible.filter { $0.isComplete(now) }.count) of \(visible.count) complete today").font(.subheadline).foregroundStyle(.secondary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .multilineTextAlignment(.center)
-                    .padding(.vertical, 8)
-                }.listRowBackground(Color.clear).listRowSeparator(.hidden)
-                if visible.isEmpty {
-                    ContentUnavailableView("Make room for a good habit", systemImage: "leaf", description: Text("Tap + to start your first daily practice."))
-                        .listRowBackground(Color.clear)
+            VStack(spacing: 0) {
+                VStack(alignment: .center, spacing: 8) {
+                    Text("MyHabits")
+                        .font(.largeTitle.bold())
+                        .accessibilityAddTraits(.isHeader)
+                        .padding(.bottom, 20)
+                    Text(now, format: .dateTime.weekday(.wide).month(.wide).day()).font(.subheadline).foregroundStyle(.secondary)
+                    Text("Another Day, Another Opportunity.")
+                        .font(.title2.bold())
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.4)
+                        .allowsTightening(true)
+                    Text("\(visible.filter { $0.isComplete(now) }.count) of \(visible.count) complete today").font(.subheadline).foregroundStyle(.secondary)
                 }
-                ForEach(visible) { habit in
-                    HStack(spacing: 14) {
-                        Button { toggleToday(habit) } label: {
-                            HabitCompletionIcon(habit: habit, today: now)
-                        }.buttonStyle(.borderless)
-                            .accessibilityLabel("\(habit.isComplete(now) ? "Undo" : "Complete") \(habit.name) for today")
-                            .accessibilityValue(habit.isComplete(now) ? "Completed" : "Not completed")
-                        NavigationLink {
-                            HabitDetailView(habit: habit)
-                        } label: {
-                            VStack(alignment: .leading, spacing: 10) {
-                                Text(habit.name).font(.headline)
-                                StreakGoalView(current: HabitStats(habit: habit, today: now).current, goal: habit.streakGoal, colorHex: habit.colorHex)
-                                MiniHeatmap(habit: habit, today: now)
-                            }.padding(.vertical, 8)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 32)
+                .padding(.top, 4)
+                .padding(.bottom, 12)
+                List {
+                    if visible.isEmpty {
+                        ContentUnavailableView("Make room for a good habit", systemImage: "leaf", description: Text("Tap + to start your first daily practice."))
+                            .listRowBackground(Color.clear)
+                    }
+                    ForEach(visible) { habit in
+                        HStack(spacing: 14) {
+                            Button { toggleToday(habit) } label: {
+                                HabitCompletionIcon(habit: habit, today: now)
+                            }.buttonStyle(.borderless)
+                                .accessibilityLabel("\(habit.isComplete(now) ? "Undo" : "Complete") \(habit.name) for today")
+                                .accessibilityValue(habit.isComplete(now) ? "Completed" : "Not completed")
+                            NavigationLink {
+                                HabitDetailView(habit: habit)
+                            } label: {
+                                VStack(alignment: .leading, spacing: 10) {
+                                    Text(habit.name).font(.headline)
+                                    StreakGoalView(current: HabitStats(habit: habit, today: now).current, goal: habit.streakGoal, colorHex: habit.colorHex)
+                                    MiniHeatmap(habit: habit, today: now)
+                                }.padding(.vertical, 8)
+                            }
                         }
-                    }
-                    .swipeActions {
-                        Button("Archive") { pendingArchive = habit }.tint(.orange)
-                    }
-                }.onMove(perform: move)
+                        .swipeActions {
+                            Button("Archive") { pendingArchive = habit }.tint(.orange)
+                        }
+                    }.onMove(perform: move)
+                }
+                .contentMargins(.top, 32, for: .scrollContent)
+                .scrollContentBackground(.hidden)
             }
+            .background(Color(uiColor: .systemGroupedBackground))
             .onReceive(Timer.publish(every: 30, on: .main, in: .common).autoconnect()) { now = $0 }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
