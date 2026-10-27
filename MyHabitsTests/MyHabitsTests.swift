@@ -295,4 +295,18 @@ final class MyHabitsTests: XCTestCase {
         XCTAssertThrowsError(try invalid.validated())
     }
 
+    @MainActor func testUnchangedRemindersAreNotRescheduledButEditsAre() throws {
+        var settings = HabitReminders(); settings.enabled = true
+        let id = UUID()
+        let old = try ReminderScheduler.requests(for: [ReminderDefinition(id: id, name: "Read", settings: settings)])
+        let unchanged = try ReminderScheduler.requests(for: [ReminderDefinition(id: id, name: "Read", settings: settings)])
+        XCTAssertTrue(ReminderScheduler.requestsNeedingUpdate(unchanged, existing: old).isEmpty)
+        let renamed = try ReminderScheduler.requests(for: [ReminderDefinition(id: id, name: "Read a chapter", settings: settings)])
+        XCTAssertEqual(ReminderScheduler.requestsNeedingUpdate(renamed, existing: old).count, 1)
+        settings.times = [660]
+        let rescheduled = try ReminderScheduler.requests(for: [ReminderDefinition(id: id, name: "Read", settings: settings)])
+        XCTAssertEqual(ReminderScheduler.requestsNeedingUpdate(rescheduled, existing: old).count, 1)
+        XCTAssertEqual(ReminderScheduler.requestsNeedingUpdate(old, existing: []).count, 1)
+    }
+
 }

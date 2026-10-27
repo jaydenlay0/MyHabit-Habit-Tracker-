@@ -146,7 +146,9 @@ struct BackupView: View {
                 }.appSectionStyle()
             }
             .task {
-                _ = await notificationScheduler.reconcile(habits)
+                // Opening settings only needs permission status, not a full rewrite
+                // of every pending notification. Edits and foregrounding reconcile.
+                await notificationScheduler.refreshAuthorization()
             }
             .appScreenStyle()
             .preferredColorScheme(appearance.colorScheme)

@@ -19,6 +19,10 @@ for scheme in (root/'MyHabits.xcodeproj/xcshareddata/xcschemes').glob('*.xcschem
         target = objects[reference.attrib['BlueprintIdentifier']]
         assert 'isa = PBXNativeTarget;' in target
         assert 'name = ' + reference.attrib['BlueprintName'] + ';' in target
+personal_scheme = ET.parse(root/'MyHabits.xcodeproj/xcshareddata/xcschemes/MyHabitsPersonal.xcscheme')
+assert personal_scheme.find('LaunchAction').attrib['buildConfiguration'] == 'Release'
+assert personal_scheme.find('LaunchAction').attrib['selectedDebuggerIdentifier'] == ''
+assert personal_scheme.find('TestAction').attrib['buildConfiguration'] == 'Debug'
 personal = next(body for body in objects.values() if 'isa = PBXNativeTarget;' in body and 'name = MyHabitsPersonal;' in body)
 assert 'dependencies = ();' in personal, 'Personal Team build must not depend on widgets.'
 config_list_id = re.search(r'buildConfigurationList = ([0-9A-F]{24});', personal)[1]
