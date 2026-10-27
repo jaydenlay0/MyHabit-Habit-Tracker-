@@ -14,9 +14,15 @@ struct HabitReminders: Codable, Equatable {
     var scheduledMinutes: [Int] {
         guard usesWindow else { return times.sorted() }
         guard windowCount > 1 else { return [(windowStart + windowEnd) / 2] }
-        return (0..<min(windowCount, 3)).map { index in
-            windowStart + Int((Double(windowEnd - windowStart) * Double(index) / Double(windowCount - 1)).rounded())
+        let count: Int = min(windowCount, 3)
+        let span: Double = Double(windowEnd - windowStart)
+        let segments: Double = Double(windowCount - 1)
+        var minutes: [Int] = []
+        for index in 0..<count {
+            let offset: Int = Int((span * Double(index) / segments).rounded())
+            minutes.append(windowStart + offset)
         }
+        return minutes
     }
     var hasValidStoredValues: Bool {
         weekdays.count <= 7 && Set(weekdays).count == weekdays.count && weekdays.allSatisfy({ (1...7).contains($0) })

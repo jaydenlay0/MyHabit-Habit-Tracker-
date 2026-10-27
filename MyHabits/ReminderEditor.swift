@@ -4,8 +4,13 @@ struct ReminderEditor: View {
     @Environment(\.colorScheme) private var scheme
     @Binding var settings: HabitReminders
     private var weekdays: [Int] {
-        let first = Calendar.current.firstWeekday
-        return (0..<7).map { (first - 1 + $0) % 7 + 1 }
+        let first: Int = Calendar.current.firstWeekday
+        var ordered: [Int] = []
+        for offset in 0..<7 {
+            let day: Int = (first - 1 + offset) % 7 + 1
+            ordered.append(day)
+        }
+        return ordered
     }
     private func timeBinding(_ get: @escaping () -> Int, set: @escaping (Int) -> Void) -> Binding<Date> {
         Binding {
@@ -89,16 +94,27 @@ struct ReminderSummary: View {
     let settings: HabitReminders
     private var dayNames: String {
         guard settings.weekdays.count != 7 else { return "Every day" }
-        let first = Calendar.current.firstWeekday
-        return (0..<7).map { (first - 1 + $0) % 7 + 1 }
-            .filter { settings.weekdays.contains($0) }
-            .map { Calendar.current.shortWeekdaySymbols[$0 - 1] }.joined(separator: ", ")
+        let calendar: Calendar = .current
+        let first: Int = calendar.firstWeekday
+        let symbols: [String] = calendar.shortWeekdaySymbols
+        var names: [String] = []
+        for offset in 0..<7 {
+            let day: Int = (first - 1 + offset) % 7 + 1
+            if settings.weekdays.contains(day) {
+                names.append(symbols[day - 1])
+            }
+        }
+        return names.joined(separator: ", ")
     }
     private var timeNames: String {
-        settings.scheduledMinutes.map { minute in
-            (Calendar.current.date(bySettingHour: minute / 60, minute: minute % 60, second: 0, of: .now) ?? .now)
-                .formatted(date: .omitted, time: .shortened)
-        }.joined(separator: ", ")
+        let calendar: Calendar = .current
+        var names: [String] = []
+        for minute in settings.scheduledMinutes {
+            let date: Date = calendar.date(bySettingHour: minute / 60, minute: minute % 60, second: 0, of: .now) ?? .now
+            let name: String = date.formatted(date: .omitted, time: .shortened)
+            names.append(name)
+        }
+        return names.joined(separator: ", ")
     }
     var body: some View {
         if settings.enabled {
