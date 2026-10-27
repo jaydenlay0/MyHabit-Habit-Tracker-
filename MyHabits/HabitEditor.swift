@@ -69,7 +69,7 @@ struct HabitEditor: View {
                     }
                 }
             }
-            .navigationTitle(habit == nil ? "New habit" : "Edit habit")
+            .navigationTitle(habit == nil ? "New Habit" : "Edit habit")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
