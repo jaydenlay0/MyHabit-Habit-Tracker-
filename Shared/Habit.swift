@@ -12,6 +12,8 @@ final class Habit {
     var archived: Bool
     // Keep the stored default for existing installations; zero means no goal.
     var streakGoal: Int = 30
+    // Optional additive storage: existing habits start with reminders disabled.
+    var reminderData: Data? = nil
     // Day keys follow the user's local calendar; travel never shifts past check-ins.
     var days: [String]
 

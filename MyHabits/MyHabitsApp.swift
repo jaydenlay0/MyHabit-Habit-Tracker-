@@ -23,10 +23,14 @@ struct MyHabitsApp: App {
             Group {
                 if let container {
                     HabitListView().modelContainer(container).id(generation)
+                        .task { await refreshReminders(container) }
                         .onChange(of: scenePhase) { _, phase in
-                            if phase == .active && widgetRevision != SharedStore.widgetRevision() {
-                                do { self.container = try SharedStore.make(); widgetRevision = SharedStore.widgetRevision(); generation = UUID() }
-                                catch { failure = error.localizedDescription }
+                            if phase == .active {
+                                if widgetRevision != SharedStore.widgetRevision() {
+                                    do { self.container = try SharedStore.make(); widgetRevision = SharedStore.widgetRevision(); generation = UUID() }
+                                    catch { failure = error.localizedDescription }
+                                }
+                                Task { await refreshReminders(self.container ?? container) }
                             }
                         }
                 } else {
@@ -36,4 +40,11 @@ struct MyHabitsApp: App {
             .preferredColorScheme(appearance.colorScheme)
         }
     }
+    @MainActor private func refreshReminders(_ container: ModelContainer) async {
+        do {
+            let habits = try container.mainContext.fetch(FetchDescriptor<Habit>())
+            _ = await ReminderScheduler.shared.reconcile(habits)
+        } catch { /* Keep existing scheduled reminders if storage cannot be read. */ }
+    }
+
 }

@@ -84,7 +84,9 @@ struct HabitListView: View {
             .confirmationDialog("Archive this habit? It will leave your daily list and widgets. Archived habits cannot be browsed or restored in the app.", isPresented: Binding(get: { pendingArchive != nil }, set: { if !$0 { pendingArchive = nil } }), titleVisibility: .visible) {
                 Button("Archive habit") {
                     pendingArchive?.archived = true
-                    save()
+                    if save() {
+                        Task { _ = await ReminderScheduler.shared.reconcile(habits) }
+                    }
                     pendingArchive = nil
                 }
                 Button("Cancel", role: .cancel) { pendingArchive = nil }

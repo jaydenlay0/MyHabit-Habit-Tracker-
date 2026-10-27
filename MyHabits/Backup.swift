@@ -3,6 +3,8 @@ import SwiftUI
 import SwiftData
 import UniformTypeIdentifiers
 import WidgetKit
+import UIKit
+import UserNotifications
 
 struct HabitRecord: Codable {
     var id: UUID
@@ -15,12 +17,17 @@ struct HabitRecord: Codable {
     var days: [String]
     // Missing means a legacy 30-day goal; explicit zero means no goal.
     var streakGoal: Int?
+    var reminders: HabitReminders?
     var resolvedStreakGoal: Int { streakGoal ?? 30 }
     init(_ habit: Habit) {
         id = habit.id; name = habit.name; symbol = habit.symbol; colorHex = habit.colorHex
-        createdAt = habit.createdAt; order = habit.order; archived = habit.archived; days = habit.days; streakGoal = habit.streakGoal
+        createdAt = habit.createdAt; order = habit.order; archived = habit.archived; days = habit.days; streakGoal = habit.streakGoal; reminders = habit.reminders
     }
-    func model() -> Habit { Habit(id: id, name: name, symbol: symbol, colorHex: colorHex, createdAt: createdAt, order: order, archived: archived, days: days, streakGoal: resolvedStreakGoal) }
+    func model() -> Habit {
+        let habit = Habit(id: id, name: name, symbol: symbol, colorHex: colorHex, createdAt: createdAt, order: order, archived: archived, days: days, streakGoal: resolvedStreakGoal)
+        habit.reminders = reminders ?? HabitReminders()
+        return habit
+    }
 }
 struct HabitBackup: Codable {
     var version = 1
@@ -40,6 +47,11 @@ struct HabitBackup: Codable {
                   habit.createdAt <= Date.now,
                   (0...3650).contains(habit.resolvedStreakGoal),
                   Set(habit.days).count == habit.days.count else { throw BackupError.invalid("Invalid habit fields.") }
+            if let reminders = habit.reminders {
+                guard reminders.hasValidStoredValues, reminders.validationMessage == nil else {
+                    throw BackupError.invalid(reminders.validationMessage ?? "Invalid reminder settings.")
+                }
+            }
             for day in habit.days {
                 guard day.range(of: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$", options: .regularExpression) != nil,
                       let date = parser.date(from: day), parser.string(from: date) == day,
@@ -61,6 +73,7 @@ struct BackupDocument: FileDocument {
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper { FileWrapper(regularFileWithContents: data) }
 }
 struct BackupView: View {
+    @State private var notificationScheduler = ReminderScheduler.shared
     @AppStorage(AppAppearance.storageKey) private var appearance: AppAppearance = .system
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
@@ -91,6 +104,23 @@ struct BackupView: View {
                     Button("Delete archived habits", role: .destructive) { deleteArchivedHabits() }
                     Button("Cancel", role: .cancel) {}
                 }
+                Section("Notifications") {
+                    Text("Reminders default to 10:00 am. Set up to three times per day, weekdays or a time window in New Habit or Edit.")
+                        .font(.subheadline)
+                    Text("iOS supports 64 scheduled notification slots per app. Every-day reminders use fewer slots than individual weekdays. Focus modes and notification settings can delay delivery.")
+                        .font(.caption).foregroundStyle(AppTheme.secondaryText)
+                    if let notice = notificationScheduler.notice {
+                        Text(notice).font(.caption).foregroundStyle(AppTheme.secondaryText)
+                    }
+                    if notificationScheduler.authorization == .notDetermined && habits.contains(where: { !$0.archived && $0.reminders.enabled }) {
+                        Button("Enable notifications") {
+                            Task { _ = await notificationScheduler.reconcile(habits, requestPermission: true) }
+                        }
+                    }
+                    if notificationScheduler.authorization == .denied {
+                        Link("Open iPhone notification settings", destination: URL(string: UIApplication.openSettingsURLString)!)
+                    }
+                }.appSectionStyle()
                 Section("Backups") {
                     Button("Export all habits") {
                         do {
@@ -114,6 +144,9 @@ struct BackupView: View {
                 } footer: {
                     Text("System follows your iPhone’s appearance. Your choice is saved on this device.")
                 }.appSectionStyle()
+            }
+            .task {
+                _ = await notificationScheduler.reconcile(habits)
             }
             .appScreenStyle()
             .preferredColorScheme(appearance.colorScheme)
@@ -152,11 +185,14 @@ struct BackupView: View {
             for record in backup.habits {
                 if let habit = existing[record.id] {
                     habit.name = record.name; habit.symbol = record.symbol; habit.colorHex = record.colorHex
-                    habit.createdAt = record.createdAt; habit.order = record.order; habit.archived = record.archived; habit.days = record.days; habit.streakGoal = record.resolvedStreakGoal
+                    habit.createdAt = record.createdAt; habit.order = record.order; habit.archived = record.archived; habit.days = record.days; habit.streakGoal = record.resolvedStreakGoal; habit.reminders = record.reminders ?? HabitReminders()
                 } else { context.insert(record.model()) }
             }
             try context.save(); WidgetCenter.shared.reloadAllTimelines()
             message = "Imported \(backup.habits.count) habits."
+            if let all = try? context.fetch(FetchDescriptor<Habit>()) {
+                Task { _ = await notificationScheduler.reconcile(all) }
+            }
         } catch { context.rollback(); message = error.localizedDescription }
         pending = nil
     }

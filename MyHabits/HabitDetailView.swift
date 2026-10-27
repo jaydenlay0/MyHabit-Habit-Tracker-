@@ -30,6 +30,10 @@ struct HabitDetailView: View {
                     .padding(.vertical, 6)
                 Button(habit.hasStreakGoal ? "Change or remove goal" : "Add a goal (optional)") { editing = true }
             }.appSectionStyle()
+            Section("Reminders") {
+                ReminderSummary(settings: habit.reminders)
+                Button("Edit reminders") { editing = true }
+            }.appSectionStyle()
             Section("Your rhythm") {
                 Picker("View", selection: $weekly) { Text("Daily").tag(false); Text("Weekly").tag(true) }.pickerStyle(.segmented)
                 HeatmapView(habit: habit, today: now, weekly: weekly) { date in toggleCheckIn(date) }.padding(.vertical, 8)
@@ -45,7 +49,7 @@ struct HabitDetailView: View {
                     .confirmationDialog("Archive this habit? It will leave your daily list and widgets. Archived habits cannot be browsed or restored in the app.", isPresented: $archiving, titleVisibility: .visible) {
                         Button("Archive habit") {
                             habit.archived = true
-                            if save() { dismiss() }
+                            if save() { refreshReminders(); dismiss() }
                         }
                         Button("Cancel", role: .cancel) {}
                     }
@@ -60,10 +64,16 @@ struct HabitDetailView: View {
         .confirmationDialog("Delete this habit and all its check-ins?", isPresented: $deleting, titleVisibility: .visible) {
             Button("Delete permanently", role: .destructive) {
                 context.delete(habit)
-                if save() { dismiss() }
+                if save() { refreshReminders(); dismiss() }
             }
         }
         .alert("Couldn’t save", isPresented: Binding(get: { failure != nil }, set: { if !$0 { failure = nil } })) { Button("OK") {} } message: { Text(failure ?? "") }
+    }
+    private func refreshReminders() {
+        do {
+            let all = try context.fetch(FetchDescriptor<Habit>())
+            Task { _ = await ReminderScheduler.shared.reconcile(all) }
+        } catch { failure = "Habit saved, but reminders could not be refreshed. Reopen MyHabits to retry." }
     }
     private func toggleCheckIn(_ date: Date) {
         now = .now

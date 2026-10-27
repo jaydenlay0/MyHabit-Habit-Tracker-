@@ -1,5 +1,6 @@
 import XCTest
 import SwiftData
+import UserNotifications
 @testable import MyHabits
 
 final class MyHabitsTests: XCTestCase {
@@ -209,6 +210,85 @@ final class MyHabitsTests: XCTestCase {
         XCTAssertEqual(feedback.bursts.map(\.id), [second.id])
         feedback.finishBurst(token: second.id)
         XCTAssertTrue(feedback.bursts.isEmpty)
+    }
+
+    func testRemindersDefaultToOffAndTenAM() {
+        let settings = Habit(name: "Read").reminders
+        XCTAssertFalse(settings.enabled)
+        XCTAssertEqual(settings.times, [600])
+        XCTAssertEqual(settings.weekdays, Array(1...7))
+    }
+    func testReminderWindowAndValidation() {
+        var settings = HabitReminders()
+        settings.enabled = true; settings.usesWindow = true
+        settings.windowStart = 600; settings.windowEnd = 1080; settings.windowCount = 3
+        XCTAssertEqual(settings.scheduledMinutes, [600, 840, 1080])
+        XCTAssertNil(settings.validationMessage)
+        settings.windowCount = 1
+        XCTAssertEqual(settings.scheduledMinutes, [840])
+        settings.windowEnd = 599
+        XCTAssertNotNil(settings.validationMessage)
+        settings.usesWindow = false; settings.times = [600, 600]
+        XCTAssertNotNil(settings.validationMessage)
+        settings.times = [600]; settings.weekdays = []
+        XCTAssertNotNil(settings.validationMessage)
+    }
+    @MainActor func testDailyAndWeekdayNotificationTriggers() throws {
+        var daily = HabitReminders(); daily.enabled = true; daily.times = [600, 840, 1080]
+        let id = UUID()
+        let requests = try ReminderScheduler.requests(for: [ReminderDefinition(id: id, name: "Read", settings: daily)])
+        XCTAssertEqual(requests.count, 3)
+        for request in requests {
+            let trigger = try XCTUnwrap(request.trigger as? UNCalendarNotificationTrigger)
+            XCTAssertTrue(trigger.repeats); XCTAssertNil(trigger.dateComponents.weekday)
+            XCTAssertNil(trigger.dateComponents.timeZone)
+            XCTAssertEqual(request.content.title, "Read")
+        }
+        var weekdays = daily; weekdays.weekdays = [2, 4, 6]
+        let weekly = try ReminderScheduler.requests(for: [ReminderDefinition(id: id, name: "Read", settings: weekdays)])
+        XCTAssertEqual(weekly.count, 9)
+        XCTAssertEqual(Set(weekly.map(\.identifier)).count, 9)
+        let days = weekly.compactMap { ($0.trigger as? UNCalendarNotificationTrigger)?.dateComponents.weekday }
+        XCTAssertEqual(Set(days), Set([2, 4, 6]))
+        XCTAssertEqual(requests[0].identifier, try ReminderScheduler.requests(for: [ReminderDefinition(id: id, name: "Renamed", settings: daily)])[0].identifier)
+    }
+    @MainActor func testArchiveAndDisableRemoveHabitFromReminderPlan() throws {
+        let habit = Habit(name: "Walk")
+        var settings = HabitReminders(); settings.enabled = true
+        habit.reminders = settings
+        XCTAssertEqual(ReminderScheduler.definitions([habit]).count, 1)
+        habit.archived = true
+        XCTAssertTrue(ReminderScheduler.definitions([habit]).isEmpty)
+        habit.archived = false; settings.enabled = false; habit.reminders = settings
+        XCTAssertTrue(ReminderScheduler.definitions([habit]).isEmpty)
+    }
+    @MainActor func testNotificationCapacityExplainsOverflow() throws {
+        var settings = HabitReminders(); settings.enabled = true; settings.times = [600, 840, 1080]
+        let definitions = (0..<21).map { ReminderDefinition(id: UUID(), name: "Habit \($0)", settings: settings) }
+        XCTAssertEqual(try ReminderScheduler.requests(for: definitions).count, 63)
+        XCTAssertThrowsError(try ReminderScheduler.requests(for: definitions + [ReminderDefinition(id: UUID(), name: "Extra", settings: settings)]))
+    }
+    @MainActor func testReminderSettingsPersistAndRoundTripInBackup() throws {
+        let container = try ModelContainer(for: Habit.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let context = ModelContext(container)
+        let habit = Habit(name: "Read")
+        var settings = HabitReminders(); settings.enabled = true; settings.weekdays = [2, 4, 6]; settings.times = [600, 1080]
+        habit.reminders = settings; context.insert(habit); try context.save()
+        let other = ModelContext(container)
+        let loaded = try XCTUnwrap(other.fetch(FetchDescriptor<Habit>()).first)
+        XCTAssertEqual(loaded.reminders, settings)
+        let backup = HabitBackup(habits: [HabitRecord(loaded)])
+        let data = try JSONEncoder().encode(backup)
+        let decoded = try JSONDecoder().decode(HabitBackup.self, from: data).validated()
+        XCTAssertEqual(decoded.habits[0].model().reminders, settings)
+        var legacy = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        var records = try XCTUnwrap(legacy["habits"] as? [[String: Any]])
+        records[0].removeValue(forKey: "reminders"); legacy["habits"] = records
+        let oldBackup = try JSONDecoder().decode(HabitBackup.self, from: JSONSerialization.data(withJSONObject: legacy)).validated()
+        XCTAssertFalse(oldBackup.habits[0].model().reminders.enabled)
+        var invalid = backup; var invalidSettings = settings; invalidSettings.times = [1440]
+        invalid.habits[0].reminders = invalidSettings
+        XCTAssertThrowsError(try invalid.validated())
     }
 
 }

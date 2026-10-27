@@ -50,13 +50,14 @@ struct Provider: TimelineProvider {
     }
 }
 struct HabitsWidgetView: View {
+    @Environment(\.colorScheme) private var scheme
     @Environment(\.widgetFamily) private var family
     let entry: HabitEntry
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack { Text("MyHabits").font(.headline); Spacer(); Text(entry.date, format: .dateTime.day().month(.abbreviated)).font(.caption).foregroundStyle(.secondary) }
+            HStack { Text("MyHabits").font(.headline); Spacer(); Text(entry.date, format: .dateTime.day().month(.abbreviated)).font(.caption).foregroundStyle(AppTheme.secondaryText) }
             if entry.habits.isEmpty {
-                Text(entry.failed ? "Open MyHabits to check shared storage." : "Add your first habit in MyHabits.").font(.subheadline).foregroundStyle(.secondary)
+                Text(entry.failed ? "Open MyHabits to check shared storage." : "Add your first habit in MyHabits.").font(.subheadline).foregroundStyle(AppTheme.secondaryText)
             } else {
                 ForEach(Array(entry.habits.prefix(family == .systemLarge ? 6 : (family == .systemSmall ? 2 : 3)))) { habit in
                     Button(intent: CheckInIntent(habitID: habit.id.uuidString)) {
@@ -66,16 +67,17 @@ struct HabitsWidgetView: View {
                                 .frame(width: 28, height: 28)
                                 .foregroundStyle(habit.done ? Palette.selectionInk(habit.colorHex) : Color(habitHex: habit.colorHex))
                                 .background(Color(habitHex: habit.colorHex).opacity(habit.done ? 1 : 0.14), in: RoundedRectangle(cornerRadius: 8))
-                            Text(habit.name).lineLimit(1).foregroundStyle(.primary)
+                            Text(habit.name).lineLimit(1).foregroundStyle(AppTheme.primaryText)
                             Spacer()
-                            if !habit.done { Image(systemName: "circle").foregroundStyle(.secondary) }
+                            if !habit.done { Image(systemName: "circle").foregroundStyle(AppTheme.secondaryText) }
                         }.font(.subheadline).frame(maxWidth: .infinity, minHeight: 24, alignment: .leading)
                     }.buttonStyle(.plain).accessibilityLabel("\(habit.done ? "Undo" : "Complete") \(habit.name)")
                         .accessibilityValue(habit.done ? "Completed" : "Not completed")
                 }
             }
             Spacer(minLength: 0)
-        }.containerBackground(.background, for: .widget)
+        }.foregroundStyle(AppTheme.primaryText)
+            .containerBackground(scheme == .dark ? AppTheme.background : Color(uiColor: .systemBackground), for: .widget)
     }
 }
 @main

@@ -12,9 +12,13 @@ struct HabitEditor: View {
     @State private var hasStreakGoal: Bool
     @State private var streakGoal: Int
     @State private var color: String
+    @State private var reminders: HabitReminders
+    @State private var saving = false
+    @State private var reminderNotice: String?
     @State private var failure: String?
     init(habit: Habit? = nil, nextOrder: Int = 0) {
         self.habit = habit; self.nextOrder = nextOrder
+        _reminders = State(initialValue: habit?.reminders ?? HabitReminders())
         _name = State(initialValue: habit?.name ?? "")
         _symbol = State(initialValue: habit?.symbol ?? "checkmark")
         _hasStreakGoal = State(initialValue: habit?.hasStreakGoal ?? false)
@@ -46,6 +50,7 @@ struct HabitEditor: View {
                 } footer: {
                     Text("Goals are optional. Your streak is tracked either way. You can add, change or remove a goal later without losing check-ins.")
                 }.appSectionStyle()
+                ReminderEditor(settings: $reminders)
                 Section("Colour") {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 0), spacing: 4), count: 6), spacing: 8) {
                         ForEach(Palette.colors, id: \.self) { hex in
@@ -69,23 +74,56 @@ struct HabitEditor: View {
                     }
                 }.appSectionStyle()
             }
+            .disabled(saving)
+            .interactiveDismissDisabled(saving)
             .appScreenStyle()
             .navigationTitle(habit == nil ? "New Habit" : "Edit habit")
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.disabled(saving) }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save", action: save).disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    Button(saving ? "Saving…" : "Save") { Task { await save() } }
+                        .disabled(saving || name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || reminders.validationMessage != nil)
                 }
             }
-            .alert("Couldn’t save", isPresented: Binding(get: { failure != nil }, set: { if !$0 { failure = nil } })) { Button("OK") {} } message: { Text(failure ?? "") }
+            .alert(reminderNotice == nil ? "Couldn’t save" : "Habit saved", isPresented: Binding(get: { failure != nil || reminderNotice != nil }, set: { visible in
+                if !visible {
+                    if reminderNotice != nil { dismiss() }
+                    failure = nil; reminderNotice = nil
+                }
+            })) {
+                Button("OK") {}
+            } message: { Text(failure ?? reminderNotice ?? "") }
         }
     }
-    private func save() {
+    @MainActor private func save() async {
+        guard !saving else { return }
+        guard reminders.validationMessage == nil else { failure = reminders.validationMessage; return }
+        saving = true
+        defer { saving = false }
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         let savedGoal = hasStreakGoal ? streakGoal : 0
-        if let habit { habit.name = trimmed; habit.symbol = symbol; habit.colorHex = color; habit.streakGoal = savedGoal }
-        else { context.insert(Habit(name: trimmed, symbol: symbol, colorHex: color, order: nextOrder, streakGoal: savedGoal)) }
-        do { try context.save(); WidgetCenter.shared.reloadAllTimelines(); dismiss() }
-        catch { context.rollback(); failure = error.localizedDescription }
+        do {
+            let allHabits = try context.fetch(FetchDescriptor<Habit>())
+            var definitions = ReminderScheduler.definitions(allHabits.filter { $0.id != habit?.id })
+            if reminders.enabled && !(habit?.archived ?? false) {
+                definitions.append(ReminderDefinition(id: habit?.id ?? UUID(), name: trimmed, settings: reminders))
+            }
+            if reminders.enabled { try ReminderScheduler.validateCapacity(definitions) }
+            let saved: Habit
+            if let habit {
+                saved = habit; habit.name = trimmed; habit.symbol = symbol
+                habit.colorHex = color; habit.streakGoal = savedGoal
+            } else {
+                saved = Habit(name: trimmed, symbol: symbol, colorHex: color, order: nextOrder, streakGoal: savedGoal)
+                context.insert(saved)
+            }
+            saved.reminders = reminders
+            try context.save()
+            WidgetCenter.shared.reloadAllTimelines()
+            let savedHabits = habit == nil ? allHabits + [saved] : allHabits
+            if let notice = await ReminderScheduler.shared.reconcile(savedHabits, requestPermission: reminders.enabled) {
+                reminderNotice = notice
+            } else { dismiss() }
+        } catch { context.rollback(); failure = error.localizedDescription }
     }
 }
