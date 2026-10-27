@@ -118,7 +118,7 @@ private struct ConfettiRain: View {
             Canvas { context, size in
                 let elapsed = max(0, timeline.date.timeIntervalSince(startedAt))
                 guard elapsed < CelebrationTiming.duration else { return }
-                for index in 0..<48 {
+                for index in 0..<96 {
                     let delay = Double(index % 8) * 0.04
                     let fallDuration = 2.6 + Double(index % 5) * 0.1
                     let progress = (elapsed - delay) / fallDuration
@@ -132,8 +132,8 @@ private struct ConfettiRain: View {
                     particle.opacity = min(1, max(0, (1 - progress) * 8))
                     particle.translateBy(x: x, y: y)
                     particle.rotate(by: .degrees(Double(index) * 23 + elapsed * 190))
-                    let rect = CGRect(x: -6, y: -10, width: 12, height: 20)
-                    particle.fill(Path(roundedRect: rect, cornerRadius: 3), with: .color(Color(habitHex: colors[index % colors.count])))
+                    let rect = CGRect(x: -3, y: -5, width: 6, height: 10)
+                    particle.fill(Path(roundedRect: rect, cornerRadius: 1.5), with: .color(Color(habitHex: colors[index % colors.count])))
                 }
             }
         }
