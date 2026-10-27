@@ -13,11 +13,14 @@ struct HabitRecord: Codable {
     var order: Int
     var archived: Bool
     var days: [String]
+    // Optional for compatibility with backups exported before streak goals.
+    var streakGoal: Int?
+    var resolvedStreakGoal: Int { streakGoal ?? 30 }
     init(_ habit: Habit) {
         id = habit.id; name = habit.name; symbol = habit.symbol; colorHex = habit.colorHex
-        createdAt = habit.createdAt; order = habit.order; archived = habit.archived; days = habit.days
+        createdAt = habit.createdAt; order = habit.order; archived = habit.archived; days = habit.days; streakGoal = habit.streakGoal
     }
-    func model() -> Habit { Habit(id: id, name: name, symbol: symbol, colorHex: colorHex, createdAt: createdAt, order: order, archived: archived, days: days) }
+    func model() -> Habit { Habit(id: id, name: name, symbol: symbol, colorHex: colorHex, createdAt: createdAt, order: order, archived: archived, days: days, streakGoal: resolvedStreakGoal) }
 }
 struct HabitBackup: Codable {
     var version = 1
@@ -35,6 +38,7 @@ struct HabitBackup: Codable {
                   Palette.symbols.contains(habit.symbol),
                   habit.colorHex.range(of: "^[0-9A-Fa-f]{6}$", options: .regularExpression) != nil,
                   habit.createdAt <= Date.now,
+                  (1...3650).contains(habit.resolvedStreakGoal),
                   Set(habit.days).count == habit.days.count else { throw BackupError.invalid("Invalid habit fields.") }
             for day in habit.days {
                 guard day.range(of: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$", options: .regularExpression) != nil,
@@ -126,7 +130,7 @@ struct BackupView: View {
             for record in backup.habits {
                 if let habit = existing[record.id] {
                     habit.name = record.name; habit.symbol = record.symbol; habit.colorHex = record.colorHex
-                    habit.createdAt = record.createdAt; habit.order = record.order; habit.archived = record.archived; habit.days = record.days
+                    habit.createdAt = record.createdAt; habit.order = record.order; habit.archived = record.archived; habit.days = record.days; habit.streakGoal = record.resolvedStreakGoal
                 } else { context.insert(record.model()) }
             }
             try context.save(); WidgetCenter.shared.reloadAllTimelines()

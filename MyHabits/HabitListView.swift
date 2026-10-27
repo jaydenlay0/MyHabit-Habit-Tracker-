@@ -42,7 +42,8 @@ struct HabitListView: View {
                             HabitDetailView(habit: habit)
                         } label: {
                             VStack(alignment: .leading, spacing: 10) {
-                                HStack { Text(habit.name).font(.headline); Spacer(); Text("\(HabitStats(habit: habit, today: now).current)d").font(.caption.monospacedDigit()).foregroundStyle(.secondary) }
+                                Text(habit.name).font(.headline)
+                                StreakGoalView(current: HabitStats(habit: habit, today: now).current, goal: habit.streakGoal, colorHex: habit.colorHex)
                                 MiniHeatmap(habit: habit, today: now)
                             }.padding(.vertical, 8)
                         }

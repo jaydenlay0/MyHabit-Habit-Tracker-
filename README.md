@@ -7,7 +7,7 @@ The original interface uses soft rounded cards, selectable accent colours, small
 ## Implemented in layers
 
 1. **Habits and persistence:** create and edit names/icons/colours, check in or undo for today, reorder with Edit, archive/restore by swipe, and permanently delete with confirmation. SwiftData stores habits and history locally.
-2. **History and statistics:** 12-week daily heatmap with editable past days, weekly intensity view, 28-day list previews, current/longest streaks and all-time completion percentage.
+2. **History and statistics:** 12-week daily heatmap with editable past days, weekly intensity view, 28-day list previews, current/longest streaks and all-time completion percentage. Each habit has an editable consecutive-day goal (30 days initially, adjustable from 1 to 3,650 days). Cards and details show the current streak, days remaining, a progress bar and the target; reaching the target shows “Goal reached!” without resetting the streak.
 3. **Widgets:** interactive small, medium and large widgets showing the first 2/3/6 active habits in list order. Widget buttons toggle today through an App Intent. The app and extension use the same App Group SwiftData store.
 4. **Backups:** export all habits, including archived ones, as versioned JSON. Import validates the entire document before a single save, merging by UUID. Matching habits are overwritten, including their histories; other habits remain. Errors roll back the transaction. No destructive replace-all operation.
 
@@ -28,7 +28,7 @@ The target settings generate the application Info.plist; the extension supplies 
 
 ## Test
 
-Run **Product → Test** (⌘U). `MyHabitsTests` covers reversible check-ins, new habits, a streak crossing an unfinished today, gaps/longest streaks, calendar day iteration, backup round-tripping/rejection, SwiftData persistence across contexts, and reopening an on-disk store. The shared scheme includes the test target.
+Run **Product → Test** (⌘U). `MyHabitsTests` covers reversible check-ins, new habits, a streak crossing an unfinished today, gaps/longest streaks, calendar day iteration, backup round-tripping/rejection, SwiftData persistence across contexts, reopening an on-disk store with its goal, goal progress before/at/beyond the target, and goal backup/legacy import validation. The shared scheme includes the test target.
 
 On a Mac, the equivalent commands are (substitute an installed simulator from `xcrun simctl list devices available`):
 
@@ -48,6 +48,8 @@ The Linux authoring environment has no Swift compiler, Apple SDK, simulator or X
 
 - Create multiple habits, choose icons/colours, terminate and reopen the app: habits and check-ins should persist.
 - Edit a name, reorder with Edit, archive by swiping, restore from View archive, and delete from the detail screen. Cancel deletion once to verify confirmation.
+- Before updating an existing installation, export a backup. Rebuild the app and widget together; the added goal field uses a stored default of 30 for automatic SwiftData migration. Confirm existing history and archived habits remain.
+- Create a habit with a 7-day goal, edit it to 14, and relaunch to verify the goal persists. Check the card/detail counts before, at and beyond the goal; a missed day restarts progress without changing the longest streak. Export/import to verify goals are retained; backups from before goals were added import with a 30-day goal.
 - Check/uncheck today in both list and detail. Tap eligible past dates in the daily heatmap; future and pre-creation cells are disabled. Compare weekly totals, streaks and completion with the daily history.
 - In Settings → Appearance, verify System is initially selected. Switch to Light and Dark and confirm the settings sheet, list, detail and editor update. Relaunch to check that the selection persists. Switch back to System and toggle the simulator’s appearance (Features → Toggle Appearance) to verify it follows the device.
 - Test larger text, VoiceOver labels, and landscape. Dense heatmap cells are intentionally compact; VoiceOver names every date and state.

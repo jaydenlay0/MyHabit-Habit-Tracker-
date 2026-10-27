@@ -63,3 +63,28 @@ struct HeatmapView: View {
         }
     }
 }
+
+struct StreakGoalView: View {
+    let current: Int
+    let goal: Int
+    let colorHex: String
+    private var progress: StreakGoalProgress { StreakGoalProgress(current: current, goal: goal) }
+    private var status: String {
+        if progress.reached { return "Goal reached!" }
+        return "\(progress.remaining) \(progress.remaining == 1 ? "day" : "days") to goal"
+    }
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("\(progress.current)-day streak · \(status)")
+                .font(.caption.weight(.medium)).monospacedDigit()
+                .foregroundStyle(Color(habitHex: colorHex))
+                .fixedSize(horizontal: false, vertical: true)
+            ProgressView(value: progress.fraction)
+                .tint(Color(habitHex: colorHex))
+                .accessibilityHidden(true)
+            Text("Goal: \(progress.goal) consecutive \(progress.goal == 1 ? "day" : "days")")
+                .font(.caption2).foregroundStyle(.secondary)
+        }
+        .accessibilityElement(children: .combine)
+    }
+}

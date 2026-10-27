@@ -61,14 +61,54 @@ final class MyHabitsTests: XCTestCase {
             let config = ModelConfiguration(url: url, cloudKitDatabase: .none)
             let container = try ModelContainer(for: Habit.self, configurations: config)
             let context = ModelContext(container)
-            let habit = Habit(id: id, name: "Read", order: 7)
+            let habit = Habit(id: id, name: "Read", order: 7, streakGoal: 60)
             habit.toggle(); context.insert(habit); try context.save()
         }
         let config = ModelConfiguration(url: url, cloudKitDatabase: .none)
         let reopened = try ModelContainer(for: Habit.self, configurations: config)
         let context = ModelContext(reopened)
         let saved = try XCTUnwrap(context.fetch(FetchDescriptor<Habit>()).first)
-        XCTAssertEqual(saved.id, id); XCTAssertEqual(saved.order, 7); XCTAssertTrue(saved.isComplete())
+        XCTAssertEqual(saved.id, id); XCTAssertEqual(saved.order, 7); XCTAssertEqual(saved.streakGoal, 60); XCTAssertTrue(saved.isComplete())
+    }
+
+    func testGoalProgressAtAndBeyondTarget() {
+        let incomplete = StreakGoalProgress(current: 7, goal: 30)
+        XCTAssertEqual(incomplete.remaining, 23)
+        XCTAssertEqual(incomplete.fraction, 7.0 / 30, accuracy: 0.0001)
+        XCTAssertFalse(incomplete.reached)
+        for current in [30, 35] {
+            let reached = StreakGoalProgress(current: current, goal: 30)
+            XCTAssertTrue(reached.reached); XCTAssertEqual(reached.remaining, 0)
+            XCTAssertEqual(reached.fraction, 1)
+            XCTAssertEqual(reached.current, current)
+        }
+    }
+    func testBrokenStreakRestartsGoalProgressWithoutErasingBest() {
+        let habit = Habit(name: "Read", createdAt: date(-4), days: [-4, -3, -2].map { Day.key(date($0)) }, streakGoal: 7)
+        let stats = HabitStats(habit: habit)
+        let progress = StreakGoalProgress(current: stats.current, goal: habit.streakGoal)
+        XCTAssertEqual(progress.current, 0); XCTAssertEqual(progress.remaining, 7)
+        XCTAssertEqual(stats.longest, 3)
+    }
+    func testGoalBackupsAndLegacyCompatibility() throws {
+        let habit = Habit(name: "Read", streakGoal: 90)
+        let encoder = JSONEncoder()
+        let backup = HabitBackup(habits: [HabitRecord(habit)])
+        let data = try encoder.encode(backup)
+        let decoded = try JSONDecoder().decode(HabitBackup.self, from: data).validated()
+        XCTAssertEqual(decoded.habits[0].model().streakGoal, 90)
+        var legacy = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        var records = try XCTUnwrap(legacy["habits"] as? [[String: Any]])
+        records[0].removeValue(forKey: "streakGoal")
+        legacy["habits"] = records
+        let legacyData = try JSONSerialization.data(withJSONObject: legacy)
+        let imported = try JSONDecoder().decode(HabitBackup.self, from: legacyData).validated()
+        XCTAssertEqual(imported.habits[0].model().streakGoal, 30)
+        var invalid = backup
+        for goal in [0, -1, 3651] {
+            invalid.habits[0].streakGoal = goal
+            XCTAssertThrowsError(try invalid.validated())
+        }
     }
 
 }
