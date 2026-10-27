@@ -15,11 +15,18 @@ struct HabitListView: View {
         NavigationStack {
             List {
                 Section {
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .center, spacing: 8) {
                         Text(now, format: .dateTime.weekday(.wide).month(.wide).day()).font(.subheadline).foregroundStyle(.secondary)
-                        Text("Another Day, Another Opportunity.").font(.title2.bold())
+                        Text("Another Day, Another Opportunity.")
+                            .font(.title2.bold())
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.4)
+                            .allowsTightening(true)
                         Text("\(visible.filter { $0.isComplete(now) }.count) of \(visible.count) complete today").font(.subheadline).foregroundStyle(.secondary)
-                    }.padding(.vertical, 8)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .multilineTextAlignment(.center)
+                    .padding(.vertical, 8)
                 }.listRowBackground(Color.clear).listRowSeparator(.hidden)
                 if visible.isEmpty {
                     ContentUnavailableView("Make room for a good habit", systemImage: "leaf", description: Text("Tap + to start your first daily practice."))
