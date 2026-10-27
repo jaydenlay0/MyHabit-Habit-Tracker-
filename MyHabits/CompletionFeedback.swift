@@ -76,7 +76,7 @@ struct HabitCompletionIcon: View {
 }
 
 private enum CelebrationTiming {
-    static let duration: TimeInterval = 3.4
+    static let duration: TimeInterval = 3.8
 }
 
 struct CompletionCelebration: View {
@@ -132,13 +132,15 @@ private struct ConfettiRain: View {
             Canvas { context, size in
                 let elapsed = max(0, timeline.date.timeIntervalSince(startedAt))
                 guard elapsed < CelebrationTiming.duration else { return }
-                for index in 0..<384 {
-                    let delay = Double(index % 8) * 0.04
-                    let fallDuration = 2.6 + Double(index % 5) * 0.1
+                for index in 0..<192 {
+                    // More stagger and varied speeds make a taller, airier shower,
+                    // rather than packing extra pieces into a thin falling band.
+                    let delay = Double(index % 8) * 0.08
+                    let fallDuration = 2.2 + Double(index % 5) * 0.2
                     let progress = (elapsed - delay) / fallDuration
                     guard progress >= 0 && progress <= 1 else { continue }
                     // Distribute flakes across the top and let each cross the full screen.
-                    let startX = CGFloat((index * 149) % 389) / 388 * size.width
+                    let startX = CGFloat((index * 73) % 193) / 192 * size.width
                     let drift = CGFloat(sin(elapsed * 3 + Double(index)) * 16)
                     let x = startX + drift
                     let y = -24 + (size.height + 48) * CGFloat(progress)
