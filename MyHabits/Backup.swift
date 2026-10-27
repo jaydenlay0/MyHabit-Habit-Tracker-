@@ -67,6 +67,7 @@ struct BackupView: View {
     @Query(sort: \Habit.order) private var habits: [Habit]
     @State private var exporting = false
     @State private var importing = false
+    @State private var clearingArchive = false
     @State private var document = BackupDocument()
     @State private var pending: HabitBackup?
     @State private var message: String?
@@ -76,6 +77,19 @@ struct BackupView: View {
                 Section("Your data stays yours") {
                     Text("Unlimited habits. No accounts, subscriptions, analytics, or cloud sync. Habits and check-ins are stored locally in the shared app container.")
                     Text("Use backups to move your data or keep a safe copy. Backup files are plain JSON; store them somewhere you trust.").font(.caption).foregroundStyle(.secondary)
+                }
+                Section {
+                    LabeledContent("Archived habits", value: "\(habits.filter { $0.archived }.count)")
+                    Button("Delete archived habits", role: .destructive) { clearingArchive = true }
+                        .disabled(!habits.contains { $0.archived })
+                } header: {
+                    Text("Archive storage")
+                } footer: {
+                    Text("Archived habits stay out of your daily focus. They are kept in backups, but cannot be browsed or restored here.")
+                }
+                .confirmationDialog("Permanently delete all archived habits and their check-ins? Active habits will be kept.", isPresented: $clearingArchive, titleVisibility: .visible) {
+                    Button("Delete archived habits", role: .destructive) { deleteArchivedHabits() }
+                    Button("Cancel", role: .cancel) {}
                 }
                 Section("Backups") {
                     Button("Export all habits") {
@@ -120,8 +134,15 @@ struct BackupView: View {
                 Button("Import and merge", role: .destructive) { merge() }
                 Button("Cancel", role: .cancel) { pending = nil }
             }
-            .alert("Backup", isPresented: Binding(get: { message != nil }, set: { if !$0 { message = nil } })) { Button("OK") {} } message: { Text(message ?? "") }
+            .alert("Settings", isPresented: Binding(get: { message != nil }, set: { if !$0 { message = nil } })) { Button("OK") {} } message: { Text(message ?? "") }
         }
+    }
+    private func deleteArchivedHabits() {
+        do {
+            for habit in habits where habit.archived { context.delete(habit) }
+            try context.save()
+            WidgetCenter.shared.reloadAllTimelines()
+        } catch { context.rollback(); message = error.localizedDescription }
     }
     private func merge() {
         guard let backup = pending else { return }

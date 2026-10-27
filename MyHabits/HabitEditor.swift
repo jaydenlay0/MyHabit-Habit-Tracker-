@@ -17,7 +17,7 @@ struct HabitEditor: View {
         _name = State(initialValue: habit?.name ?? "")
         _symbol = State(initialValue: habit?.symbol ?? "checkmark")
         _streakGoal = State(initialValue: habit?.streakGoal ?? 30)
-        _color = State(initialValue: habit?.colorHex ?? Palette.colors[0])
+        _color = State(initialValue: habit?.colorHex ?? Palette.defaultColor)
     }
     var body: some View {
         NavigationStack {
@@ -42,23 +42,24 @@ struct HabitEditor: View {
                     Text("Aim for consecutive days. Your goal appears on the habit card. Missing a full day restarts your current streak, but keeps your longest streak.")
                 }
                 Section("Colour") {
-                    HStack {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 44))], spacing: 8) {
                         ForEach(Palette.colors, id: \.self) { hex in
                             Button { color = hex } label: {
                                 Circle().fill(Color(habitHex: hex)).frame(width: 34, height: 34)
                                     .overlay { if color == hex { Image(systemName: "checkmark").foregroundStyle(.black) } }
-                            }.buttonStyle(.plain).accessibilityLabel("Colour \(hex)").accessibilityAddTraits(color == hex ? .isSelected : [])
+                                    .frame(minWidth: 44, minHeight: 44)
+                            }.buttonStyle(.plain).accessibilityLabel(Palette.colorName(hex)).accessibilityAddTraits(color == hex ? .isSelected : [])
                         }
                     }
                 }
                 Section("Icon") {
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6)) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 44))], spacing: 8) {
                         ForEach(Palette.symbols, id: \.self) { item in
                             Button { symbol = item } label: {
-                                Image(systemName: item).frame(minWidth: 32, minHeight: 44)
+                                Image(systemName: item).frame(minWidth: 44, minHeight: 44)
                                     .foregroundStyle(symbol == item ? Color(habitHex: color) : .secondary)
                                     .background(symbol == item ? Color(habitHex: color).opacity(0.15) : .clear, in: RoundedRectangle(cornerRadius: 10))
-                            }.buttonStyle(.plain).accessibilityLabel(item).accessibilityAddTraits(symbol == item ? .isSelected : [])
+                            }.buttonStyle(.plain).accessibilityLabel(Palette.symbolName(item)).accessibilityAddTraits(symbol == item ? .isSelected : [])
                         }
                     }
                 }

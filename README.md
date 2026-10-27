@@ -2,11 +2,11 @@
 
 A native, offline iPhone habit tracker built with SwiftUI, SwiftData and WidgetKit. Requires **iOS 17+** and **Xcode 16+ on macOS**. No packages, server, account, subscription, advertising, analytics or app-managed cloud sync. All habits are available without a limit or paywall.
 
-The original interface uses soft rounded cards, selectable accent colours, small contribution grids and System (default), Light, or Dark appearance. Choose a mode in Settings → Appearance; it applies immediately and is saved locally between launches. Widgets continue to follow the system appearance. It uses SF Symbols, not HabitKit assets.
+The original interface uses soft rounded cards, selectable accent colours, small contribution grids and System (default), Light, or Dark appearance. Choose a mode in Settings → Appearance; it applies immediately and is saved locally between launches. Widgets continue to follow the system appearance. The editor offers exactly 20 rainbow colours and 18 SF Symbols, including meditation, yoga, basketball, skipping rope, pills and AirPods Max headphones. It uses SF Symbols, not HabitKit assets.
 
 ## Implemented in layers
 
-1. **Habits and persistence:** create and edit names/icons/colours, check in or undo for today, reorder with Edit, archive/restore by swipe, and permanently delete with confirmation. SwiftData stores habits and history locally.
+1. **Habits and persistence:** create and edit names/icons/colours, check in or undo for today, reorder with Edit, archive by swipe (with confirmation), and permanently delete with confirmation. SwiftData stores habits and history locally. Home shows only active habits; Settings → Archive storage shows a count and a confirmed permanent-delete option, with no archive browsing or restore action.
 2. **History and statistics:** 12-week daily heatmap with editable past days, weekly intensity view, 28-day list previews, current/longest streaks and all-time completion percentage. Each habit has an editable consecutive-day goal (30 days initially, adjustable from 1 to 3,650 days). Cards and details show the current streak, days remaining, a progress bar and the target; reaching the target shows “Goal reached!” without resetting the streak.
 3. **Widgets:** interactive small, medium and large widgets showing the first 2/3/6 active habits in list order. Widget buttons toggle today through an App Intent. The app and extension use the same App Group SwiftData store.
 4. **Backups:** export all habits, including archived ones, as versioned JSON. Import validates the entire document before a single save, merging by UUID. Matching habits are overwritten, including their histories; other habits remain. Errors roll back the transaction. No destructive replace-all operation.
@@ -47,7 +47,8 @@ The Linux authoring environment has no Swift compiler, Apple SDK, simulator or X
 ### Manual acceptance checks on an iPhone
 
 - Create multiple habits, choose icons/colours, terminate and reopen the app: habits and check-ins should persist.
-- Edit a name, reorder with Edit, archive by swiping, restore from View archive, and delete from the detail screen. Cancel deletion once to verify confirmation.
+- Edit a name and reorder with Edit. Archive from a swipe or the detail screen: cancel once, then confirm. Verify it disappears from Home, today’s count and widgets, with no View archive button or restore action. Settings → Archive storage should show only a count. Cancel archive deletion once, then confirm it deletes archived habits while keeping active habits and their check-ins. Delete a single active habit from its detail screen and verify confirmation.
+- Open New habit and verify 20 unique rainbow colour swatches. Select each of the six new icons (meditation, yoga, basketball, skipping rope, pills and AirPods Max), save, relaunch and confirm its appearance in the list, details and widget. Check the grids on smaller screens and with VoiceOver.
 - Before updating an existing installation, export a backup. Rebuild the app and widget together; the added goal field uses a stored default of 30 for automatic SwiftData migration. Confirm existing history and archived habits remain.
 - Create a habit with a 7-day goal, edit it to 14, and relaunch to verify the goal persists. Check the card/detail counts before, at and beyond the goal; a missed day restarts progress without changing the longest streak. Export/import to verify goals are retained; backups from before goals were added import with a 30-day goal.
 - Check/uncheck today in both list and detail. Tap eligible past dates in the daily heatmap; future and pre-creation cells are disabled. Compare weekly totals, streaks and completion with the daily history.
@@ -69,7 +70,7 @@ For distribution use Xcode **Product → Archive** with a suitable distribution 
 - Each habit is a daily habit. There are no reminder permissions or custom schedules in this version.
 - One completion per local calendar date, stored as `yyyy-MM-dd` day keys. Historical keys do not move when travelling across time zones. The calendar follows the device settings.
 - Current streak counts backwards from today if complete, otherwise yesterday; an incomplete today does not break yesterday’s streak until tomorrow. Longest streak scans history from the creation day through today.
-- Completion = completed days ÷ elapsed calendar days from creation through today, rounded to the nearest percentage. Archiving retains history; archived habits’ statistics still use elapsed days through today.
+- Completion = completed days ÷ elapsed calendar days from creation through today, rounded to the nearest percentage. Archiving retains history in local storage and exports but removes it from the app’s browsing and daily workflow. Settings can permanently clear archived data. A backup intentionally imported from before archiving can still restore that earlier state.
 - Weekly columns follow the current locale’s first weekday. They show counts and intensity for the same 12 weeks as the daily heatmap.
 - SwiftData uses an explicit shared on-device store with CloudKit disabled. There is no sync service. OS-level device backups are governed by iOS settings. Deleting the app may remove local data; export before uninstalling.
 - JSON backups are unencrypted. Imports reject files above 20 MB as a safety limit; this is not a limit on the number of locally created habits.

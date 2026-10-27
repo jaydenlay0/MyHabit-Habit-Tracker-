@@ -9,6 +9,7 @@ struct HabitDetailView: View {
     @State private var now = Date.now
     @State private var editing = false
     @State private var deleting = false
+    @State private var archiving = false
     @State private var weekly = false
     @State private var failure: String?
     var body: some View {
@@ -39,7 +40,14 @@ struct HabitDetailView: View {
                 Text("Completion includes every day since creation, including today. Your current streak stays alive until the end of today.").font(.caption).foregroundStyle(.secondary)
             }
             Section {
-                Button(habit.archived ? "Restore habit" : "Archive habit") { habit.archived.toggle(); save() }
+                Button("Archive habit") { archiving = true }
+                    .confirmationDialog("Archive this habit? It will leave your daily list and widgets. Archived habits cannot be browsed or restored in the app.", isPresented: $archiving, titleVisibility: .visible) {
+                        Button("Archive habit") {
+                            habit.archived = true
+                            if save() { dismiss() }
+                        }
+                        Button("Cancel", role: .cancel) {}
+                    }
                 Button("Delete habit", role: .destructive) { deleting = true }
             }
         }
