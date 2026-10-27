@@ -56,7 +56,7 @@ enum Palette {
     static func symbolName(_ symbol: String) -> String {
         let names = [
             "checkmark": "Checkmark", "figure.walk": "Walking", "book.closed": "Reading",
-            "drop": "Water", "moon": "Sleep", "leaf": "Leaf", "heart": "Heart",
+            "drop": "Water", "moon": "Sleep", "leaf": "Brushing teeth", "heart": "Heart",
             "dumbbell": "Exercise", "pencil": "Writing", "sun.max": "Sunshine",
             "cup.and.saucer": "Tea or coffee", "music.note": "Music",
             "figure.mind.and.body": "Meditation", "figure.yoga": "Yoga",

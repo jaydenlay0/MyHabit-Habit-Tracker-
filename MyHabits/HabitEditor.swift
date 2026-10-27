@@ -66,7 +66,7 @@ struct HabitEditor: View {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 44))], spacing: 8) {
                         ForEach(Palette.symbols, id: \.self) { item in
                             Button { symbol = item } label: {
-                                Image(systemName: item).frame(minWidth: 44, minHeight: 44)
+                                HabitSymbol(name: item).frame(minWidth: 44, minHeight: 44)
                                     .foregroundStyle(symbol == item ? Color(habitHex: color) : .secondary)
                                     .background(symbol == item ? Color(habitHex: color).opacity(0.15) : .clear, in: RoundedRectangle(cornerRadius: 10))
                             }.buttonStyle(.plain).accessibilityLabel(Palette.symbolName(item)).accessibilityAddTraits(symbol == item ? .isSelected : [])

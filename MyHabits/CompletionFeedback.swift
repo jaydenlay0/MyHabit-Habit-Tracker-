@@ -55,7 +55,7 @@ struct HabitCompletionIcon: View {
         let tick = complete && feedback.showsTick(habit.id, on: today)
         let moment = feedback.moments[habit.id]
         ZStack {
-            Image(systemName: habit.symbol).opacity(tick ? 0 : 1)
+            HabitSymbol(name: habit.symbol, size: size > 46 ? 24 : 18).opacity(tick ? 0 : 1)
             Image(systemName: "checkmark").opacity(tick ? 1 : 0)
         }
             .font(size > 46 ? .title2 : .headline)

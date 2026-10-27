@@ -22,7 +22,13 @@ struct HabitDetailView: View {
                     VStack(alignment: .leading) { Text(habit.name).font(.title2.bold()); Text("Every day · Since \(habit.createdAt.formatted(date: .abbreviated, time: .omitted))").font(.caption).foregroundStyle(AppTheme.secondaryText) }
                 }.padding(.vertical, 12)
                 if !habit.archived {
-                    Button { toggleCheckIn(.now) } label: { Label(habit.isComplete(now) ? "Completed today · Undo" : "Check in today", systemImage: feedback.showsTick(habit.id, on: now) ? "checkmark" : habit.symbol) }.tint(Color(habitHex: habit.colorHex))
+                    Button { toggleCheckIn(.now) } label: {
+                        Label {
+                            Text(habit.isComplete(now) ? "Completed today · Undo" : "Check in today")
+                        } icon: {
+                            HabitSymbol(name: feedback.showsTick(habit.id, on: now) ? "checkmark" : habit.symbol)
+                        }
+                    }.tint(Color(habitHex: habit.colorHex))
                 }
             }.appSectionStyle()
             Section(habit.hasStreakGoal ? "Streak goal" : "Current streak") {

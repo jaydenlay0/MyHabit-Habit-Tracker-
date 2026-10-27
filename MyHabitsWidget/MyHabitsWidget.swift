@@ -62,7 +62,7 @@ struct HabitsWidgetView: View {
                 ForEach(Array(entry.habits.prefix(family == .systemLarge ? 6 : (family == .systemSmall ? 2 : 3)))) { habit in
                     Button(intent: CheckInIntent(habitID: habit.id.uuidString)) {
                         HStack {
-                            Image(systemName: habit.symbol)
+                            HabitSymbol(name: habit.symbol, size: 14)
                                 .font(.system(size: 14, weight: .semibold))
                                 .frame(width: 28, height: 28)
                                 .foregroundStyle(habit.done ? Palette.selectionInk(habit.colorHex) : Color(habitHex: habit.colorHex))
