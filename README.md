@@ -13,7 +13,22 @@ The original interface places a centred MyHabits title and daily summary directl
 5. **Local reminders:** optional, off by default, with the first time set to **10:00 am**. Choose up to three daily times, individual weekdays or Every day. A same-day time window evenly spaces the chosen number of reminders, using the midpoint for a single reminder. iOS notification permission is requested only when saving enabled reminders or explicitly enabling notifications in Settings. Settings reports denied permission and scheduling errors. Editing replaces the schedule; archiving, deleting or switching reminders off removes future alerts. Reminders are repeating local notifications, so they work offline and do not require the app process to stay running.
 6. **Backups:** export all habits, including archived ones, as versioned JSON. Import validates the entire document before a single save, merging by UUID. Matching habits are overwritten, including their histories; other habits remain. Errors roll back the transaction. No destructive replace-all operation.
 
-## Open, sign and compile in Xcode
+## Install on your iPhone with a free Apple account
+
+Use the **MyHabitsPersonal** scheme. It has the same habit tracking, appearance settings, reminders, confetti and backups, with an app-private SwiftData store. It embeds no widget, declares no App Group, and needs no paid capability.
+
+1. Open `MyHabits.xcodeproj` from the downloaded project.
+2. In the Mac menu bar choose **Product → Scheme → MyHabitsPersonal**.
+3. Connect and unlock your iPhone, accept **Trust This Computer**, and select your actual phone in Xcode’s device selector.
+4. Press **⌘1**, click the blue MyHabits project, select **MyHabitsPersonal** under **TARGETS**, and open **Signing & Capabilities**.
+5. Enable **Automatically manage signing**, choose your **Personal Team**, and give this target a unique bundle identifier, such as `com.yourname.MyHabitsPersonal`. If your team is missing, add your Apple Account under **Xcode → Settings → Accounts**. You do not need to configure the MyHabitsWidget target or any App Group for this scheme.
+6. Enable **Settings → Privacy & Security → Developer Mode** on the phone and restart if requested. Press **⌘R** in Xcode to install and launch. If iOS asks you to trust the developer, follow the prompt under **Settings → General → VPN & Device Management**.
+
+Free provisioning normally expires after **7 days**. Reconnect the phone and run the same scheme with the same team and bundle identifier to renew it. Reinstall over the existing app; do not delete it first. Keep exported backups, since uninstalling removes local data. Apple also limits free provisioning registrations and active development apps.
+
+The personal and widget editions have separate app identities and databases. To transfer habits from a simulator or the widget edition, export a JSON backup there and import it in the personal app. Signing and actual installation must be verified in Xcode on your Mac; they have not been run in the Linux authoring environment.
+
+## Open, sign and compile the widget edition in Xcode
 
 1. Open `MyHabits.xcodeproj`. The project and shared scheme are checked in; no generator, CocoaPods or package installation is needed.
 2. Select the **MyHabits** target → **Signing & Capabilities**. Choose your Apple development team and change the bundle identifier from `com.example.MyHabits` to a unique identifier, such as `com.yourname.MyHabits`.
@@ -30,9 +45,9 @@ The target settings generate the application Info.plist; the extension supplies 
 
 ## Test
 
-Run **Product → Test** (⌘U). `MyHabitsTests` covers reversible check-ins, new habits, a streak crossing an unfinished today, gaps/longest streaks, calendar day iteration, backup round-tripping/rejection, SwiftData persistence across contexts, reopening an on-disk store with its goal, goal progress before/at/beyond the target, goal backup/legacy import validation, reminder defaults/window validation, daily and weekly notification trigger generation, scheduling capacity, and reminder persistence/backup compatibility, and completion feedback lifecycle (expiry without data loss, rapid undo/recompletion, independent habits and background cleanup). The shared scheme includes the test target.
+Run **Product → Test** (⌘U). `MyHabitsTests` covers reversible check-ins, new habits, a streak crossing an unfinished today, gaps/longest streaks, calendar day iteration, backup round-tripping/rejection, SwiftData persistence across contexts, reopening an on-disk store with its goal, goal progress before/at/beyond the target, goal backup/legacy import validation, reminder defaults/window validation, daily and weekly notification trigger generation, scheduling capacity, and reminder persistence/backup compatibility, and completion feedback lifecycle (expiry without data loss, rapid undo/recompletion, independent habits and background cleanup). Both shared schemes include their own test target; MyHabitsPersonalTests runs the same suite against the personal app module.
 
-On a Mac, the equivalent commands are (substitute an installed simulator from `xcrun simctl list devices available`):
+For the personal edition, select MyHabitsPersonal and use ⌘U on a simulator; in the commands below replace `-scheme MyHabits` with `-scheme MyHabitsPersonal`. On a Mac, the equivalent widget-edition commands are (substitute an installed simulator from `xcrun simctl list devices available`):
 
 ```sh
 xcodebuild -list -project MyHabits.xcodeproj
@@ -65,7 +80,7 @@ The Linux authoring environment has no Swift compiler, Apple SDK, simulator or X
 - Enable Airplane Mode and repeat create/check-in/reopen/export. No network connection is required. Files locations chosen for backup may themselves use iCloud; choose **On My iPhone** for a local-only backup.
 - Change the system date/time zone only on a test device and check midnight behavior. The active app refreshes its date-dependent views every 30 seconds; widgets request a new timeline at midnight.
 
-## Install on a physical iPhone
+## Install the widget edition on a physical iPhone
 
 Connect the phone to your Mac, unlock it, trust the Mac, and enable **Settings → Privacy & Security → Developer Mode** if prompted. Select it as the run destination, allow Xcode to register/provision it, and press ⌘R. If iOS asks, trust the developer under **Settings → General → VPN & Device Management**. Keep the app and widget in the same signed build. Installation needs Apple signing services; using the installed tracker does not.
 

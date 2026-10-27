@@ -1,7 +1,11 @@
 import XCTest
 import SwiftData
 import UserNotifications
+#if PERSONAL_TEAM
+@testable import MyHabitsPersonal
+#else
 @testable import MyHabits
+#endif
 
 final class MyHabitsTests: XCTestCase {
     func date(_ offset: Int) -> Date { Day.adding(offset, to: .now) }
