@@ -57,6 +57,7 @@ struct BackupDocument: FileDocument {
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper { FileWrapper(regularFileWithContents: data) }
 }
 struct BackupView: View {
+    @AppStorage(AppAppearance.storageKey) private var appearance: AppAppearance = .system
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
     @Query(sort: \Habit.order) private var habits: [Habit]
@@ -83,8 +84,20 @@ struct BackupView: View {
                     Button("Import backup") { importing = true }
                     Text("Import merges by habit ID. Matching habits are replaced by the backup; other habits are kept. Export first to preserve your current history.").font(.caption).foregroundStyle(.secondary)
                 }
-                Section("Appearance") { Text("MyHabits follows your iPhone’s light or dark appearance and text size.") }
+                Section {
+                    Picker("Appearance", selection: $appearance) {
+                        ForEach(AppAppearance.allCases) { option in
+                            Text(option.title).tag(option)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                } header: {
+                    Text("Appearance")
+                } footer: {
+                    Text("System follows your iPhone’s appearance. Your choice is saved on this device.")
+                }
             }
+            .preferredColorScheme(appearance.colorScheme)
             .navigationTitle("Settings").toolbar { Button("Done") { dismiss() } }
             .fileExporter(isPresented: $exporting, document: document, contentType: .json, defaultFilename: "MyHabits-\(Day.key(.now))") { result in
                 if case .failure(let error) = result { message = error.localizedDescription }

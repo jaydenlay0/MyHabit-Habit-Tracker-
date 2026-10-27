@@ -2,7 +2,7 @@
 
 A native, offline iPhone habit tracker built with SwiftUI, SwiftData and WidgetKit. Requires **iOS 17+** and **Xcode 16+ on macOS**. No packages, server, account, subscription, advertising, analytics or app-managed cloud sync. All habits are available without a limit or paywall.
 
-The original interface uses soft rounded cards, selectable accent colours, small contribution grids and the system’s light/dark appearance. It uses SF Symbols, not HabitKit assets.
+The original interface uses soft rounded cards, selectable accent colours, small contribution grids and System (default), Light, or Dark appearance. Choose a mode in Settings → Appearance; it applies immediately and is saved locally between launches. Widgets continue to follow the system appearance. It uses SF Symbols, not HabitKit assets.
 
 ## Implemented in layers
 
@@ -49,7 +49,8 @@ The Linux authoring environment has no Swift compiler, Apple SDK, simulator or X
 - Create multiple habits, choose icons/colours, terminate and reopen the app: habits and check-ins should persist.
 - Edit a name, reorder with Edit, archive by swiping, restore from View archive, and delete from the detail screen. Cancel deletion once to verify confirmation.
 - Check/uncheck today in both list and detail. Tap eligible past dates in the daily heatmap; future and pre-creation cells are disabled. Compare weekly totals, streaks and completion with the daily history.
-- Test light/dark mode, larger text, VoiceOver labels, and landscape. Dense heatmap cells are intentionally compact; VoiceOver names every date and state.
+- In Settings → Appearance, verify System is initially selected. Switch to Light and Dark and confirm the settings sheet, list, detail and editor update. Relaunch to check that the selection persists. Switch back to System and toggle the simulator’s appearance (Features → Toggle Appearance) to verify it follows the device.
+- Test larger text, VoiceOver labels, and landscape. Dense heatmap cells are intentionally compact; VoiceOver names every date and state.
 - Export a backup using Settings, save it in Files, modify a habit, then import the backup. Confirm matching history is restored and other habits remain. Import malformed JSON or an unsupported version: no data should change.
 - Add the MyHabits Home Screen widget (long-press Home Screen → Edit/Add Widget → MyHabits). Toggle a habit there, reopen the app, and verify the same check-in; toggle in the app and verify the widget updates. Check small/medium/large layouts and archived habits disappearing. WidgetKit controls reload timing; midnight refresh is requested, not guaranteed to the second.
 - Enable Airplane Mode and repeat create/check-in/reopen/export. No network connection is required. Files locations chosen for backup may themselves use iCloud; choose **On My iPhone** for a local-only backup.

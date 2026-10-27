@@ -3,6 +3,7 @@ import SwiftData
 
 @main
 struct MyHabitsApp: App {
+    @AppStorage(AppAppearance.storageKey) private var appearance: AppAppearance = .system
     @State private var container: ModelContainer?
     @State private var failure: String?
     @Environment(\.scenePhase) private var scenePhase
@@ -19,17 +20,20 @@ struct MyHabitsApp: App {
     }
     var body: some Scene {
         WindowGroup {
-            if let container {
-                HabitListView().modelContainer(container).id(generation)
-                    .onChange(of: scenePhase) { _, phase in
-                        if phase == .active && widgetRevision != SharedStore.widgetRevision() {
-                            do { self.container = try SharedStore.make(); widgetRevision = SharedStore.widgetRevision(); generation = UUID() }
-                            catch { failure = error.localizedDescription }
+            Group {
+                if let container {
+                    HabitListView().modelContainer(container).id(generation)
+                        .onChange(of: scenePhase) { _, phase in
+                            if phase == .active && widgetRevision != SharedStore.widgetRevision() {
+                                do { self.container = try SharedStore.make(); widgetRevision = SharedStore.widgetRevision(); generation = UUID() }
+                                catch { failure = error.localizedDescription }
+                            }
                         }
-                    }
-            } else {
-                ContentUnavailableView("Storage unavailable", systemImage: "externaldrive.badge.exclamationmark", description: Text(failure ?? "Unable to open local storage. Your data has not been reset."))
+                } else {
+                    ContentUnavailableView("Storage unavailable", systemImage: "externaldrive.badge.exclamationmark", description: Text(failure ?? "Unable to open local storage. Your data has not been reset."))
+                }
             }
+            .preferredColorScheme(appearance.colorScheme)
         }
     }
 }
