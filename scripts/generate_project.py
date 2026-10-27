@@ -17,6 +17,8 @@ for directory in ['Shared', 'MyHabits', 'MyHabitsWidget', 'MyHabitsTests']:
             relative = str(path.relative_to(root))
             kind = {'.swift':'sourcecode.swift', '.plist':'text.plist.xml', '.entitlements':'text.plist.entitlements', '.xcprivacy':'text.xml'}.get(path.suffix, 'text')
             files[relative] = add('file:'+relative, f'isa = PBXFileReference; lastKnownFileType = {kind}; path = {q(relative)}; sourceTree = "<group>";')
+asset_path = 'MyHabits/Assets.xcassets'
+files[asset_path] = add('file:'+asset_path, f'isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = {q(asset_path)}; sourceTree = "<group>";')
 products = {}
 for name, ext, kind in [('MyHabits','app','wrapper.application'),('MyHabitsWidget','appex','wrapper.app-extension'),('MyHabitsTests','xctest','wrapper.cfbundle'),('MyHabitsPersonal','app','wrapper.application'),('MyHabitsPersonalTests','xctest','wrapper.cfbundle')]:
     products[name] = add('product:'+name, f'isa = PBXFileReference; explicitFileType = {kind}; path = {name}.{ext}; sourceTree = BUILT_PRODUCTS_DIR;')
@@ -35,6 +37,8 @@ for name in products:
     resource_builds = []
     if not is_test:
         resource_builds.append(add('privacy:'+name, f'isa = PBXBuildFile; fileRef = {files["MyHabits/PrivacyInfo.xcprivacy"]};'))
+    if name in ['MyHabits', 'MyHabitsPersonal']:
+        resource_builds.append(add('assets:'+name, f'isa = PBXBuildFile; fileRef = {files[asset_path]};'))
     resources = add('resources:'+name, f'isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = {arr(resource_builds)}; runOnlyForDeploymentPostprocessing = 0;')
     phases = [sources, frameworks, resources]; dependencies = []
     dependency = 'MyHabitsWidget' if name == 'MyHabits' else ('MyHabitsPersonal' if name == 'MyHabitsPersonalTests' else ('MyHabits' if name == 'MyHabitsTests' else None))
@@ -50,6 +54,7 @@ for name in products:
         if name in ['MyHabits', 'MyHabitsWidget']: values['CODE_SIGN_ENTITLEMENTS'] = name+'/'+name+'.entitlements'
         if is_personal: values['SWIFT_ACTIVE_COMPILATION_CONDITIONS'] = '$(inherited) PERSONAL_TEAM'
         if name in ['MyHabits', 'MyHabitsPersonal']:
+            values['ASSETCATALOG_COMPILER_APPICON_NAME'] = 'AppIcon'
             values.update(INFOPLIST_KEY_CFBundleDisplayName='MyHabits', INFOPLIST_KEY_UILaunchScreen_Generation='YES', INFOPLIST_KEY_UIApplicationSceneManifest_Generation='YES', INFOPLIST_KEY_UISupportedInterfaceOrientations='UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight')
         if name == 'MyHabitsWidget': values.update(INFOPLIST_FILE='MyHabitsWidget/Info.plist', SKIP_INSTALL='YES', APPLICATION_EXTENSION_API_ONLY='YES', PRODUCT_BUNDLE_IDENTIFIER='com.example.MyHabits.widget')
         if is_test:

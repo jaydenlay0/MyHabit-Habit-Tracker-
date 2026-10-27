@@ -41,7 +41,7 @@ The personal and widget editions have separate app identities and databases. To 
 
 A development team with App Groups capability is required to install this shared-store/widget build on a physical phone. Personal Team provisioning may not support App Groups; in that case use an Apple Developer Program team. Never remove the shared-store entitlement to work around signing: the app deliberately reports a storage error rather than silently creating a separate widget-inaccessible database.
 
-The target settings generate the application Info.plist; the extension supplies its WidgetKit extension declaration. There are no runtime API keys or environment variables. A custom App Store icon and distribution screenshots are not included; add those before distribution.
+The target settings generate the application Info.plist; the extension supplies its WidgetKit extension declaration. There are no runtime API keys or environment variables. Both app targets include an opaque 1024 × 1024 app icon: a mint checkmark on charcoal, in `MyHabits/Assets.xcassets/AppIcon.appiconset`. Distribution screenshots are not included.
 
 ## Test
 
