@@ -4,6 +4,7 @@ import WidgetKit
 
 struct HabitDetailView: View {
     @Bindable var habit: Habit
+    @Environment(CompletionFeedback.self) private var feedback
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
     @State private var now = Date.now
@@ -17,11 +18,11 @@ struct HabitDetailView: View {
         List {
             Section {
                 HStack(spacing: 16) {
-                    Image(systemName: habit.symbol).font(.largeTitle).foregroundStyle(Color(habitHex: habit.colorHex))
+                    HabitCompletionIcon(habit: habit, today: now, size: 56)
                     VStack(alignment: .leading) { Text(habit.name).font(.title2.bold()); Text("Every day · Since \(habit.createdAt.formatted(date: .abbreviated, time: .omitted))").font(.caption).foregroundStyle(.secondary) }
                 }.padding(.vertical, 12)
                 if !habit.archived {
-                    Button { habit.toggle(now); save() } label: { Label(habit.isComplete(now) ? "Completed today · Undo" : "Check in today", systemImage: habit.isComplete(now) ? "checkmark.circle.fill" : "circle") }.tint(Color(habitHex: habit.colorHex))
+                    Button { toggleCheckIn(.now) } label: { Label(habit.isComplete(now) ? "Completed today · Undo" : "Check in today", systemImage: feedback.showsTick(habit.id, on: now) ? "checkmark" : habit.symbol) }.tint(Color(habitHex: habit.colorHex))
                 }
             }
             Section(habit.hasStreakGoal ? "Streak goal" : "Current streak") {
@@ -31,7 +32,7 @@ struct HabitDetailView: View {
             }
             Section("Your rhythm") {
                 Picker("View", selection: $weekly) { Text("Daily").tag(false); Text("Weekly").tag(true) }.pickerStyle(.segmented)
-                HeatmapView(habit: habit, today: now, weekly: weekly) { date in habit.toggle(date); save() }.padding(.vertical, 8)
+                HeatmapView(habit: habit, today: now, weekly: weekly) { date in toggleCheckIn(date) }.padding(.vertical, 8)
             }
             Section("All-time statistics") {
                 LabeledContent("Current streak", value: "\(stats.current) days")
@@ -62,6 +63,15 @@ struct HabitDetailView: View {
             }
         }
         .alert("Couldn’t save", isPresented: Binding(get: { failure != nil }, set: { if !$0 { failure = nil } })) { Button("OK") {} } message: { Text(failure ?? "") }
+    }
+    private func toggleCheckIn(_ date: Date) {
+        now = .now
+        let isToday = Day.key(date) == Day.key(now)
+        let wasComplete = habit.isComplete(date)
+        habit.toggle(date)
+        guard save(), isToday else { return }
+        if wasComplete { feedback.undo(habit.id) }
+        else { feedback.complete(habit.id, at: now) }
     }
     @discardableResult private func save() -> Bool {
         do { try context.save(); WidgetCenter.shared.reloadAllTimelines(); return true }

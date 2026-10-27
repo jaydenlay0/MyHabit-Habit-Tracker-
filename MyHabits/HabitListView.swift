@@ -5,6 +5,8 @@ import WidgetKit
 struct HabitListView: View {
     @Environment(\.modelContext) private var context
     @Query(sort: \Habit.order) private var habits: [Habit]
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var feedback = CompletionFeedback()
     @State private var now = Date.now
     @State private var creating = false
     @State private var settings = false
@@ -16,6 +18,10 @@ struct HabitListView: View {
             List {
                 Section {
                     VStack(alignment: .center, spacing: 8) {
+                        Text("MyHabits")
+                            .font(.largeTitle.bold())
+                            .accessibilityAddTraits(.isHeader)
+                            .padding(.bottom, 20)
                         Text(now, format: .dateTime.weekday(.wide).month(.wide).day()).font(.subheadline).foregroundStyle(.secondary)
                         Text("Another Day, Another Opportunity.")
                             .font(.title2.bold())
@@ -34,13 +40,11 @@ struct HabitListView: View {
                 }
                 ForEach(visible) { habit in
                     HStack(spacing: 14) {
-                        Button { habit.toggle(now); save() } label: {
-                            Image(systemName: habit.isComplete(now) ? "checkmark" : habit.symbol)
-                                .font(.headline).frame(width: 46, height: 46)
-                                .foregroundStyle(habit.isComplete(now) ? Color.black : Color(habitHex: habit.colorHex))
-                                .background(Color(habitHex: habit.colorHex).opacity(habit.isComplete(now) ? 1 : 0.14), in: RoundedRectangle(cornerRadius: 14))
+                        Button { toggleToday(habit) } label: {
+                            HabitCompletionIcon(habit: habit, today: now)
                         }.buttonStyle(.borderless)
                             .accessibilityLabel("\(habit.isComplete(now) ? "Undo" : "Complete") \(habit.name) for today")
+                            .accessibilityValue(habit.isComplete(now) ? "Completed" : "Not completed")
                         NavigationLink {
                             HabitDetailView(habit: habit)
                         } label: {
@@ -57,7 +61,8 @@ struct HabitListView: View {
                 }.onMove(perform: move)
             }
             .onReceive(Timer.publish(every: 30, on: .main, in: .common).autoconnect()) { now = $0 }
-            .navigationTitle("MyHabits")
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { Button { settings = true } label: { Image(systemName: "slider.horizontal.3") }.accessibilityLabel("Settings and backups") }
                 ToolbarItemGroup(placement: .topBarTrailing) {
@@ -77,15 +82,31 @@ struct HabitListView: View {
             }
             .alert("Couldn’t save", isPresented: Binding(get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } })) { Button("OK") {} } message: { Text(errorMessage ?? "") }
         }
+        .overlay { CompletionCelebration() }
+        .environment(feedback)
+        .sensoryFeedback(.success, trigger: feedback.hapticTrigger)
+        .onChange(of: scenePhase) { _, phase in
+            if phase != .active { feedback.stop() }
+            else { now = .now }
+        }
     }
+    private func toggleToday(_ habit: Habit) {
+        now = .now
+        let wasComplete = habit.isComplete(now)
+        habit.toggle(now)
+        guard save() else { return }
+        if wasComplete { feedback.undo(habit.id) }
+        else { feedback.complete(habit.id, at: now) }
+    }
+
     private func move(from source: IndexSet, to destination: Int) {
         var ordered = visible; ordered.move(fromOffsets: source, toOffset: destination)
         let hidden = habits.filter { $0.archived }
         for (index, habit) in (ordered + hidden).enumerated() { habit.order = index }
         save()
     }
-    private func save() {
-        do { try context.save(); WidgetCenter.shared.reloadAllTimelines() }
-        catch { context.rollback(); errorMessage = error.localizedDescription }
+    @discardableResult private func save() -> Bool {
+        do { try context.save(); WidgetCenter.shared.reloadAllTimelines(); return true }
+        catch { context.rollback(); errorMessage = error.localizedDescription; return false }
     }
 }

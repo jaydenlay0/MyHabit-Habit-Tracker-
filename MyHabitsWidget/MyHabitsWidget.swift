@@ -61,12 +61,17 @@ struct HabitsWidgetView: View {
                 ForEach(Array(entry.habits.prefix(family == .systemLarge ? 6 : (family == .systemSmall ? 2 : 3)))) { habit in
                     Button(intent: CheckInIntent(habitID: habit.id.uuidString)) {
                         HStack {
-                            Image(systemName: habit.done ? "checkmark.circle.fill" : habit.symbol).foregroundStyle(Color(habitHex: habit.colorHex))
+                            Image(systemName: habit.symbol)
+                                .font(.system(size: 14, weight: .semibold))
+                                .frame(width: 28, height: 28)
+                                .foregroundStyle(habit.done ? Palette.selectionInk(habit.colorHex) : Color(habitHex: habit.colorHex))
+                                .background(Color(habitHex: habit.colorHex).opacity(habit.done ? 1 : 0.14), in: RoundedRectangle(cornerRadius: 8))
                             Text(habit.name).lineLimit(1).foregroundStyle(.primary)
                             Spacer()
                             if !habit.done { Image(systemName: "circle").foregroundStyle(.secondary) }
                         }.font(.subheadline).frame(maxWidth: .infinity, minHeight: 24, alignment: .leading)
                     }.buttonStyle(.plain).accessibilityLabel("\(habit.done ? "Undo" : "Complete") \(habit.name)")
+                        .accessibilityValue(habit.done ? "Completed" : "Not completed")
                 }
             }
             Spacer(minLength: 0)

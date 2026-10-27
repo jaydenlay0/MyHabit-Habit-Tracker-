@@ -141,4 +141,53 @@ final class MyHabitsTests: XCTestCase {
         XCTAssertEqual(imported.days, saved.days)
     }
 
+    @MainActor func testTickExpiresWithoutUndoingSavedCompletion() throws {
+        let container = try ModelContainer(for: Habit.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let context = ModelContext(container)
+        let now = Date.now
+        let habit = Habit(name: "Read")
+        context.insert(habit); habit.toggle(now); try context.save()
+        let feedback = CompletionFeedback()
+        feedback.complete(habit.id, at: now)
+        let moment = try XCTUnwrap(feedback.moments[habit.id])
+        XCTAssertTrue(feedback.showsTick(habit.id, on: now, now: now.addingTimeInterval(1)))
+        XCTAssertFalse(feedback.showsTick(habit.id, on: now, now: now.addingTimeInterval(2)))
+        feedback.finishTick(habit.id, token: moment.id)
+        XCTAssertNil(feedback.moments[habit.id])
+        let otherContext = ModelContext(container)
+        XCTAssertTrue(try XCTUnwrap(otherContext.fetch(FetchDescriptor<Habit>()).first).isComplete(now))
+    }
+    @MainActor func testRapidUndoAndRecompletionIgnoreOldCleanupTasks() throws {
+        let feedback = CompletionFeedback(), id = UUID()
+        let now = Date.now
+        feedback.complete(id, at: now)
+        let oldMoment = try XCTUnwrap(feedback.moments[id])
+        let oldBurst = try XCTUnwrap(feedback.burst)
+        feedback.undo(id)
+        XCTAssertNil(feedback.burst); XCTAssertNil(feedback.moments[id])
+        XCTAssertEqual(feedback.hapticTrigger, 1)
+        feedback.complete(id, at: now.addingTimeInterval(0.2))
+        let newMoment = try XCTUnwrap(feedback.moments[id])
+        let newBurst = try XCTUnwrap(feedback.burst)
+        feedback.finishTick(id, token: oldMoment.id)
+        feedback.finishBurst(token: oldBurst.id)
+        XCTAssertEqual(feedback.moments[id]?.id, newMoment.id)
+        XCTAssertEqual(feedback.burst?.id, newBurst.id)
+        XCTAssertEqual(feedback.hapticTrigger, 2)
+    }
+    @MainActor func testCelebrationsStayIndependentAcrossHabitsAndStopOnBackground() throws {
+        let feedback = CompletionFeedback(), first = UUID(), second = UUID()
+        let now = Date.now
+        feedback.complete(first, at: now); feedback.complete(second, at: now)
+        let secondBurst = try XCTUnwrap(feedback.burst)
+        feedback.undo(first)
+        XCTAssertNil(feedback.moments[first])
+        XCTAssertNotNil(feedback.moments[second])
+        XCTAssertEqual(feedback.burst?.id, secondBurst.id)
+        XCTAssertFalse(feedback.showsTick(second, on: Day.adding(1, to: now), now: now))
+        feedback.stop()
+        XCTAssertNil(feedback.burst); XCTAssertTrue(feedback.moments.isEmpty)
+        XCTAssertEqual(feedback.hapticTrigger, 2)
+    }
+
 }
