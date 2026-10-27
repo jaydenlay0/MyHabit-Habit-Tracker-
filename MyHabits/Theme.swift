@@ -24,18 +24,18 @@ enum AppAppearance: String, CaseIterable, Identifiable {
 
 enum Palette {
     static let defaultColor = "63D6A3"
-    // Rows run light to deep; columns are red, blue, green, yellow, pink, purple.
+    // Rows run deep to light; columns are red, blue, green, yellow, pink, purple.
     static let colors = [
-        "FF9B9B", "A8D3FF", "A8E6B5", "FFF2A6", "FFD1E3", "DDCBFF",
-        "FF6B6B", "73B5FF", "63D6A3", "F0D66E", "F787A5", "B79CFF",
+        "C93645", "3568C8", "268B52", "D9A923", "D94888", "7850C5",
         "E94B57", "4F8FE8", "45BA73", "F6CC4D", "EE6AA7", "9C75E8",
-        "C93645", "3568C8", "268B52", "D9A923", "D94888", "7850C5"
+        "FF6B6B", "73B5FF", "63D6A3", "F0D66E", "F787A5", "B79CFF",
+        "FF9B9B", "A8D3FF", "A8E6B5", "FFF2A6", "FFD1E3", "DDCBFF"
     ]
     static let colorNames = [
-        "Light red", "Baby blue", "Light green", "Pale yellow", "Baby pink", "Lilac",
-        "Red", "Blue", "Mint green", "Yellow", "Pink", "Lavender",
+        "Deep red", "Royal blue", "Forest green", "Mustard yellow", "Deep pink", "Deep purple",
         "Scarlet red", "Cornflower blue", "Leaf green", "Golden yellow", "Rose pink", "Violet",
-        "Deep red", "Royal blue", "Forest green", "Mustard yellow", "Deep pink", "Deep purple"
+        "Red", "Blue", "Mint green", "Yellow", "Pink", "Lavender",
+        "Light red", "Baby blue", "Light green", "Pale yellow", "Baby pink", "Lilac"
     ]
     static func selectionInk(_ hex: String) -> Color {
         // Choose black or white to keep the selection mark readable on every shade.
