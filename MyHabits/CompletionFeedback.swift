@@ -15,13 +15,14 @@ struct CompletionBurst: Identifiable {
 @MainActor @Observable
 final class CompletionFeedback {
     private(set) var moments: [UUID: CompletionMoment] = [:]
-    private(set) var burst: CompletionBurst?
+    private(set) var bursts: [CompletionBurst] = []
     private(set) var hapticTrigger = 0
 
     func complete(_ habitID: UUID, at date: Date = .now) {
         moments = moments.filter { $0.value.expiresAt > date }
         moments[habitID] = CompletionMoment(day: Day.key(date), expiresAt: date.addingTimeInterval(2))
-        burst = CompletionBurst(habitID: habitID, startedAt: date)
+        bursts.removeAll { date.timeIntervalSince($0.startedAt) >= CelebrationTiming.duration }
+        bursts.append(CompletionBurst(habitID: habitID, startedAt: date))
         hapticTrigger += 1
     }
     func showsTick(_ habitID: UUID, on date: Date, now: Date = .now) -> Bool {
@@ -33,13 +34,13 @@ final class CompletionFeedback {
         if moments[habitID]?.id == token { moments.removeValue(forKey: habitID) }
     }
     func finishBurst(token: UUID) {
-        if burst?.id == token { burst = nil }
+        bursts.removeAll { $0.id == token }
     }
     func undo(_ habitID: UUID) {
         moments.removeValue(forKey: habitID)
-        if burst?.habitID == habitID { burst = nil }
+        bursts.removeAll { $0.habitID == habitID }
     }
-    func stop() { moments.removeAll(); burst = nil }
+    func stop() { moments.removeAll(); bursts.removeAll() }
 }
 
 struct HabitCompletionIcon: View {
@@ -84,25 +85,39 @@ struct CompletionCelebration: View {
 
     var body: some View {
         ZStack {
-            if let burst = feedback.burst {
-                if reduceMotion {
-                    // A quiet acknowledgement instead of moving particles.
-                    VStack {
-                        Label("Well done!", systemImage: "sparkles")
-                            .font(.headline).padding(14)
-                            .background(.regularMaterial, in: Capsule())
-                        Spacer()
-                    }.padding(.top, 12)
-                } else {
-                    ConfettiRain(startedAt: burst.startedAt).id(burst.id).ignoresSafeArea()
-                }
+            ForEach(feedback.bursts) { burst in
+                ConfettiLayer(burst: burst)
+            }
+            if reduceMotion && !feedback.bursts.isEmpty {
+                // Show just one quiet acknowledgement when showers overlap.
+                VStack {
+                    Label("Well done!", systemImage: "sparkles")
+                        .font(.headline).padding(14)
+                        .background(.regularMaterial, in: Capsule())
+                    Spacer()
+                }.padding(.top, 12)
             }
         }
         .allowsHitTesting(false)
         .accessibilityHidden(true)
-        .task(id: feedback.burst?.id) {
-            guard let burst = feedback.burst else { return }
-            do { try await Task.sleep(for: .seconds(CelebrationTiming.duration)) }
+    }
+}
+
+private struct ConfettiLayer: View {
+    let burst: CompletionBurst
+    @Environment(CompletionFeedback.self) private var feedback
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        Group {
+            if reduceMotion { Color.clear }
+            else { ConfettiRain(startedAt: burst.startedAt).ignoresSafeArea() }
+        }
+        // Each stable layer keeps its own clock and cleanup task. Adding another
+        // completion never resets the start time or cancels an older shower.
+        .task(id: burst.id) {
+            let remaining = max(0, burst.startedAt.addingTimeInterval(CelebrationTiming.duration).timeIntervalSinceNow)
+            do { try await Task.sleep(for: .seconds(remaining)) }
             catch { return }
             feedback.finishBurst(token: burst.id)
         }

@@ -162,32 +162,53 @@ final class MyHabitsTests: XCTestCase {
         let now = Date.now
         feedback.complete(id, at: now)
         let oldMoment = try XCTUnwrap(feedback.moments[id])
-        let oldBurst = try XCTUnwrap(feedback.burst)
+        let oldBurst = try XCTUnwrap(feedback.bursts.last)
         feedback.undo(id)
-        XCTAssertNil(feedback.burst); XCTAssertNil(feedback.moments[id])
+        XCTAssertTrue(feedback.bursts.isEmpty); XCTAssertNil(feedback.moments[id])
         XCTAssertEqual(feedback.hapticTrigger, 1)
         feedback.complete(id, at: now.addingTimeInterval(0.2))
         let newMoment = try XCTUnwrap(feedback.moments[id])
-        let newBurst = try XCTUnwrap(feedback.burst)
+        let newBurst = try XCTUnwrap(feedback.bursts.last)
         feedback.finishTick(id, token: oldMoment.id)
         feedback.finishBurst(token: oldBurst.id)
         XCTAssertEqual(feedback.moments[id]?.id, newMoment.id)
-        XCTAssertEqual(feedback.burst?.id, newBurst.id)
+        XCTAssertEqual(feedback.bursts.last?.id, newBurst.id)
         XCTAssertEqual(feedback.hapticTrigger, 2)
     }
     @MainActor func testCelebrationsStayIndependentAcrossHabitsAndStopOnBackground() throws {
         let feedback = CompletionFeedback(), first = UUID(), second = UUID()
         let now = Date.now
         feedback.complete(first, at: now); feedback.complete(second, at: now)
-        let secondBurst = try XCTUnwrap(feedback.burst)
+        let secondBurst = try XCTUnwrap(feedback.bursts.last)
         feedback.undo(first)
         XCTAssertNil(feedback.moments[first])
         XCTAssertNotNil(feedback.moments[second])
-        XCTAssertEqual(feedback.burst?.id, secondBurst.id)
+        XCTAssertEqual(feedback.bursts.last?.id, secondBurst.id)
         XCTAssertFalse(feedback.showsTick(second, on: Day.adding(1, to: now), now: now))
         feedback.stop()
-        XCTAssertNil(feedback.burst); XCTAssertTrue(feedback.moments.isEmpty)
+        XCTAssertTrue(feedback.bursts.isEmpty); XCTAssertTrue(feedback.moments.isEmpty)
         XCTAssertEqual(feedback.hapticTrigger, 2)
+    }
+
+    @MainActor func testConfettiShowersOverlapWithoutRestartingEarlierOne() throws {
+        let feedback = CompletionFeedback()
+        let start = Date.now
+        let firstHabit = UUID(), secondHabit = UUID()
+        feedback.complete(firstHabit, at: start)
+        let first = try XCTUnwrap(feedback.bursts.first)
+        feedback.complete(secondHabit, at: start.addingTimeInterval(1))
+        XCTAssertEqual(feedback.bursts.count, 2)
+        XCTAssertEqual(feedback.bursts[0].id, first.id)
+        XCTAssertEqual(feedback.bursts[0].startedAt, start)
+        let second = feedback.bursts[1]
+        XCTAssertEqual(second.startedAt, start.addingTimeInterval(1))
+        feedback.finishBurst(token: first.id)
+        XCTAssertEqual(feedback.bursts.map(\.id), [second.id])
+        // A repeated cleanup from the first shower must not cancel the second.
+        feedback.finishBurst(token: first.id)
+        XCTAssertEqual(feedback.bursts.map(\.id), [second.id])
+        feedback.finishBurst(token: second.id)
+        XCTAssertTrue(feedback.bursts.isEmpty)
     }
 
 }
