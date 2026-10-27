@@ -1,19 +1,21 @@
 import SwiftUI
 
 struct MiniHeatmap: View {
+    @Environment(\.colorScheme) private var scheme
     let habit: Habit
     let today: Date
     var body: some View {
         HStack(spacing: 3) {
             ForEach(-27...0, id: \.self) { offset in
                 let done = habit.isComplete(Day.adding(offset, to: today))
-                RoundedRectangle(cornerRadius: 2).fill(Color(habitHex: habit.colorHex).opacity(done ? 1 : 0.12)).frame(height: 8)
+                RoundedRectangle(cornerRadius: 2).fill(done ? Color(habitHex: habit.colorHex) : (scheme == .dark ? AppTheme.emptyHeatmap : Color(habitHex: habit.colorHex).opacity(0.12))).frame(height: 8)
             }
         }.accessibilityElement(children: .ignore).accessibilityLabel("Last 28 days: \((-27...0).filter { habit.isComplete(Day.adding($0, to: today)) }.count) completed")
     }
 }
 
 struct HeatmapView: View {
+    @Environment(\.colorScheme) private var scheme
     let habit: Habit
     let today: Date
     let weekly: Bool
@@ -26,7 +28,7 @@ struct HeatmapView: View {
     }
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack { Text(dates[0], format: .dateTime.month(.abbreviated)); Spacer(); Text(today, format: .dateTime.month(.abbreviated).year()) }.font(.caption).foregroundStyle(.secondary)
+            HStack { Text(dates[0], format: .dateTime.month(.abbreviated)); Spacer(); Text(today, format: .dateTime.month(.abbreviated).year()) }.font(.caption).foregroundStyle(AppTheme.secondaryText)
             if weekly {
                 HStack(alignment: .bottom, spacing: 6) {
                     ForEach(0..<12) { week in
@@ -34,7 +36,7 @@ struct HeatmapView: View {
                         let eligible = slice.filter { $0 <= today && $0 >= Day.calendar.startOfDay(for: habit.createdAt) }
                         let count = eligible.filter { habit.isComplete($0) }.count
                         VStack(spacing: 6) {
-                            RoundedRectangle(cornerRadius: 5).fill(Color(habitHex: habit.colorHex).opacity(count == 0 ? 0.12 : 0.2 + Double(count) / 7 * 0.8))
+                            RoundedRectangle(cornerRadius: 5).fill(count == 0 && scheme == .dark ? AppTheme.emptyHeatmap : Color(habitHex: habit.colorHex).opacity(count == 0 ? 0.12 : 0.2 + Double(count) / 7 * 0.8))
                                 .frame(height: 72)
                             Text("\(count)").font(.caption2.monospacedDigit())
                         }.accessibilityElement(children: .ignore).accessibilityLabel("Week of \(slice[0].formatted(date: .abbreviated, time: .omitted)): \(count) of \(eligible.count) days")
@@ -50,7 +52,7 @@ struct HeatmapView: View {
                                 let eligible = date <= today && date >= Day.calendar.startOfDay(for: habit.createdAt)
                                 Button { toggle(date) } label: {
                                     RoundedRectangle(cornerRadius: 3)
-                                        .fill(Color(habitHex: habit.colorHex).opacity(habit.isComplete(date) ? 1 : 0.12))
+                                        .fill(habit.isComplete(date) ? Color(habitHex: habit.colorHex) : (scheme == .dark ? AppTheme.emptyHeatmap : Color(habitHex: habit.colorHex).opacity(0.12)))
                                         .aspectRatio(1, contentMode: .fit).opacity(eligible ? 1 : 0.2)
                                 }.buttonStyle(.plain).disabled(!eligible)
                                     .accessibilityLabel("\(date.formatted(date: .complete, time: .omitted)), \(habit.isComplete(date) ? "complete, undo" : "incomplete, complete")")
@@ -59,7 +61,7 @@ struct HeatmapView: View {
                     }
                 }
             }
-            Text(weekly ? "Each column is a week. Brighter means more completed days." : "12 weeks · Tap a day to update its check-in.").font(.caption).foregroundStyle(.secondary)
+            Text(weekly ? "Each column is a week. Brighter means more completed days." : "12 weeks · Tap a day to update its check-in.").font(.caption).foregroundStyle(AppTheme.secondaryText)
         }
     }
 }
@@ -84,7 +86,7 @@ struct StreakGoalView: View {
                     .tint(Color(habitHex: colorHex))
                     .accessibilityHidden(true)
                 Text("Goal: \(progress.goal) consecutive \(progress.goal == 1 ? "day" : "days")")
-                    .font(.caption2).foregroundStyle(.secondary)
+                    .font(.caption2).foregroundStyle(AppTheme.secondaryText)
             } else {
                 Text("\(max(0, current))-day streak")
                     .font(.caption.weight(.medium)).monospacedDigit()

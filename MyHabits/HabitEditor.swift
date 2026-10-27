@@ -26,7 +26,7 @@ struct HabitEditor: View {
             Form {
                 Section("A small promise to yourself :)") {
                     TextField("Habit name", text: $name).onChange(of: name) { _, value in name = String(value.prefix(80)) }
-                }
+                }.appSectionStyle()
                 Section {
                     Toggle("Streak Goal", isOn: $hasStreakGoal)
                     if hasStreakGoal {
@@ -45,7 +45,7 @@ struct HabitEditor: View {
                     Text("Set a Streak Goal")
                 } footer: {
                     Text("Goals are optional. Your streak is tracked either way. You can add, change or remove a goal later without losing check-ins.")
-                }
+                }.appSectionStyle()
                 Section("Colour") {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 0), spacing: 4), count: 6), spacing: 8) {
                         ForEach(Palette.colors, id: \.self) { hex in
@@ -56,7 +56,7 @@ struct HabitEditor: View {
                             }.buttonStyle(.plain).accessibilityLabel(Palette.colorName(hex)).accessibilityAddTraits(color == hex ? .isSelected : [])
                         }
                     }
-                }
+                }.appSectionStyle()
                 Section("Icon") {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 44))], spacing: 8) {
                         ForEach(Palette.symbols, id: \.self) { item in
@@ -67,8 +67,9 @@ struct HabitEditor: View {
                             }.buttonStyle(.plain).accessibilityLabel(Palette.symbolName(item)).accessibilityAddTraits(symbol == item ? .isSelected : [])
                         }
                     }
-                }
+                }.appSectionStyle()
             }
+            .appScreenStyle()
             .navigationTitle(habit == nil ? "New Habit" : "Edit habit")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }

@@ -76,8 +76,8 @@ struct BackupView: View {
             Form {
                 Section("Your data stays yours") {
                     Text("Unlimited habits. No accounts, subscriptions, analytics, or cloud sync. Habits and check-ins are stored locally in the shared app container.")
-                    Text("Use backups to move your data or keep a safe copy. Backup files are plain JSON; store them somewhere you trust.").font(.caption).foregroundStyle(.secondary)
-                }
+                    Text("Use backups to move your data or keep a safe copy. Backup files are plain JSON; store them somewhere you trust.").font(.caption).foregroundStyle(AppTheme.secondaryText)
+                }.appSectionStyle()
                 Section {
                     LabeledContent("Archived habits", value: "\(habits.filter { $0.archived }.count)")
                     Button("Delete archived habits", role: .destructive) { clearingArchive = true }
@@ -86,7 +86,7 @@ struct BackupView: View {
                     Text("Archive storage")
                 } footer: {
                     Text("Archived habits stay out of your daily focus. They are kept in backups, but cannot be browsed or restored here.")
-                }
+                }.appSectionStyle()
                 .confirmationDialog("Permanently delete all archived habits and their check-ins? Active habits will be kept.", isPresented: $clearingArchive, titleVisibility: .visible) {
                     Button("Delete archived habits", role: .destructive) { deleteArchivedHabits() }
                     Button("Cancel", role: .cancel) {}
@@ -100,8 +100,8 @@ struct BackupView: View {
                         } catch { message = error.localizedDescription }
                     }
                     Button("Import backup") { importing = true }
-                    Text("Import merges by habit ID. Matching habits are replaced by the backup; other habits are kept. Export first to preserve your current history.").font(.caption).foregroundStyle(.secondary)
-                }
+                    Text("Import merges by habit ID. Matching habits are replaced by the backup; other habits are kept. Export first to preserve your current history.").font(.caption).foregroundStyle(AppTheme.secondaryText)
+                }.appSectionStyle()
                 Section {
                     Picker("Appearance", selection: $appearance) {
                         ForEach(AppAppearance.allCases) { option in
@@ -113,8 +113,9 @@ struct BackupView: View {
                     Text("Appearance")
                 } footer: {
                     Text("System follows your iPhone’s appearance. Your choice is saved on this device.")
-                }
+                }.appSectionStyle()
             }
+            .appScreenStyle()
             .preferredColorScheme(appearance.colorScheme)
             .navigationTitle("Settings").toolbar { Button("Done") { dismiss() } }
             .fileExporter(isPresented: $exporting, document: document, contentType: .json, defaultFilename: "MyHabits-\(Day.key(.now))") { result in

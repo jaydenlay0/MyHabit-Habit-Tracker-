@@ -19,27 +19,27 @@ struct HabitDetailView: View {
             Section {
                 HStack(spacing: 16) {
                     HabitCompletionIcon(habit: habit, today: now, size: 56)
-                    VStack(alignment: .leading) { Text(habit.name).font(.title2.bold()); Text("Every day · Since \(habit.createdAt.formatted(date: .abbreviated, time: .omitted))").font(.caption).foregroundStyle(.secondary) }
+                    VStack(alignment: .leading) { Text(habit.name).font(.title2.bold()); Text("Every day · Since \(habit.createdAt.formatted(date: .abbreviated, time: .omitted))").font(.caption).foregroundStyle(AppTheme.secondaryText) }
                 }.padding(.vertical, 12)
                 if !habit.archived {
                     Button { toggleCheckIn(.now) } label: { Label(habit.isComplete(now) ? "Completed today · Undo" : "Check in today", systemImage: feedback.showsTick(habit.id, on: now) ? "checkmark" : habit.symbol) }.tint(Color(habitHex: habit.colorHex))
                 }
-            }
+            }.appSectionStyle()
             Section(habit.hasStreakGoal ? "Streak goal" : "Current streak") {
                 StreakGoalView(current: stats.current, goal: habit.streakGoal, colorHex: habit.colorHex)
                     .padding(.vertical, 6)
                 Button(habit.hasStreakGoal ? "Change or remove goal" : "Add a goal (optional)") { editing = true }
-            }
+            }.appSectionStyle()
             Section("Your rhythm") {
                 Picker("View", selection: $weekly) { Text("Daily").tag(false); Text("Weekly").tag(true) }.pickerStyle(.segmented)
                 HeatmapView(habit: habit, today: now, weekly: weekly) { date in toggleCheckIn(date) }.padding(.vertical, 8)
-            }
+            }.appSectionStyle()
             Section("All-time statistics") {
                 LabeledContent("Current streak", value: "\(stats.current) days")
                 LabeledContent("Longest streak", value: "\(stats.longest) days")
                 LabeledContent("Completion", value: "\(stats.percentage)%")
-                Text("Completion includes every day since creation, including today. Your current streak stays alive until the end of today.").font(.caption).foregroundStyle(.secondary)
-            }
+                Text("Completion includes every day since creation, including today. Your current streak stays alive until the end of today.").font(.caption).foregroundStyle(AppTheme.secondaryText)
+            }.appSectionStyle()
             Section {
                 Button("Archive habit") { archiving = true }
                     .confirmationDialog("Archive this habit? It will leave your daily list and widgets. Archived habits cannot be browsed or restored in the app.", isPresented: $archiving, titleVisibility: .visible) {
@@ -50,8 +50,9 @@ struct HabitDetailView: View {
                         Button("Cancel", role: .cancel) {}
                     }
                 Button("Delete habit", role: .destructive) { deleting = true }
-            }
+            }.appSectionStyle()
         }
+        .appScreenStyle()
         .onReceive(Timer.publish(every: 30, on: .main, in: .common).autoconnect()) { now = $0 }
         .navigationTitle("Habit").navigationBarTitleDisplayMode(.inline)
         .toolbar { Button("Edit") { editing = true } }

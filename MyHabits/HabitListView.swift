@@ -5,6 +5,7 @@ import WidgetKit
 struct HabitListView: View {
     @Environment(\.modelContext) private var context
     @Query(sort: \Habit.order) private var habits: [Habit]
+    @Environment(\.colorScheme) private var scheme
     @Environment(\.scenePhase) private var scenePhase
     @State private var feedback = CompletionFeedback()
     @State private var now = Date.now
@@ -21,13 +22,13 @@ struct HabitListView: View {
                         .font(.largeTitle.bold())
                         .accessibilityAddTraits(.isHeader)
                         .padding(.bottom, 20)
-                    Text(now, format: .dateTime.weekday(.wide).month(.wide).day()).font(.subheadline).foregroundStyle(.secondary)
+                    Text(now, format: .dateTime.weekday(.wide).month(.wide).day()).font(.subheadline).foregroundStyle(AppTheme.secondaryText)
                     Text("Another Day, Another Opportunity.")
                         .font(.title2.bold())
                         .lineLimit(1)
                         .minimumScaleFactor(0.4)
                         .allowsTightening(true)
-                    Text("\(visible.filter { $0.isComplete(now) }.count) of \(visible.count) complete today").font(.subheadline).foregroundStyle(.secondary)
+                    Text("\(visible.filter { $0.isComplete(now) }.count) of \(visible.count) complete today").font(.subheadline).foregroundStyle(AppTheme.secondaryText)
                 }
                 .frame(maxWidth: .infinity, alignment: .center)
                 .multilineTextAlignment(.center)
@@ -56,15 +57,18 @@ struct HabitListView: View {
                                 }.padding(.vertical, 8)
                             }
                         }
+                        .appHabitCardStyle()
                         .swipeActions {
                             Button("Archive") { pendingArchive = habit }.tint(.orange)
                         }
                     }.onMove(perform: move)
                 }
+                .listRowSpacing(scheme == .dark ? 10 : nil)
                 .contentMargins(.top, 32, for: .scrollContent)
                 .scrollContentBackground(.hidden)
             }
-            .background(Color(uiColor: .systemGroupedBackground))
+            .background(AppTheme.background)
+            .appScreenStyle()
             .onReceive(Timer.publish(every: 30, on: .main, in: .common).autoconnect()) { now = $0 }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)

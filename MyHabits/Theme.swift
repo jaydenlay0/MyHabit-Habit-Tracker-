@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 enum AppAppearance: String, CaseIterable, Identifiable {
     static let storageKey = "appearance"
@@ -73,5 +74,27 @@ extension Color {
     init(habitHex: String) {
         let n = UInt64(habitHex, radix: 16) ?? 0x63D6A3
         self.init(.sRGB, red: Double((n >> 16) & 255) / 255, green: Double((n >> 8) & 255) / 255, blue: Double(n & 255) / 255, opacity: 1)
+    }
+}
+
+// Semantic colours resolve with the current appearance, including sheet overrides.
+// Light variants keep the existing native iOS colours.
+enum AppTheme {
+    static let background = adaptive("0D1117", light: .systemGroupedBackground)
+    static let surface = adaptive("161B22", light: .secondarySystemGroupedBackground)
+    static let border = adaptive("30363D", light: .separator)
+    static let primaryText = adaptive("E6EDF3", light: .label)
+    static let secondaryText = adaptive("9198A1", light: .secondaryLabel)
+    static let accent = adaptive("58A6FF", light: .systemBlue)
+    static let emptyHeatmap = Color(habitHex: "21262D")
+
+    private static func adaptive(_ hex: String, light: UIColor) -> Color {
+        let n = UInt64(hex, radix: 16)!
+        let dark = UIColor(red: CGFloat((n >> 16) & 255) / 255,
+                           green: CGFloat((n >> 8) & 255) / 255,
+                           blue: CGFloat(n & 255) / 255, alpha: 1)
+        return Color(uiColor: UIColor { traits in
+            traits.userInterfaceStyle == .dark ? dark : light
+        })
     }
 }
