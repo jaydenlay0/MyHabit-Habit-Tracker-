@@ -47,12 +47,12 @@ struct HabitEditor: View {
                     Text("Goals are optional. Your streak is tracked either way. You can add, change or remove a goal later without losing check-ins.")
                 }
                 Section("Colour") {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 44))], spacing: 8) {
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 0), spacing: 4), count: 6), spacing: 8) {
                         ForEach(Palette.colors, id: \.self) { hex in
                             Button { color = hex } label: {
                                 Circle().fill(Color(habitHex: hex)).frame(width: 34, height: 34)
-                                    .overlay { if color == hex { Image(systemName: "checkmark").foregroundStyle(.black) } }
-                                    .frame(minWidth: 44, minHeight: 44)
+                                    .overlay { if color == hex { Image(systemName: "checkmark").foregroundStyle(Palette.selectionInk(hex)) } }
+                                    .frame(maxWidth: .infinity, minHeight: 44)
                             }.buttonStyle(.plain).accessibilityLabel(Palette.colorName(hex)).accessibilityAddTraits(color == hex ? .isSelected : [])
                         }
                     }

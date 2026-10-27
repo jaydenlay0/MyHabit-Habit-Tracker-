@@ -23,19 +23,30 @@ enum AppAppearance: String, CaseIterable, Identifiable {
 
 enum Palette {
     static let defaultColor = "63D6A3"
-    // Twenty-four hues in rainbow order; existing saved colours remain in the palette.
+    // Rows run light to deep; columns are red, blue, green, yellow, pink, purple.
     static let colors = [
-        "FF6B6B", "FF8B66", "FF9F43", "FFB86C", "FFC857", "F0D66E",
-        "D4E76C", "A5DC74", "77D98B", "63D6A3", "2FBF9B", "50C9BC",
-        "53C9DC", "66C4F5", "73B5FF", "5A82E8", "8295F2", "9C87F5",
-        "B79CFF", "CA8DE8", "E68BCB", "E56AB5", "F787A5", "F57589"
+        "FF9B9B", "A8D3FF", "A8E6B5", "FFF2A6", "FFD1E3", "DDCBFF",
+        "FF6B6B", "73B5FF", "63D6A3", "F0D66E", "F787A5", "B79CFF",
+        "E94B57", "4F8FE8", "45BA73", "F6CC4D", "EE6AA7", "9C75E8",
+        "C93645", "3568C8", "268B52", "D9A923", "D94888", "7850C5"
     ]
     static let colorNames = [
-        "Red", "Coral", "Orange", "Peach", "Amber", "Yellow",
-        "Lime", "Spring green", "Green", "Mint", "Emerald", "Teal",
-        "Turquoise", "Sky blue", "Blue", "Cobalt", "Indigo", "Violet",
-        "Lavender", "Purple", "Orchid", "Magenta", "Pink", "Rose"
+        "Light red", "Baby blue", "Light green", "Pale yellow", "Baby pink", "Lilac",
+        "Red", "Blue", "Mint green", "Yellow", "Pink", "Lavender",
+        "Scarlet red", "Cornflower blue", "Leaf green", "Golden yellow", "Rose pink", "Violet",
+        "Deep red", "Royal blue", "Forest green", "Mustard yellow", "Deep pink", "Deep purple"
     ]
+    static func selectionInk(_ hex: String) -> Color {
+        // Choose black or white to keep the selection mark readable on every shade.
+        let value = UInt64(hex, radix: 16) ?? 0x63D6A3
+        func linear(_ channel: UInt64) -> Double {
+            let value = Double(channel) / 255
+            return value <= 0.04045 ? value / 12.92 : pow((value + 0.055) / 1.055, 2.4)
+        }
+        let luminance = 0.2126 * linear((value >> 16) & 255)
+            + 0.7152 * linear((value >> 8) & 255) + 0.0722 * linear(value & 255)
+        return luminance > 0.179 ? .black : .white
+    }
     static let symbols = [
         "checkmark", "figure.walk", "book.closed", "drop", "moon", "leaf",
         "heart", "dumbbell", "pencil", "sun.max", "cup.and.saucer", "music.note",
