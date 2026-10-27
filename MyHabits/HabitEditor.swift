@@ -24,11 +24,11 @@ struct HabitEditor: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("A small promise to yourself") {
+                Section("A small promise to yourself :)") {
                     TextField("Habit name", text: $name).onChange(of: name) { _, value in name = String(value.prefix(80)) }
                 }
                 Section {
-                    Toggle("Set a streak goal", isOn: $hasStreakGoal)
+                    Toggle("Streak Goal", isOn: $hasStreakGoal)
                     if hasStreakGoal {
                         Stepper("\(streakGoal)-day streak", value: $streakGoal, in: 1...3650)
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 48))]) {
@@ -42,7 +42,7 @@ struct HabitEditor: View {
                         }
                     }
                 } header: {
-                    Text("Streak goal")
+                    Text("Set a Streak Goal")
                 } footer: {
                     Text("Goals are optional. Your streak is tracked either way. You can add, change or remove a goal later without losing check-ins.")
                 }
