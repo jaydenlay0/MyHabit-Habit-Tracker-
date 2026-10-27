@@ -53,15 +53,14 @@ struct HabitCompletionIcon: View {
         let complete = habit.isComplete(today)
         let tick = complete && feedback.showsTick(habit.id, on: today)
         let moment = feedback.moments[habit.id]
-        let settled = complete && !tick
         ZStack {
             Image(systemName: habit.symbol).opacity(tick ? 0 : 1)
             Image(systemName: "checkmark").opacity(tick ? 1 : 0)
         }
             .font(size > 46 ? .title2 : .headline)
             .frame(width: size, height: size)
-            .foregroundStyle(settled ? Palette.selectionInk(habit.colorHex) : Color(habitHex: habit.colorHex))
-            .background(Color(habitHex: habit.colorHex).opacity(settled ? 1 : 0.14), in: RoundedRectangle(cornerRadius: 14))
+            .foregroundStyle(complete ? Palette.selectionInk(habit.colorHex) : Color(habitHex: habit.colorHex))
+            .background(Color(habitHex: habit.colorHex).opacity(complete ? 1 : 0.14), in: RoundedRectangle(cornerRadius: 14))
             .animation(reduceMotion ? nil : .easeInOut(duration: 0.45), value: tick)
             .animation(reduceMotion ? nil : .easeInOut(duration: 0.45), value: complete)
             .accessibilityHidden(true)
