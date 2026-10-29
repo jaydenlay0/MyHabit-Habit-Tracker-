@@ -164,6 +164,7 @@ struct BackupView: View {
             .appScreenStyle()
             .preferredColorScheme(appearance.colorScheme)
             .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 if showsDoneButton { Button("Done") { dismiss() } }
             }
