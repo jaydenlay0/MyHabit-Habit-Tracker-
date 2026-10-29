@@ -12,9 +12,51 @@ struct HabitSymbol: View {
                 .stroke(style: StrokeStyle(lineWidth: size * 0.075, lineCap: .round, lineJoin: .round))
                 .frame(width: size, height: size)
                 .scaleEffect(1.32)
+        } else if name == "music.note" {
+            // Keep the stored identifier compatible with existing habits and backups.
+            DeodorantSpray()
+                .stroke(style: StrokeStyle(lineWidth: size * 0.075, lineCap: .round, lineJoin: .round))
+                .frame(width: size, height: size)
         } else {
             Image(systemName: name)
         }
+    }
+}
+
+private struct DeodorantSpray: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        // Rounded spray button and its nozzle.
+        path.move(to: CGPoint(x: 13, y: 6))
+        path.addCurve(to: CGPoint(x: 16, y: 1), control1: CGPoint(x: 13, y: 2), control2: CGPoint(x: 14, y: 1))
+        path.addCurve(to: CGPoint(x: 19, y: 6), control1: CGPoint(x: 18, y: 1), control2: CGPoint(x: 19, y: 2))
+        path.move(to: CGPoint(x: 16, y: 3.5))
+        path.addLine(to: CGPoint(x: 16, y: 4))
+        // Shoulder, narrow neck, gently shaped can and flat base.
+        path.move(to: CGPoint(x: 12.5, y: 6))
+        path.addLine(to: CGPoint(x: 19.5, y: 6))
+        path.addQuadCurve(to: CGPoint(x: 21, y: 8), control: CGPoint(x: 21.5, y: 6))
+        path.addCurve(to: CGPoint(x: 20, y: 14), control1: CGPoint(x: 20.5, y: 10), control2: CGPoint(x: 20, y: 12))
+        path.addCurve(to: CGPoint(x: 21, y: 23), control1: CGPoint(x: 20, y: 17), control2: CGPoint(x: 21, y: 20))
+        path.addLine(to: CGPoint(x: 21, y: 31))
+        path.addLine(to: CGPoint(x: 11, y: 31))
+        path.addLine(to: CGPoint(x: 11, y: 23))
+        path.addCurve(to: CGPoint(x: 12, y: 14), control1: CGPoint(x: 11, y: 20), control2: CGPoint(x: 12, y: 17))
+        path.addCurve(to: CGPoint(x: 11, y: 8), control1: CGPoint(x: 12, y: 12), control2: CGPoint(x: 11.5, y: 10))
+        path.addQuadCurve(to: CGPoint(x: 12.5, y: 6), control: CGPoint(x: 10.5, y: 6))
+        path.closeSubpath()
+        path.move(to: CGPoint(x: 11.5, y: 10))
+        path.addLine(to: CGPoint(x: 20.5, y: 10))
+        path.move(to: CGPoint(x: 12, y: 13))
+        path.addLine(to: CGPoint(x: 20, y: 13))
+        // Sweeping label edges from the supplied reference.
+        path.move(to: CGPoint(x: 11, y: 23))
+        path.addQuadCurve(to: CGPoint(x: 20.8, y: 19.5), control: CGPoint(x: 16, y: 19.5))
+        path.move(to: CGPoint(x: 11, y: 28))
+        path.addQuadCurve(to: CGPoint(x: 21, y: 23), control: CGPoint(x: 18, y: 28))
+        let scale = min(rect.width, rect.height) / 32
+        return path.applying(CGAffineTransform(a: scale, b: 0, c: 0, d: scale,
+                                               tx: rect.midX - 16 * scale, ty: rect.midY - 16 * scale))
     }
 }
 

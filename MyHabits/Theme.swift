@@ -58,7 +58,7 @@ enum Palette {
             "checkmark": "Checkmark", "figure.walk": "Walking", "book.closed": "Reading",
             "drop": "Water", "moon": "Sleep", "leaf": "Brushing teeth", "heart": "Heart",
             "dumbbell": "Exercise", "pencil": "Writing", "sun.max": "Sunshine",
-            "cup.and.saucer": "Tea or coffee", "music.note": "Music",
+            "cup.and.saucer": "Tea or coffee", "music.note": "Deodorant",
             "figure.mind.and.body": "Meditation", "figure.yoga": "Yoga",
             "basketball.fill": "Basketball", "figure.jumprope": "Skipping rope",
             "pills.fill": "Pills", "airpodsmax": "AirPods Max headphones"
