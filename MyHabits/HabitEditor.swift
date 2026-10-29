@@ -51,6 +51,9 @@ struct HabitEditor: View {
                         Stepper("Daily target: \(dailyTarget)", value: $dailyTarget, in: 1...10000)
                         Text("Use + and − to track your daily count. Reach your target to complete the habit.")
                             .font(.caption).foregroundStyle(AppTheme.secondaryText)
+                    } else {
+                        Text("Tap the habit icon to mark it complete for the day. Tap again to undo your check-in.")
+                            .font(.caption).foregroundStyle(AppTheme.secondaryText)
                     }
                 }.appSectionStyle()
                 Section {
