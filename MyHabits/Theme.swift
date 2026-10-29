@@ -49,9 +49,9 @@ enum Palette {
         return luminance > 0.179 ? .black : .white
     }
     static let symbols = [
-        "checkmark", "figure.walk", "book.closed", "drop", "moon", "leaf",
-        "heart", "dumbbell", "pencil", "sun.max", "cup.and.saucer", "music.note",
-        "figure.mind.and.body", "figure.yoga", "basketball.fill", "figure.jumprope", "pills.fill", "airpodsmax"
+        "checkmark", "heart", "pencil", "book.closed", "drop", "moon",
+        "figure.walk", "figure.mind.and.body", "figure.yoga", "figure.jumprope", "dumbbell", "basketball.fill",
+        "leaf", "pills.fill", "sun.max", "music.note", "airpodsmax", "cup.and.saucer"
     ]
     static func symbolName(_ symbol: String) -> String {
         let names = [

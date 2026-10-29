@@ -88,7 +88,7 @@ struct HabitEditor: View {
                     }
                 }.appSectionStyle()
                 Section("Icon") {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 44))], spacing: 8) {
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 0), spacing: 4), count: 6), spacing: 8) {
                         ForEach(Palette.symbols, id: \.self) { item in
                             Button { symbol = item } label: {
                                 HabitSymbol(name: item).frame(minWidth: 44, minHeight: 44)
