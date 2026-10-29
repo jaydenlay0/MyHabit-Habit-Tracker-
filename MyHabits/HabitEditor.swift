@@ -42,7 +42,7 @@ struct HabitEditor: View {
                         .onChange(of: habitDescription) { _, value in
                             habitDescription = Self.limitedDescription(value)
                         }
-                        .accessibilityHint("Optional description, up to 50 words")
+                        .accessibilityHint("Optional description, up to 50 words or 300 characters, whichever comes first")
                 }.appSectionStyle()
                 Section("Habit Tracking") {
                     Picker("Tracking type", selection: $trackingMode) {
@@ -124,8 +124,9 @@ struct HabitEditor: View {
         }
     }
     private static func limitedDescription(_ value: String) -> String {
-        let words = value.split(whereSeparator: { $0.isWhitespace })
-        return words.count > 50 ? words.prefix(50).joined(separator: " ") : value
+        let capped = String(value.prefix(300))
+        let words = capped.split(whereSeparator: { $0.isWhitespace })
+        return words.count > 50 ? words.prefix(50).joined(separator: " ") : capped
     }
 
     @MainActor private func save() async {
