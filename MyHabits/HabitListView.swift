@@ -86,6 +86,14 @@ struct HabitListView: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Image("BrandMark")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 30, height: 30)
+                        .clipShape(RoundedRectangle(cornerRadius: 7))
+                        .accessibilityLabel("MyHabits logo")
+                }
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     EditButton()
                 }
