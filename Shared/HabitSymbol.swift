@@ -20,8 +20,8 @@ struct HabitSymbol: View {
 private struct ToothbrushWithPaste: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        // Horizontal brush base with five rounded upright bristles.
-        path.move(to: CGPoint(x: 4, y: 27))
+        // End the brush at the first bristle on the left; the handle extends right.
+        path.move(to: CGPoint(x: 8, y: 27))
         path.addLine(to: CGPoint(x: 29, y: 27))
         let bristles: [CGFloat] = [8, 12, 16, 20, 24]
         for x in bristles {
@@ -37,9 +37,10 @@ private struct ToothbrushWithPaste: Shape {
         path.addLine(to: CGPoint(x: 16, y: 11))
         path.addCurve(to: CGPoint(x: 18.5, y: 6.5), control1: CGPoint(x: 18.5, y: 11), control2: CGPoint(x: 18.5, y: 9))
         path.closeSubpath()
-        let scale = min(rect.width, rect.height) / 32
+        // Fill the symbol frame to match the visual weight of the SF Symbols.
+        let scale = min(rect.width, rect.height) / 28
         let offsetX = rect.midX - 16 * scale
-        let offsetY = rect.midY - 16 * scale
+        let offsetY = rect.midY - 16.75 * scale
         return path.applying(CGAffineTransform(a: scale, b: 0, c: 0, d: scale, tx: offsetX, ty: offsetY))
     }
 }
