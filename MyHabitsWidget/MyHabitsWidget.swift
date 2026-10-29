@@ -15,7 +15,8 @@ struct CheckInIntent: AppIntent {
         let context = ModelContext(container)
         let descriptor = FetchDescriptor<Habit>(predicate: #Predicate { $0.id == id })
         if let habit = try context.fetch(descriptor).first, !habit.archived {
-            habit.toggle(); try context.save(); SharedStore.markWidgetWrite()
+            if habit.isCounter { habit.adjustCount(by: 1) } else { habit.toggle() }
+            try context.save(); SharedStore.markWidgetWrite()
         }
         WidgetCenter.shared.reloadAllTimelines()
         return .result()
@@ -23,6 +24,9 @@ struct CheckInIntent: AppIntent {
 }
 struct WidgetHabit: Identifiable {
     var id: UUID; var name: String; var symbol: String; var colorHex: String; var done: Bool
+    var isCounter = false
+    var count = 0
+    var target = 1
 }
 struct HabitEntry: TimelineEntry {
     let date: Date
@@ -44,7 +48,7 @@ struct Provider: TimelineProvider {
             let context = ModelContext(container)
             var descriptor = FetchDescriptor<Habit>(predicate: #Predicate { !$0.archived }, sortBy: [SortDescriptor(\Habit.order)])
             descriptor.fetchLimit = 6
-            let habits = try context.fetch(descriptor).map { WidgetHabit(id: $0.id, name: $0.name, symbol: $0.symbol, colorHex: $0.colorHex, done: $0.isComplete()) }
+            let habits = try context.fetch(descriptor).map { WidgetHabit(id: $0.id, name: $0.name, symbol: $0.symbol, colorHex: $0.colorHex, done: $0.isComplete(), isCounter: $0.isCounter, count: $0.count(), target: $0.dailyTarget) }
             return HabitEntry(date: .now, habits: habits)
         } catch { return HabitEntry(date: .now, habits: [], failed: true) }
     }
@@ -69,9 +73,12 @@ struct HabitsWidgetView: View {
                                 .background(Color(habitHex: habit.colorHex).opacity(habit.done ? 1 : 0.14), in: RoundedRectangle(cornerRadius: 8))
                             Text(habit.name).lineLimit(1).foregroundStyle(AppTheme.primaryText)
                             Spacer()
+                            if habit.isCounter {
+                                Text("\(habit.count)/\(habit.target)").font(.caption).foregroundStyle(AppTheme.secondaryText)
+                            }
                             if !habit.done { Image(systemName: "circle").foregroundStyle(AppTheme.secondaryText) }
                         }.font(.subheadline).frame(maxWidth: .infinity, minHeight: 24, alignment: .leading)
-                    }.buttonStyle(.plain).accessibilityLabel("\(habit.done ? "Undo" : "Complete") \(habit.name)")
+                    }.buttonStyle(.plain).accessibilityLabel(habit.isCounter ? "Increase \(habit.name) count" : "\(habit.done ? "Undo" : "Complete") \(habit.name)")
                         .accessibilityValue(habit.done ? "Completed" : "Not completed")
                 }
             }

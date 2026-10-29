@@ -9,6 +9,9 @@ import UserNotifications
 struct HabitRecord: Codable {
     var id: UUID
     var name: String
+    var trackingMode: String?
+    var dailyTarget: Int?
+    var counts: [String: Int]?
     var habitDescription: String?
     var symbol: String
     var colorHex: String
@@ -21,12 +24,14 @@ struct HabitRecord: Codable {
     var reminders: HabitReminders?
     var resolvedStreakGoal: Int { streakGoal ?? 30 }
     init(_ habit: Habit) {
+        trackingMode = habit.trackingMode; dailyTarget = habit.dailyTarget; counts = habit.counts
         habitDescription = habit.habitDescription
         id = habit.id; name = habit.name; symbol = habit.symbol; colorHex = habit.colorHex
         createdAt = habit.createdAt; order = habit.order; archived = habit.archived; days = habit.days; streakGoal = habit.streakGoal; reminders = habit.reminders
     }
     func model() -> Habit {
         let habit = Habit(id: id, name: name, symbol: symbol, colorHex: colorHex, createdAt: createdAt, order: order, archived: archived, days: days, streakGoal: resolvedStreakGoal)
+        habit.trackingMode = trackingMode ?? "yesNo"; habit.dailyTarget = dailyTarget ?? 1; habit.counts = counts ?? [:]
         habit.habitDescription = habitDescription
         habit.reminders = reminders ?? HabitReminders()
         return habit
@@ -46,6 +51,9 @@ struct HabitBackup: Codable {
         for habit in habits {
             guard !habit.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, habit.name.count <= 80,
                   (habit.habitDescription?.count ?? 0) <= 1000,
+                  ["yesNo", "counter"].contains(habit.trackingMode ?? "yesNo"),
+                  (1...10000).contains(habit.dailyTarget ?? 1),
+                  (habit.counts ?? [:]).values.allSatisfy({ (0...1_000_000).contains($0) }),
                   Palette.symbols.contains(habit.symbol),
                   habit.colorHex.range(of: "^[0-9A-Fa-f]{6}$", options: .regularExpression) != nil,
                   habit.createdAt <= Date.now,
@@ -56,7 +64,8 @@ struct HabitBackup: Codable {
                     throw BackupError.invalid(reminders.validationMessage ?? "Invalid reminder settings.")
                 }
             }
-            for day in habit.days {
+            let recordedDays = Set(habit.days).union((habit.counts ?? [:]).keys)
+            for day in recordedDays {
                 guard day.range(of: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$", options: .regularExpression) != nil,
                       let date = parser.date(from: day), parser.string(from: date) == day,
                       day >= Day.key(habit.createdAt), day <= Day.key(.now) else { throw BackupError.invalid("Invalid check-in date.") }
@@ -188,6 +197,7 @@ struct BackupView: View {
             let existing = Dictionary(uniqueKeysWithValues: habits.map { ($0.id, $0) })
             for record in backup.habits {
                 if let habit = existing[record.id] {
+                    habit.trackingMode = record.trackingMode ?? "yesNo"; habit.dailyTarget = record.dailyTarget ?? 1; habit.counts = record.counts ?? [:]
                     habit.habitDescription = record.habitDescription
                     habit.name = record.name; habit.symbol = record.symbol; habit.colorHex = record.colorHex
                     habit.createdAt = record.createdAt; habit.order = record.order; habit.archived = record.archived; habit.days = record.days; habit.streakGoal = record.resolvedStreakGoal; habit.reminders = record.reminders ?? HabitReminders()

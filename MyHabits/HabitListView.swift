@@ -42,22 +42,36 @@ struct HabitListView: View {
                     }
                     ForEach(visible) { habit in
                         HStack(spacing: 14) {
-                            Button { toggleToday(habit) } label: {
+                            Button { if habit.isCounter { adjustCounter(habit, by: 1) } else { toggleToday(habit) } } label: {
                                 HabitCompletionIcon(habit: habit, today: now)
                             }.buttonStyle(.borderless)
-                                .accessibilityLabel("\(habit.isComplete(now) ? "Undo" : "Complete") \(habit.name) for today")
+                                .accessibilityLabel(habit.isCounter ? "Increase \(habit.name) count" : "\(habit.isComplete(now) ? "Undo" : "Complete") \(habit.name) for today")
                                 .accessibilityValue(habit.isComplete(now) ? "Completed" : "Not completed")
                             NavigationLink {
                                 HabitDetailView(habit: habit)
                             } label: {
                                 VStack(alignment: .leading, spacing: 10) {
                                     Text(habit.name).font(.headline)
+                                    if habit.isCounter {
+                                        Text("\(habit.count(on: now)) / \(habit.dailyTarget) today")
+                                            .font(.subheadline).foregroundStyle(AppTheme.secondaryText)
+                                    }
                                     StreakGoalView(current: HabitStats(habit: habit, today: now).current, goal: habit.streakGoal, colorHex: habit.colorHex)
                                     MiniHeatmap(habit: habit, today: now)
                                 }.padding(.vertical, 8)
                             }
+                            if habit.isCounter {
+                                VStack(spacing: 12) {
+                                    Button { adjustCounter(habit, by: 1) } label: { Image(systemName: "plus.circle.fill").font(.title2) }
+                                        .accessibilityLabel("Increase \(habit.name) count")
+                                    Button { adjustCounter(habit, by: -1) } label: { Image(systemName: "minus.circle").font(.title2) }
+                                        .disabled(habit.count(on: now) == 0)
+                                        .accessibilityLabel("Decrease \(habit.name) count")
+                                }.buttonStyle(.borderless).tint(Color(habitHex: habit.colorHex))
+                            }
                         }
                         .appHabitCardStyle()
+
                         .swipeActions {
                             Button("Archive") { pendingArchive = habit }.tint(.orange)
                         }
@@ -101,6 +115,15 @@ struct HabitListView: View {
             else { now = .now }
         }
     }
+    private func adjustCounter(_ habit: Habit, by amount: Int) {
+        now = .now
+        let wasComplete = habit.isComplete(now)
+        habit.adjustCount(by: amount, on: now)
+        guard save() else { return }
+        if !wasComplete && habit.isComplete(now) { feedback.complete(habit.id, at: now) }
+        else if wasComplete && !habit.isComplete(now) { feedback.undo(habit.id) }
+    }
+
     private func toggleToday(_ habit: Habit) {
         now = .now
         let wasComplete = habit.isComplete(now)

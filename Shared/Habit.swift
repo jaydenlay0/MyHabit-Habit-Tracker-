@@ -6,6 +6,9 @@ final class Habit {
     @Attribute(.unique) var id: UUID
     var name: String
     var habitDescription: String? = nil
+    var trackingMode: String = "yesNo"
+    var dailyTarget: Int = 1
+    var counterData: Data? = nil
     var symbol: String
     var colorHex: String
     var createdAt: Date
@@ -23,10 +26,35 @@ final class Habit {
         self.createdAt = createdAt; self.order = order; self.archived = archived; self.days = days
         self.streakGoal = streakGoal
     }
+    var isCounter: Bool { trackingMode == "counter" }
+    var counts: [String: Int] {
+        get {
+            guard let counterData else { return [:] }
+            return (try? JSONDecoder().decode([String: Int].self, from: counterData)) ?? [:]
+        }
+        set { counterData = try? JSONEncoder().encode(newValue) }
+    }
+    func count(on date: Date = .now) -> Int {
+        counts[Day.key(date)] ?? (isComplete(date) ? max(1, dailyTarget) : 0)
+    }
+    func adjustCount(by amount: Int, on date: Date = .now) {
+        let key = Day.key(date)
+        let value = min(1_000_000, max(0, count(on: date) + amount))
+        var updated = counts
+        updated[key] = value
+        counts = updated
+        days.removeAll { $0 == key }
+        if value >= max(1, dailyTarget) { days.append(key) }
+    }
     var hasStreakGoal: Bool { streakGoal > 0 }
 
     func isComplete(_ date: Date = .now) -> Bool { days.contains(Day.key(date)) }
     func toggle(_ date: Date = .now) {
+        if isCounter {
+            if isComplete(date) { adjustCount(by: -count(on: date), on: date) }
+            else { adjustCount(by: max(1, dailyTarget) - count(on: date), on: date) }
+            return
+        }
         let key = Day.key(date)
         if days.contains(key) { days.removeAll { $0 == key } } else { days.append(key) }
     }

@@ -34,6 +34,11 @@ struct HabitDetailView: View {
                     }.tint(Color(habitHex: habit.colorHex))
                 }
             }.appSectionStyle()
+            if habit.isCounter {
+                Section("Today's count") {
+                    Stepper("\(habit.count(on: now)) / \(habit.dailyTarget)", onIncrement: { adjustCounter(1) }, onDecrement: { adjustCounter(-1) })
+                }.appSectionStyle()
+            }
             Section(habit.hasStreakGoal ? "Streak goal" : "Current streak") {
                 StreakGoalView(current: stats.current, goal: habit.streakGoal, colorHex: habit.colorHex)
                     .padding(.vertical, 6)
@@ -83,6 +88,14 @@ struct HabitDetailView: View {
             let all = try context.fetch(FetchDescriptor<Habit>())
             Task { _ = await ReminderScheduler.shared.reconcile(all) }
         } catch { failure = "Habit saved, but reminders could not be refreshed. Reopen MyHabits to retry." }
+    }
+    private func adjustCounter(_ amount: Int) {
+        now = .now
+        let wasComplete = habit.isComplete(now)
+        habit.adjustCount(by: amount, on: now)
+        guard save() else { return }
+        if !wasComplete && habit.isComplete(now) { feedback.complete(habit.id, at: now) }
+        else if wasComplete && !habit.isComplete(now) { feedback.undo(habit.id) }
     }
     private func toggleCheckIn(_ date: Date) {
         now = .now

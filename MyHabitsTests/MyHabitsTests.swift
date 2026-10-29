@@ -9,6 +9,30 @@ import UserNotifications
 
 final class MyHabitsTests: XCTestCase {
     func date(_ offset: Int) -> Date { Day.adding(offset, to: .now) }
+    func testCounterTargetUndoAndBackup() throws {
+        let habit = Habit(name: "Water")
+        habit.trackingMode = "counter"; habit.dailyTarget = 3
+        habit.adjustCount(by: 2)
+        XCTAssertEqual(habit.count(), 2)
+        XCTAssertFalse(habit.isComplete())
+        habit.adjustCount(by: 1)
+        XCTAssertTrue(habit.isComplete())
+        XCTAssertEqual(habit.days.count, 1)
+        habit.adjustCount(by: 1)
+        XCTAssertEqual(habit.days.count, 1)
+        let backup = HabitBackup(habits: [HabitRecord(habit)])
+        let data = try JSONEncoder().encode(backup)
+        let restored = try JSONDecoder().decode(HabitBackup.self, from: data).validated().habits[0].model()
+        XCTAssertEqual(restored.count(), 4)
+        XCTAssertEqual(restored.dailyTarget, 3)
+        XCTAssertTrue(restored.isCounter)
+        restored.adjustCount(by: -2)
+        XCTAssertFalse(restored.isComplete())
+        restored.adjustCount(by: -10)
+        XCTAssertEqual(restored.count(), 0)
+        XCTAssertEqual(habit.count(on: date(1)), 0)
+    }
+
     func testToggleIsReversibleAndUnique() {
         let habit = Habit(name: "Read")
         habit.toggle(); XCTAssertTrue(habit.isComplete()); XCTAssertEqual(habit.days.count, 1)

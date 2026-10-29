@@ -9,6 +9,8 @@ struct HabitEditor: View {
     let nextOrder: Int
     @State private var name: String
     @State private var habitDescription: String
+    @State private var trackingMode: String
+    @State private var dailyTarget: Int
     @State private var symbol: String
     @State private var hasStreakGoal: Bool
     @State private var streakGoal: Int
@@ -22,6 +24,8 @@ struct HabitEditor: View {
         _reminders = State(initialValue: habit?.reminders ?? HabitReminders())
         _name = State(initialValue: habit?.name ?? "")
         _habitDescription = State(initialValue: habit?.habitDescription ?? "")
+        _trackingMode = State(initialValue: habit?.trackingMode ?? "yesNo")
+        _dailyTarget = State(initialValue: habit?.dailyTarget ?? 1)
         _symbol = State(initialValue: habit?.symbol ?? "checkmark")
         _hasStreakGoal = State(initialValue: habit?.hasStreakGoal ?? false)
         _streakGoal = State(initialValue: habit.flatMap { $0.hasStreakGoal ? $0.streakGoal : nil } ?? 30)
@@ -37,6 +41,17 @@ struct HabitEditor: View {
                     TextField("Add a description…", text: $habitDescription, axis: .vertical)
                         .lineLimit(3...6)
                         .onChange(of: habitDescription) { _, value in habitDescription = String(value.prefix(1000)) }
+                }.appSectionStyle()
+                Section("Habit Tracking") {
+                    Picker("Tracking type", selection: $trackingMode) {
+                        Text("Yes/No").tag("yesNo")
+                        Text("Counter").tag("counter")
+                    }.pickerStyle(.segmented)
+                    if trackingMode == "counter" {
+                        Stepper("Daily target: \(dailyTarget)", value: $dailyTarget, in: 1...10000)
+                        Text("Use + and − to track your daily count. Reach your target to complete the habit.")
+                            .font(.caption).foregroundStyle(AppTheme.secondaryText)
+                    }
                 }.appSectionStyle()
                 Section {
                     Toggle("Streak Goal", isOn: $hasStreakGoal)
@@ -126,6 +141,8 @@ struct HabitEditor: View {
             }
             let description = habitDescription.trimmingCharacters(in: .whitespacesAndNewlines)
             saved.habitDescription = description.isEmpty ? nil : description
+            saved.trackingMode = trackingMode
+            saved.dailyTarget = dailyTarget
             saved.reminders = reminders
             try context.save()
             WidgetCenter.shared.reloadAllTimelines()
