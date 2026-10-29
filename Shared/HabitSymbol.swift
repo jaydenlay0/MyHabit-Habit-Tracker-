@@ -28,18 +28,20 @@ private struct ToothbrushWithPaste: Shape {
             path.move(to: CGPoint(x: x, y: 18))
             path.addLine(to: CGPoint(x: x, y: 27))
         }
-        // Outlined toothpaste ribbon with a lifted, curved tip.
-        path.move(to: CGPoint(x: 18.5, y: 6.5))
-        path.addCurve(to: CGPoint(x: 23, y: 10), control1: CGPoint(x: 22, y: 6.5), control2: CGPoint(x: 24, y: 8))
-        path.addCurve(to: CGPoint(x: 20, y: 15), control1: CGPoint(x: 24, y: 13.5), control2: CGPoint(x: 23, y: 15))
-        path.addLine(to: CGPoint(x: 6, y: 15))
-        path.addCurve(to: CGPoint(x: 6, y: 11), control1: CGPoint(x: 2, y: 15), control2: CGPoint(x: 2, y: 11))
-        path.addLine(to: CGPoint(x: 16, y: 11))
-        path.addCurve(to: CGPoint(x: 18.5, y: 6.5), control1: CGPoint(x: 18.5, y: 11), control2: CGPoint(x: 18.5, y: 9))
-        path.closeSubpath()
+        // Shift the ribbon slightly right to align it with the brush head.
+        var toothpaste = Path()
+        toothpaste.move(to: CGPoint(x: 18.5, y: 6.5))
+        toothpaste.addCurve(to: CGPoint(x: 23, y: 10), control1: CGPoint(x: 22, y: 6.5), control2: CGPoint(x: 24, y: 8))
+        toothpaste.addCurve(to: CGPoint(x: 20, y: 15), control1: CGPoint(x: 24, y: 13.5), control2: CGPoint(x: 23, y: 15))
+        toothpaste.addLine(to: CGPoint(x: 6, y: 15))
+        toothpaste.addCurve(to: CGPoint(x: 6, y: 11), control1: CGPoint(x: 2, y: 15), control2: CGPoint(x: 2, y: 11))
+        toothpaste.addLine(to: CGPoint(x: 16, y: 11))
+        toothpaste.addCurve(to: CGPoint(x: 18.5, y: 6.5), control1: CGPoint(x: 18.5, y: 11), control2: CGPoint(x: 18.5, y: 9))
+        toothpaste.closeSubpath()
+        path.addPath(toothpaste, transform: CGAffineTransform(translationX: 3, y: 0))
         // Fill the symbol frame to match the visual weight of the SF Symbols.
-        let scale = min(rect.width, rect.height) / 28
-        let offsetX = rect.midX - 16 * scale
+        let scale = min(rect.width, rect.height) / 25
+        let offsetX = rect.midX - 18 * scale
         let offsetY = rect.midY - 16.75 * scale
         return path.applying(CGAffineTransform(a: scale, b: 0, c: 0, d: scale, tx: offsetX, ty: offsetY))
     }
