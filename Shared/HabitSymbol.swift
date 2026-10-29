@@ -17,6 +17,7 @@ struct HabitSymbol: View {
             DeodorantSpray()
                 .stroke(style: StrokeStyle(lineWidth: size * 0.075, lineCap: .round, lineJoin: .round))
                 .frame(width: size, height: size)
+                .scaleEffect(1.5)
         } else {
             Image(systemName: name)
         }
