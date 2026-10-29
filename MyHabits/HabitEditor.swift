@@ -44,6 +44,28 @@ struct HabitEditor: View {
                         }
                         .accessibilityHint("Optional description, up to 50 words or 300 characters, whichever comes first")
                 }.appSectionStyle()
+                Section("Icon") {
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 0), spacing: 4), count: 6), spacing: 8) {
+                        ForEach(Palette.symbols, id: \.self) { item in
+                            Button { symbol = item } label: {
+                                HabitSymbol(name: item).frame(minWidth: 44, minHeight: 44)
+                                    .foregroundStyle(symbol == item ? Color(habitHex: color) : .secondary)
+                                    .background(symbol == item ? Color(habitHex: color).opacity(0.15) : .clear, in: RoundedRectangle(cornerRadius: 10))
+                            }.buttonStyle(.plain).accessibilityLabel(Palette.symbolName(item)).accessibilityAddTraits(symbol == item ? .isSelected : [])
+                        }
+                    }
+                }.appSectionStyle()
+                Section("Colour") {
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 0), spacing: 4), count: 6), spacing: 8) {
+                        ForEach(Palette.colors, id: \.self) { hex in
+                            Button { color = hex } label: {
+                                Circle().fill(Color(habitHex: hex)).frame(width: 34, height: 34)
+                                    .overlay { if color == hex { Image(systemName: "checkmark").foregroundStyle(Palette.selectionInk(hex)) } }
+                                    .frame(maxWidth: .infinity, minHeight: 44)
+                            }.buttonStyle(.plain).accessibilityLabel(Palette.colorName(hex)).accessibilityAddTraits(color == hex ? .isSelected : [])
+                        }
+                    }
+                }.appSectionStyle()
                 Section("Habit Tracking") {
                     Picker("Tracking type", selection: $trackingMode) {
                         Text("Yes/No").tag("yesNo")
@@ -78,28 +100,7 @@ struct HabitEditor: View {
                     Text("Goals are optional. Your streak is tracked either way. You can add, change or remove a goal later without losing check-ins.")
                 }.appSectionStyle()
                 ReminderEditor(settings: $reminders)
-                Section("Colour") {
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 0), spacing: 4), count: 6), spacing: 8) {
-                        ForEach(Palette.colors, id: \.self) { hex in
-                            Button { color = hex } label: {
-                                Circle().fill(Color(habitHex: hex)).frame(width: 34, height: 34)
-                                    .overlay { if color == hex { Image(systemName: "checkmark").foregroundStyle(Palette.selectionInk(hex)) } }
-                                    .frame(maxWidth: .infinity, minHeight: 44)
-                            }.buttonStyle(.plain).accessibilityLabel(Palette.colorName(hex)).accessibilityAddTraits(color == hex ? .isSelected : [])
-                        }
-                    }
-                }.appSectionStyle()
-                Section("Icon") {
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 0), spacing: 4), count: 6), spacing: 8) {
-                        ForEach(Palette.symbols, id: \.self) { item in
-                            Button { symbol = item } label: {
-                                HabitSymbol(name: item).frame(minWidth: 44, minHeight: 44)
-                                    .foregroundStyle(symbol == item ? Color(habitHex: color) : .secondary)
-                                    .background(symbol == item ? Color(habitHex: color).opacity(0.15) : .clear, in: RoundedRectangle(cornerRadius: 10))
-                            }.buttonStyle(.plain).accessibilityLabel(Palette.symbolName(item)).accessibilityAddTraits(symbol == item ? .isSelected : [])
-                        }
-                    }
-                }.appSectionStyle()
+
             }
             .disabled(saving)
             .interactiveDismissDisabled(saving)
