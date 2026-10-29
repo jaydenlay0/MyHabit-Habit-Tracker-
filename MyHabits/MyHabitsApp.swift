@@ -22,7 +22,7 @@ struct MyHabitsApp: App {
         WindowGroup {
             Group {
                 if let container {
-                    HabitListView().modelContainer(container).id(generation)
+                    MainTabView().modelContainer(container).id(generation)
                         .task { await refreshReminders(container) }
                         .onChange(of: scenePhase) { _, phase in
                             if phase == .active {
@@ -47,4 +47,32 @@ struct MyHabitsApp: App {
         } catch { /* Keep existing scheduled reminders if storage cannot be read. */ }
     }
 
+}
+
+private struct MainTabView: View {
+    private enum Tab: Hashable { case home, settings, add }
+    @Query(sort: \Habit.order) private var habits: [Habit]
+    @State private var selectedTab: Tab = .home
+    @State private var creating = false
+
+    var body: some View {
+        TabView(selection: Binding(get: { selectedTab }, set: { tab in
+            if tab == .add { creating = true }
+            else { selectedTab = tab }
+        })) {
+            HabitListView()
+                .tabItem { Label("Home", systemImage: "house") }
+                .tag(Tab.home)
+            BackupView(showsDoneButton: false)
+                .tabItem { Label("Settings", systemImage: "gearshape") }
+                .tag(Tab.settings)
+            Color.clear
+                .tabItem { Label("New Habit", systemImage: "plus") }
+                .tag(Tab.add)
+        }
+        .tint(AppTheme.accent)
+        .sheet(isPresented: $creating) {
+            HabitEditor(nextOrder: (habits.map(\.order).max() ?? -1) + 1)
+        }
+    }
 }

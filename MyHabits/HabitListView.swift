@@ -9,8 +9,6 @@ struct HabitListView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var feedback = CompletionFeedback()
     @State private var now = Date.now
-    @State private var creating = false
-    @State private var settings = false
     @State private var pendingArchive: Habit?
     @State private var errorMessage: String?
     private var visible: [Habit] { habits.filter { !$0.archived } }
@@ -87,14 +85,10 @@ struct HabitListView: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) { Button { settings = true } label: { Image(systemName: "slider.horizontal.3") }.accessibilityLabel("Settings and backups") }
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     EditButton()
-                    Button { creating = true } label: { Image(systemName: "plus") }.accessibilityLabel("Create habit")
                 }
             }
-            .sheet(isPresented: $creating) { HabitEditor(nextOrder: (habits.map(\.order).max() ?? -1) + 1) }
-            .sheet(isPresented: $settings) { BackupView() }
             .confirmationDialog("Archive this habit? It will leave your daily list and widgets. Archived habits cannot be browsed or restored in the app.", isPresented: Binding(get: { pendingArchive != nil }, set: { if !$0 { pendingArchive = nil } }), titleVisibility: .visible) {
                 Button("Archive habit") {
                     pendingArchive?.archived = true

@@ -85,6 +85,7 @@ struct BackupDocument: FileDocument {
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper { FileWrapper(regularFileWithContents: data) }
 }
 struct BackupView: View {
+    var showsDoneButton = true
     @State private var notificationScheduler = ReminderScheduler.shared
     @AppStorage(AppAppearance.storageKey) private var appearance: AppAppearance = .system
     @Environment(\.modelContext) private var context
@@ -162,7 +163,10 @@ struct BackupView: View {
             }
             .appScreenStyle()
             .preferredColorScheme(appearance.colorScheme)
-            .navigationTitle("Settings").toolbar { Button("Done") { dismiss() } }
+            .navigationTitle("Settings")
+            .toolbar {
+                if showsDoneButton { Button("Done") { dismiss() } }
+            }
             .fileExporter(isPresented: $exporting, document: document, contentType: .json, defaultFilename: "MyHabits-\(Day.key(.now))") { result in
                 if case .failure(let error) = result { message = error.localizedDescription }
             }
