@@ -37,7 +37,7 @@ struct HabitEditor: View {
                 Section("A small promise to yourself :)") {
                     TextField("Habit name", text: $name).onChange(of: name) { _, value in name = String(value.prefix(80)) }
                 }.appSectionStyle()
-                Section("Description (optional)") {
+                Section("Description") {
                     TextField("Add a description…", text: $habitDescription, axis: .vertical)
                         .lineLimit(3...6)
                         .onChange(of: habitDescription) { _, value in habitDescription = String(value.prefix(1000)) }
