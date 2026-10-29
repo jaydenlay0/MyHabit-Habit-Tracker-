@@ -82,7 +82,7 @@ struct ReminderEditor: View {
                 }
             }
         } header: {
-            Text("Reminders (optional)")
+            Text("Reminders")
         } footer: {
             Text("Up to three reminders on each selected day. A time window spaces them evenly; a single reminder arrives at its midpoint. Delivery follows your local time and iPhone notification settings.")
         }
