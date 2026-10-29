@@ -50,7 +50,6 @@ struct HabitBackup: Codable {
         parser.dateFormat = "yyyy-MM-dd"; parser.isLenient = false
         for habit in habits {
             guard !habit.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, habit.name.count <= 80,
-                  (habit.habitDescription?.count ?? 0) <= 1000,
                   ["yesNo", "counter"].contains(habit.trackingMode ?? "yesNo"),
                   (1...10000).contains(habit.dailyTarget ?? 1),
                   (habit.counts ?? [:]).values.allSatisfy({ (0...1_000_000).contains($0) }),

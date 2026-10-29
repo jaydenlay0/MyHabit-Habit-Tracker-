@@ -38,9 +38,11 @@ struct HabitEditor: View {
                     TextField("Habit name", text: $name).onChange(of: name) { _, value in name = String(value.prefix(80)) }
                 }.appSectionStyle()
                 Section("Description") {
-                    TextField("Add a description…", text: $habitDescription, axis: .vertical)
-                        .lineLimit(3...6)
-                        .onChange(of: habitDescription) { _, value in habitDescription = String(value.prefix(1000)) }
+                    TextField("Add a description…", text: $habitDescription)
+                        .onChange(of: habitDescription) { _, value in
+                            habitDescription = Self.limitedDescription(value)
+                        }
+                        .accessibilityHint("Optional description, up to 50 words")
                 }.appSectionStyle()
                 Section("Habit Tracking") {
                     Picker("Tracking type", selection: $trackingMode) {
@@ -121,6 +123,11 @@ struct HabitEditor: View {
             } message: { Text(failure ?? reminderNotice ?? "") }
         }
     }
+    private static func limitedDescription(_ value: String) -> String {
+        let words = value.split(whereSeparator: { $0.isWhitespace })
+        return words.count > 50 ? words.prefix(50).joined(separator: " ") : value
+    }
+
     @MainActor private func save() async {
         guard !saving else { return }
         guard reminders.validationMessage == nil else { failure = reminders.validationMessage; return }
@@ -143,7 +150,7 @@ struct HabitEditor: View {
                 saved = Habit(name: trimmed, symbol: symbol, colorHex: color, order: nextOrder, streakGoal: savedGoal)
                 context.insert(saved)
             }
-            let description = habitDescription.trimmingCharacters(in: .whitespacesAndNewlines)
+            let description = Self.limitedDescription(habitDescription).trimmingCharacters(in: .whitespacesAndNewlines)
             saved.habitDescription = description.isEmpty ? nil : description
             saved.trackingMode = trackingMode
             saved.dailyTarget = dailyTarget
