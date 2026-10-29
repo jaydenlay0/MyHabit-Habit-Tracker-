@@ -86,14 +86,16 @@ struct HabitListView: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Image("BrandMark")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 30, height: 30)
-                        .clipShape(RoundedRectangle(cornerRadius: 7))
-                        .accessibilityLabel("MyHabits logo")
+                #if compiler(>=6.2)
+                if #available(iOS 26.0, *) {
+                    ToolbarItem(placement: .topBarLeading) { brandLogo }
+                        .sharedBackgroundVisibility(.hidden)
+                } else {
+                    ToolbarItem(placement: .topBarLeading) { brandLogo }
                 }
+                #else
+                ToolbarItem(placement: .topBarLeading) { brandLogo }
+                #endif
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     EditButton()
                 }
@@ -118,6 +120,16 @@ struct HabitListView: View {
             else { now = .now }
         }
     }
+    private var brandLogo: some View {
+        Image("BrandMark")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 44, height: 44)
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .accessibilityLabel("MyHabits logo")
+            .allowsHitTesting(false)
+    }
+
     private func adjustCounter(_ habit: Habit, by amount: Int) {
         now = .now
         let wasComplete = habit.isComplete(now)
