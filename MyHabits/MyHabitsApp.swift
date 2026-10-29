@@ -101,9 +101,14 @@ private struct MainTabView: View {
     }
     private func navigationButton(_ title: String, symbol: String, selected: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            VStack(spacing: 4) {
+            VStack(spacing: 3) {
                 Image(systemName: symbol).font(.system(size: barCollapsed ? 20 : 22, weight: .semibold))
-                if !barCollapsed { Text(title).font(.caption2.weight(.semibold)) }
+                if !barCollapsed {
+                    // Native tab labels keep a compact size even with larger body text.
+                    Text(title)
+                        .font(.system(size: 10, weight: .medium))
+                        .lineLimit(1)
+                }
             }
             .foregroundStyle(selected ? AppTheme.accent : AppTheme.primaryText)
             .frame(maxWidth: .infinity, minHeight: barCollapsed ? 44 : 50)
