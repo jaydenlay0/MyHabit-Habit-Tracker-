@@ -8,6 +8,7 @@ struct HabitEditor: View {
     let habit: Habit?
     let nextOrder: Int
     @State private var name: String
+    @State private var habitDescription: String
     @State private var symbol: String
     @State private var hasStreakGoal: Bool
     @State private var streakGoal: Int
@@ -20,6 +21,7 @@ struct HabitEditor: View {
         self.habit = habit; self.nextOrder = nextOrder
         _reminders = State(initialValue: habit?.reminders ?? HabitReminders())
         _name = State(initialValue: habit?.name ?? "")
+        _habitDescription = State(initialValue: habit?.habitDescription ?? "")
         _symbol = State(initialValue: habit?.symbol ?? "checkmark")
         _hasStreakGoal = State(initialValue: habit?.hasStreakGoal ?? false)
         _streakGoal = State(initialValue: habit.flatMap { $0.hasStreakGoal ? $0.streakGoal : nil } ?? 30)
@@ -30,6 +32,11 @@ struct HabitEditor: View {
             Form {
                 Section("A small promise to yourself :)") {
                     TextField("Habit name", text: $name).onChange(of: name) { _, value in name = String(value.prefix(80)) }
+                }.appSectionStyle()
+                Section("Description (optional)") {
+                    TextField("Add a description…", text: $habitDescription, axis: .vertical)
+                        .lineLimit(3...6)
+                        .onChange(of: habitDescription) { _, value in habitDescription = String(value.prefix(1000)) }
                 }.appSectionStyle()
                 Section {
                     Toggle("Streak Goal", isOn: $hasStreakGoal)
@@ -117,6 +124,8 @@ struct HabitEditor: View {
                 saved = Habit(name: trimmed, symbol: symbol, colorHex: color, order: nextOrder, streakGoal: savedGoal)
                 context.insert(saved)
             }
+            let description = habitDescription.trimmingCharacters(in: .whitespacesAndNewlines)
+            saved.habitDescription = description.isEmpty ? nil : description
             saved.reminders = reminders
             try context.save()
             WidgetCenter.shared.reloadAllTimelines()

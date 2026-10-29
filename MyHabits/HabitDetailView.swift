@@ -21,6 +21,9 @@ struct HabitDetailView: View {
                     HabitCompletionIcon(habit: habit, today: now, size: 56)
                     VStack(alignment: .leading) { Text(habit.name).font(.title2.bold()); Text("Every day · Since \(habit.createdAt.formatted(date: .abbreviated, time: .omitted))").font(.caption).foregroundStyle(AppTheme.secondaryText) }
                 }.padding(.vertical, 12)
+                if let description = habit.habitDescription, !description.isEmpty {
+                    Text(description).font(.subheadline).foregroundStyle(AppTheme.secondaryText)
+                }
                 if !habit.archived {
                     Button { toggleCheckIn(.now) } label: {
                         Label {

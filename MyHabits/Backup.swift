@@ -9,6 +9,7 @@ import UserNotifications
 struct HabitRecord: Codable {
     var id: UUID
     var name: String
+    var habitDescription: String?
     var symbol: String
     var colorHex: String
     var createdAt: Date
@@ -20,11 +21,13 @@ struct HabitRecord: Codable {
     var reminders: HabitReminders?
     var resolvedStreakGoal: Int { streakGoal ?? 30 }
     init(_ habit: Habit) {
+        habitDescription = habit.habitDescription
         id = habit.id; name = habit.name; symbol = habit.symbol; colorHex = habit.colorHex
         createdAt = habit.createdAt; order = habit.order; archived = habit.archived; days = habit.days; streakGoal = habit.streakGoal; reminders = habit.reminders
     }
     func model() -> Habit {
         let habit = Habit(id: id, name: name, symbol: symbol, colorHex: colorHex, createdAt: createdAt, order: order, archived: archived, days: days, streakGoal: resolvedStreakGoal)
+        habit.habitDescription = habitDescription
         habit.reminders = reminders ?? HabitReminders()
         return habit
     }
@@ -42,6 +45,7 @@ struct HabitBackup: Codable {
         parser.dateFormat = "yyyy-MM-dd"; parser.isLenient = false
         for habit in habits {
             guard !habit.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, habit.name.count <= 80,
+                  (habit.habitDescription?.count ?? 0) <= 1000,
                   Palette.symbols.contains(habit.symbol),
                   habit.colorHex.range(of: "^[0-9A-Fa-f]{6}$", options: .regularExpression) != nil,
                   habit.createdAt <= Date.now,
@@ -184,6 +188,7 @@ struct BackupView: View {
             let existing = Dictionary(uniqueKeysWithValues: habits.map { ($0.id, $0) })
             for record in backup.habits {
                 if let habit = existing[record.id] {
+                    habit.habitDescription = record.habitDescription
                     habit.name = record.name; habit.symbol = record.symbol; habit.colorHex = record.colorHex
                     habit.createdAt = record.createdAt; habit.order = record.order; habit.archived = record.archived; habit.days = record.days; habit.streakGoal = record.resolvedStreakGoal; habit.reminders = record.reminders ?? HabitReminders()
                 } else { context.insert(record.model()) }

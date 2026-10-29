@@ -5,6 +5,7 @@ import SwiftData
 final class Habit {
     @Attribute(.unique) var id: UUID
     var name: String
+    var habitDescription: String? = nil
     var symbol: String
     var colorHex: String
     var createdAt: Date
