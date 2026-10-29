@@ -11,6 +11,7 @@ struct HabitSymbol: View {
             ToothbrushWithPaste()
                 .stroke(style: StrokeStyle(lineWidth: size * 0.075, lineCap: .round, lineJoin: .round))
                 .frame(width: size, height: size)
+                .scaleEffect(1.18)
         } else {
             Image(systemName: name)
         }
