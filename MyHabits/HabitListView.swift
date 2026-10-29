@@ -76,6 +76,7 @@ struct HabitListView: View {
                     }.onMove(perform: move)
                 }
                 .listRowSpacing(scheme == .dark ? 10 : nil)
+                .tracksNavigationScroll()
                 .contentMargins(.top, 32, for: .scrollContent)
                 .scrollContentBackground(.hidden)
             }

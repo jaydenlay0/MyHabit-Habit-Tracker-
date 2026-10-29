@@ -158,6 +158,7 @@ struct BackupView: View {
                     Text("System follows your iPhone’s appearance. Your choice is saved on this device.")
                 }.appSectionStyle()
             }
+            .tracksNavigationScroll()
             .task {
                 _ = await notificationScheduler.reconcile(habits)
             }

@@ -54,6 +54,8 @@ private struct MainTabView: View {
     @Query(sort: \Habit.order) private var habits: [Habit]
     @State private var selectedTab: Tab = .home
     @State private var creating = false
+    @State private var barCollapsed = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -64,6 +66,12 @@ private struct MainTabView: View {
                 .tag(Tab.settings)
                 .toolbar(.hidden, for: .tabBar)
         }
+        .environment(\.navigationBarCollapsed, { collapsed in
+            withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.22)) {
+                barCollapsed = collapsed
+            }
+        })
+        .onChange(of: selectedTab) { _, _ in barCollapsed = false }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             HStack(spacing: 4) {
                 navigationButton("Home", symbol: "house.fill", selected: selectedTab == .home) {
@@ -76,11 +84,12 @@ private struct MainTabView: View {
                     creating = true
                 }
             }
-            .padding(6)
+            .padding(barCollapsed ? 4 : 6)
             .background(.regularMaterial, in: Capsule())
             .overlay { Capsule().strokeBorder(AppTheme.border.opacity(0.5), lineWidth: 1) }
             // Match the compact three-item floating bar used by the original UI.
-            .frame(maxWidth: 276)
+            .frame(maxWidth: barCollapsed ? 220 : 276)
+            .frame(height: 62, alignment: .bottom)
             .padding(.horizontal, 16)
             .padding(.top, 8)
             .padding(.bottom, 4)
@@ -93,15 +102,16 @@ private struct MainTabView: View {
     private func navigationButton(_ title: String, symbol: String, selected: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             VStack(spacing: 4) {
-                Image(systemName: symbol).font(.system(size: 22, weight: .semibold))
-                Text(title).font(.caption2.weight(.semibold))
+                Image(systemName: symbol).font(.system(size: barCollapsed ? 20 : 22, weight: .semibold))
+                if !barCollapsed { Text(title).font(.caption2.weight(.semibold)) }
             }
             .foregroundStyle(selected ? AppTheme.accent : AppTheme.primaryText)
-            .frame(maxWidth: .infinity, minHeight: 50)
+            .frame(maxWidth: .infinity, minHeight: barCollapsed ? 44 : 50)
             .background(selected ? AppTheme.background : .clear, in: Capsule())
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(title)
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
 
