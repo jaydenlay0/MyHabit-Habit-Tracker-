@@ -79,8 +79,9 @@ private struct MainTabView: View {
             .padding(6)
             .background(.regularMaterial, in: Capsule())
             .overlay { Capsule().strokeBorder(AppTheme.border.opacity(0.5), lineWidth: 1) }
-            .frame(maxWidth: 360)
-            .padding(.horizontal, 24)
+            // Match the compact three-item floating bar used by the original UI.
+            .frame(maxWidth: 276)
+            .padding(.horizontal, 16)
             .padding(.top, 8)
             .padding(.bottom, 4)
         }
