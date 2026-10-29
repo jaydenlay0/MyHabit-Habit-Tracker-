@@ -103,6 +103,7 @@ struct HabitEditor: View {
             .interactiveDismissDisabled(saving)
             .appScreenStyle()
             .navigationTitle(habit == nil ? "New Habit" : "Edit habit")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.disabled(saving) }
                 ToolbarItem(placement: .confirmationAction) {
