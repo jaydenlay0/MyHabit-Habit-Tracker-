@@ -50,29 +50,58 @@ struct MyHabitsApp: App {
 }
 
 private struct MainTabView: View {
-    private enum Tab: Hashable { case home, settings, add }
+    private enum Tab: Hashable { case home, settings }
     @Query(sort: \Habit.order) private var habits: [Habit]
     @State private var selectedTab: Tab = .home
     @State private var creating = false
 
     var body: some View {
-        TabView(selection: Binding(get: { selectedTab }, set: { tab in
-            if tab == .add { creating = true }
-            else { selectedTab = tab }
-        })) {
+        TabView(selection: $selectedTab) {
             HabitListView()
-                .tabItem { Label("Home", systemImage: "house") }
                 .tag(Tab.home)
+                .toolbar(.hidden, for: .tabBar)
             BackupView(showsDoneButton: false)
-                .tabItem { Label("Settings", systemImage: "gearshape") }
                 .tag(Tab.settings)
-            Color.clear
-                .tabItem { Label("New Habit", systemImage: "plus") }
-                .tag(Tab.add)
+                .toolbar(.hidden, for: .tabBar)
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            HStack(spacing: 4) {
+                navigationButton("Home", symbol: "house.fill", selected: selectedTab == .home) {
+                    selectedTab = .home
+                }
+                navigationButton("Settings", symbol: "gearshape.fill", selected: selectedTab == .settings) {
+                    selectedTab = .settings
+                }
+                navigationButton("New Habit", symbol: "plus", selected: false) {
+                    creating = true
+                }
+            }
+            .padding(6)
+            .background(.regularMaterial, in: Capsule())
+            .overlay { Capsule().strokeBorder(AppTheme.border.opacity(0.5), lineWidth: 1) }
+            .frame(maxWidth: 360)
+            .padding(.horizontal, 24)
+            .padding(.top, 8)
+            .padding(.bottom, 4)
         }
         .tint(AppTheme.accent)
         .sheet(isPresented: $creating) {
             HabitEditor(nextOrder: (habits.map(\.order).max() ?? -1) + 1)
         }
     }
+    private func navigationButton(_ title: String, symbol: String, selected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 4) {
+                Image(systemName: symbol).font(.system(size: 22, weight: .semibold))
+                Text(title).font(.caption2.weight(.semibold))
+            }
+            .foregroundStyle(selected ? AppTheme.accent : AppTheme.primaryText)
+            .frame(maxWidth: .infinity, minHeight: 50)
+            .background(selected ? AppTheme.background : .clear, in: Capsule())
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(selected ? .isSelected : [])
+    }
+
 }
