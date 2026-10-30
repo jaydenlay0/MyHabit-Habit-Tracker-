@@ -82,11 +82,11 @@ private struct MainTabView: View {
                     navigationButton("Home", symbol: "house.fill", selected: selectedTab == .home) {
                         selectedTab = .home
                     }
-                    navigationButton("Settings", symbol: "gearshape.fill", selected: selectedTab == .settings) {
-                        selectedTab = .settings
-                    }
                     navigationButton("New Habit", symbol: "plus", selected: false) {
                         creating = true
+                    }
+                    navigationButton("Settings", symbol: "gearshape.fill", selected: selectedTab == .settings) {
+                        selectedTab = .settings
                     }
                 }
                 .padding(barCollapsed ? 4 : 6)
