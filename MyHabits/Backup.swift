@@ -157,6 +157,15 @@ struct BackupView: View {
                 } footer: {
                     Text("System follows your iPhone’s appearance. Your choice is saved on this device.")
                 }.appSectionStyle()
+                Section {
+                    Text("Made with 💙🧡🤍 by Jayden Lay ⚡")
+                        .font(.footnote)
+                        .foregroundStyle(AppTheme.secondaryText)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .multilineTextAlignment(.center)
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                }
             }
             .tracksNavigationScroll()
             .task {
