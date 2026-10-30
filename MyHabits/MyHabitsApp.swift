@@ -70,7 +70,8 @@ private struct MainTabView: View {
                 .toolbar(.hidden, for: .tabBar)
         }
         .environment(\.navigationBarCollapsed, { collapsed in
-            withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.22)) {
+            guard barHiddenByScroll != collapsed else { return }
+            withAnimation(reduceMotion ? nil : .smooth(duration: 0.3)) {
                 barHiddenByScroll = collapsed
             }
         })

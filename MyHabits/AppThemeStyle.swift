@@ -76,6 +76,7 @@ extension EnvironmentValues {
 private struct NavigationScrollTracking: ViewModifier {
     @Environment(\.navigationBarCollapsed) private var setCollapsed
     @State private var anchor: CGFloat = 0
+    @State private var collapsed = false
 
     @ViewBuilder func body(content: Content) -> some View {
         if #available(iOS 18.0, *) {
@@ -85,10 +86,21 @@ private struct NavigationScrollTracking: ViewModifier {
             } action: { _, offset in
                 if offset <= 1 {
                     anchor = offset
-                    setCollapsed(false)
-                } else if abs(offset - anchor) >= 18 {
-                    setCollapsed(offset > anchor)
-                    anchor = offset
+                    if collapsed { collapsed = false; setCollapsed(false) }
+                } else if collapsed {
+                    anchor = max(anchor, offset)
+                    if anchor - offset >= 14 {
+                        collapsed = false
+                        anchor = offset
+                        setCollapsed(false)
+                    }
+                } else {
+                    anchor = min(anchor, offset)
+                    if offset - anchor >= 28 {
+                        collapsed = true
+                        anchor = offset
+                        setCollapsed(true)
+                    }
                 }
             }
         } else {

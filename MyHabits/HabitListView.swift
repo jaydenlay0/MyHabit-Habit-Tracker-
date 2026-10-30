@@ -10,6 +10,7 @@ struct HabitListView: View {
     @Environment(\.navigationBarCollapsed) private var updateNavigationScroll
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var headerHidden = false
+    @State private var headerHeight: CGFloat = 170
     @State private var feedback = CompletionFeedback()
     @State private var now = Date.now
     @State private var counterToEdit: Habit?
@@ -18,29 +19,7 @@ struct HabitListView: View {
     private var visible: [Habit] { habits.filter { !$0.archived } }
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                VStack(alignment: .center, spacing: 8) {
-                    Text("MyHabits")
-                        .font(.largeTitle.bold())
-                        .accessibilityAddTraits(.isHeader)
-                        .padding(.bottom, 20)
-                    Text(now, format: .dateTime.weekday(.wide).month(.wide).day()).font(.subheadline).foregroundStyle(AppTheme.secondaryText)
-                    Text("Another Day, Another Opportunity.")
-                        .font(.title2.bold())
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.4)
-                        .allowsTightening(true)
-                    Text("\(visible.filter { $0.isComplete(now) }.count) of \(visible.count) complete today").font(.subheadline).foregroundStyle(AppTheme.secondaryText)
-                }
-                .frame(maxWidth: .infinity, alignment: .center)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
-                .padding(.top, 4)
-                .padding(.bottom, 12)
-                .frame(height: headerHidden ? 0 : nil, alignment: .top)
-                .opacity(headerHidden ? 0 : 1)
-                .clipped()
-                .accessibilityHidden(headerHidden)
+            ZStack(alignment: .top) {
                 List {
                     if visible.isEmpty {
                         ContentUnavailableView("Make room for a good habit", systemImage: "leaf", description: Text("Tap + to start your first daily practice."))
@@ -87,12 +66,44 @@ struct HabitListView: View {
                 .tracksNavigationScroll()
                 .environment(\.navigationBarCollapsed, { scrollingDown in
                     updateNavigationScroll(scrollingDown)
-                    withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.22)) {
+                    guard headerHidden != scrollingDown else { return }
+                    withAnimation(reduceMotion ? nil : .smooth(duration: 0.3)) {
                         headerHidden = scrollingDown
                     }
                 })
-                .contentMargins(.top, 32, for: .scrollContent)
+                .contentMargins(.top, headerHeight + 32, for: .scrollContent)
                 .scrollContentBackground(.hidden)
+                VStack(alignment: .center, spacing: 8) {
+                    Text("MyHabits")
+                        .font(.largeTitle.bold())
+                        .accessibilityAddTraits(.isHeader)
+                        .padding(.bottom, 20)
+                    Text(now, format: .dateTime.weekday(.wide).month(.wide).day()).font(.subheadline).foregroundStyle(AppTheme.secondaryText)
+                    Text("Another Day, Another Opportunity.")
+                        .font(.title2.bold())
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.4)
+                        .allowsTightening(true)
+                    Text("\(visible.filter { $0.isComplete(now) }.count) of \(visible.count) complete today").font(.subheadline).foregroundStyle(AppTheme.secondaryText)
+                }
+                .frame(maxWidth: .infinity, alignment: .center)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 32)
+                .padding(.top, 4)
+                .padding(.bottom, 12)
+                .background(AppTheme.background)
+                .background {
+                    GeometryReader { geometry in
+                        Color.clear.preference(key: HomeHeaderHeightKey.self, value: geometry.size.height)
+                    }
+                }
+                .offset(y: headerHidden && !reduceMotion ? -headerHeight - 16 : 0)
+                .opacity(headerHidden ? 0 : 1)
+                .allowsHitTesting(!headerHidden)
+                .accessibilityHidden(headerHidden)
+            }
+            .onPreferenceChange(HomeHeaderHeightKey.self) { height in
+                if height > 0 && abs(headerHeight - height) > 1 { headerHeight = height }
             }
             .background(AppTheme.background)
             .appScreenStyle()
@@ -179,4 +190,9 @@ struct HabitListView: View {
         do { try context.save(); WidgetCenter.shared.reloadAllTimelines(); return true }
         catch { context.rollback(); errorMessage = error.localizedDescription; return false }
     }
+}
+
+private struct HomeHeaderHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 170
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
 }
