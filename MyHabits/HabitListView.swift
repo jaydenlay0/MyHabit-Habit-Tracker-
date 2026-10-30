@@ -97,7 +97,7 @@ struct HabitListView: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.4)
                         .allowsTightening(true)
-                    Text("\(visible.filter { $0.isComplete(now) }.count) of \(visible.count) complete today").font(.subheadline).foregroundStyle(AppTheme.secondaryText)
+                    Text("\(visible.filter { $0.isComplete(now) }.count) of \(visible.count) completed today").font(.subheadline).foregroundStyle(AppTheme.secondaryText)
                 }
                 .frame(maxWidth: .infinity, alignment: .center)
                 .multilineTextAlignment(.center)

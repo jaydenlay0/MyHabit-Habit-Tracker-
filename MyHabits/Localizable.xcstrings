@@ -911,7 +911,7 @@
         }
       }
     },
-    "%lld of %lld complete today": {
+    "%lld of %lld completed today": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
