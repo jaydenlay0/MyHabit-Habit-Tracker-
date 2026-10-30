@@ -2,18 +2,15 @@ import SwiftUI
 
 private struct AppScreenStyle: ViewModifier {
     @Environment(\.colorScheme) private var scheme
-    @ViewBuilder func body(content: Content) -> some View {
-        if scheme == .dark {
-            content
-                .scrollContentBackground(.hidden)
-                .background(AppTheme.background)
-                .foregroundStyle(AppTheme.primaryText)
-                .tint(AppTheme.accent)
-                .toolbarBackground(AppTheme.background, for: .navigationBar)
-                .toolbarBackground(.visible, for: .navigationBar)
-        } else {
-            content
-        }
+    func body(content: Content) -> some View {
+        // Keep the same scroll view identity when appearance changes.
+        content
+            .scrollContentBackground(scheme == .dark ? .hidden : .automatic)
+            .background(scheme == .dark ? AppTheme.background : Color.clear)
+            .foregroundStyle(scheme == .dark ? AppTheme.primaryText : Color.primary)
+            .tint(scheme == .dark ? AppTheme.accent : Color.accentColor)
+            .toolbarBackground(scheme == .dark ? AppTheme.background : Color.clear, for: .navigationBar)
+            .toolbarBackground(scheme == .dark ? .visible : .automatic, for: .navigationBar)
     }
 }
 
