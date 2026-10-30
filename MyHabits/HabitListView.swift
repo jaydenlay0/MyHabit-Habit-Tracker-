@@ -10,7 +10,6 @@ struct HabitListView: View {
     @Environment(\.navigationBarCollapsed) private var updateNavigationScroll
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var headerHidden = false
-    @State private var reordering = false
     @State private var editMode: EditMode = .inactive
     @State private var headerHeight: CGFloat = 170
     @State private var feedback = CompletionFeedback()
@@ -58,18 +57,6 @@ struct HabitListView: View {
                             }
                         }
                         .appHabitCardStyle()
-                        .simultaneousGesture(
-                            LongPressGesture(minimumDuration: 0.35)
-                                .sequenced(before: DragGesture(minimumDistance: 0))
-                                .onChanged { value in
-                                    if case .second(true, _) = value {
-                                        reordering = true
-                                        hideHeaderForReordering()
-                                    }
-                                }
-                                .onEnded { _ in reordering = false }
-                        )
-
                         .swipeActions {
                             Button("Archive") { pendingArchive = habit }.tint(.orange)
                         }
@@ -79,7 +66,7 @@ struct HabitListView: View {
                 .environment(\.editMode, $editMode)
                 .tracksNavigationScroll()
                 .environment(\.navigationBarCollapsed, { scrollingDown in
-                    guard !reordering && !editMode.isEditing else {
+                    guard !editMode.isEditing else {
                         hideHeaderForReordering()
                         return
                     }
@@ -89,7 +76,7 @@ struct HabitListView: View {
                         headerHidden = scrollingDown
                     }
                 })
-                .contentMargins(.top, reordering || editMode.isEditing ? 16 : headerHeight + 32, for: .scrollContent)
+                .contentMargins(.top, headerHeight + 32, for: .scrollContent)
                 .scrollContentBackground(.hidden)
                 VStack(alignment: .center, spacing: 8) {
                     Text("MyHabits")
@@ -214,7 +201,6 @@ struct HabitListView: View {
     }
 
     private func move(from source: IndexSet, to destination: Int) {
-        reordering = false
         var ordered = visible; ordered.move(fromOffsets: source, toOffset: destination)
         let hidden = habits.filter { $0.archived }
         for (index, habit) in (ordered + hidden).enumerated() { habit.order = index }
