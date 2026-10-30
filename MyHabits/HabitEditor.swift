@@ -34,7 +34,7 @@ struct HabitEditor: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("A small promise to yourself :)") {
+                Section("A Small Promise to Yourself :)") {
                     TextField("Habit name", text: $name).onChange(of: name) { _, value in name = String(value.prefix(80)) }
                 }.appSectionStyle()
                 Section("Description") {
