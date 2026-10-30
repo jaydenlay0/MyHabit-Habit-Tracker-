@@ -4,6 +4,7 @@ import WidgetKit
 
 struct HabitDetailView: View {
     @Bindable var habit: Habit
+    @Environment(\.setBottomNavigationHidden) private var setBottomNavigationHidden
     @Environment(CompletionFeedback.self) private var feedback
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
@@ -71,6 +72,8 @@ struct HabitDetailView: View {
             }.appSectionStyle()
         }
         .appScreenStyle()
+        .onAppear { setBottomNavigationHidden(true) }
+        .onDisappear { setBottomNavigationHidden(false) }
         .onReceive(Timer.publish(every: 30, on: .main, in: .common).autoconnect()) { now = $0 }
         .navigationTitle("Habit").navigationBarTitleDisplayMode(.inline)
         .toolbar { Button("Edit") { editing = true } }

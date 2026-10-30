@@ -55,6 +55,7 @@ private struct MainTabView: View {
     @State private var selectedTab: Tab = .home
     @State private var creating = false
     @State private var barCollapsed = false
+    @State private var barHidden = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
@@ -71,28 +72,31 @@ private struct MainTabView: View {
                 barCollapsed = collapsed
             }
         })
-        .onChange(of: selectedTab) { _, _ in barCollapsed = false }
+        .environment(\.setBottomNavigationHidden, { hidden in barHidden = hidden })
+        .onChange(of: selectedTab) { _, _ in barCollapsed = false; barHidden = false }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            HStack(spacing: 4) {
-                navigationButton("Home", symbol: "house.fill", selected: selectedTab == .home) {
-                    selectedTab = .home
+            if !barHidden {
+                HStack(spacing: 4) {
+                    navigationButton("Home", symbol: "house.fill", selected: selectedTab == .home) {
+                        selectedTab = .home
+                    }
+                    navigationButton("Settings", symbol: "gearshape.fill", selected: selectedTab == .settings) {
+                        selectedTab = .settings
+                    }
+                    navigationButton("New Habit", symbol: "plus", selected: false) {
+                        creating = true
+                    }
                 }
-                navigationButton("Settings", symbol: "gearshape.fill", selected: selectedTab == .settings) {
-                    selectedTab = .settings
-                }
-                navigationButton("New Habit", symbol: "plus", selected: false) {
-                    creating = true
-                }
+                .padding(barCollapsed ? 4 : 6)
+                .background(.regularMaterial, in: Capsule())
+                .overlay { Capsule().strokeBorder(AppTheme.border.opacity(0.5), lineWidth: 1) }
+                // Match the compact three-item floating bar used by the original UI.
+                .frame(maxWidth: barCollapsed ? 220 : 276)
+                .frame(height: 62, alignment: .bottom)
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
+                .padding(.bottom, 4)
             }
-            .padding(barCollapsed ? 4 : 6)
-            .background(.regularMaterial, in: Capsule())
-            .overlay { Capsule().strokeBorder(AppTheme.border.opacity(0.5), lineWidth: 1) }
-            // Match the compact three-item floating bar used by the original UI.
-            .frame(maxWidth: barCollapsed ? 220 : 276)
-            .frame(height: 62, alignment: .bottom)
-            .padding(.horizontal, 16)
-            .padding(.top, 8)
-            .padding(.bottom, 4)
         }
         .tint(AppTheme.accent)
         .sheet(isPresented: $creating) {

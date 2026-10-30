@@ -56,11 +56,20 @@ extension View {
     func appHabitCardStyle() -> some View { modifier(AppHabitCardStyle()) }
 }
 
+private struct BottomNavigationVisibilityKey: EnvironmentKey {
+    static let defaultValue: (Bool) -> Void = { _ in }
+}
+
 private struct NavigationScrollHandlerKey: EnvironmentKey {
     static let defaultValue: (Bool) -> Void = { _ in }
 }
 
 extension EnvironmentValues {
+    var setBottomNavigationHidden: (Bool) -> Void {
+        get { self[BottomNavigationVisibilityKey.self] }
+        set { self[BottomNavigationVisibilityKey.self] = newValue }
+    }
+
     var navigationBarCollapsed: (Bool) -> Void {
         get { self[NavigationScrollHandlerKey.self] }
         set { self[NavigationScrollHandlerKey.self] = newValue }
