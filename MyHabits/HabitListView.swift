@@ -9,6 +9,7 @@ struct HabitListView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var feedback = CompletionFeedback()
     @State private var now = Date.now
+    @State private var counterToEdit: Habit?
     @State private var pendingArchive: Habit?
     @State private var errorMessage: String?
     private var visible: [Habit] { habits.filter { !$0.archived } }
@@ -61,7 +62,7 @@ struct HabitListView: View {
                             if habit.isCounter {
                                 VStack(spacing: 12) {
                                     Button { adjustCounter(habit, by: 1) } label: { Image(systemName: "plus.circle.fill").font(.title2) }
-                                        .accessibilityLabel("Increase \(habit.name) count")
+                                        .accessibilityLabel(habit.isComplete(now) ? "Edit \(habit.name) count" : "Increase \(habit.name) count")
                                     Button { adjustCounter(habit, by: -1) } label: { Image(systemName: "minus.circle").font(.title2) }
                                         .disabled(habit.count(on: now) == 0)
                                         .accessibilityLabel("Decrease \(habit.name) count")
@@ -100,6 +101,9 @@ struct HabitListView: View {
                     EditButton()
                 }
             }
+            .sheet(item: $counterToEdit) { habit in
+                CounterEditor(habit: habit, date: now)
+            }
             .confirmationDialog("Archive this habit? It will leave your daily list and widgets. You can restore it later from Settings → Archived habits.", isPresented: Binding(get: { pendingArchive != nil }, set: { if !$0 { pendingArchive = nil } }), titleVisibility: .visible) {
                 Button("Archive habit") {
                     pendingArchive?.archived = true
@@ -132,6 +136,10 @@ struct HabitListView: View {
 
     private func adjustCounter(_ habit: Habit, by amount: Int) {
         now = .now
+        if amount > 0 && habit.count(on: now) >= habit.dailyTarget {
+            counterToEdit = habit
+            return
+        }
         let wasComplete = habit.isComplete(now)
         habit.adjustCount(by: amount, on: now)
         guard save() else { return }

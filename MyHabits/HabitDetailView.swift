@@ -10,6 +10,7 @@ struct HabitDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var now = Date.now
     @State private var editing = false
+    @State private var editingCounter = false
     @State private var deleting = false
     @State private var archiving = false
     @State private var weekly = false
@@ -85,6 +86,7 @@ struct HabitDetailView: View {
             }
         }
         .sheet(isPresented: $editing) { HabitEditor(habit: habit) }
+        .sheet(isPresented: $editingCounter) { CounterEditor(habit: habit, date: now) }
         .confirmationDialog("Delete this habit and all its check-ins?", isPresented: $deleting, titleVisibility: .visible) {
             Button("Delete permanently", role: .destructive) {
                 context.delete(habit)
@@ -101,6 +103,10 @@ struct HabitDetailView: View {
     }
     private func adjustCounter(_ amount: Int) {
         now = .now
+        if amount > 0 && habit.count(on: now) >= habit.dailyTarget {
+            editingCounter = true
+            return
+        }
         let wasComplete = habit.isComplete(now)
         habit.adjustCount(by: amount, on: now)
         guard save() else { return }

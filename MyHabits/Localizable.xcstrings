@@ -1080,6 +1080,56 @@
           }
         }
       }
+    },
+    "Reset": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重置"
+          }
+        }
+      }
+    },
+    "Reach goal": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "达到目标"
+          }
+        }
+      }
+    },
+    "Save count": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存次数"
+          }
+        }
+      }
+    },
+    "Increase count": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "增加次数"
+          }
+        }
+      }
+    },
+    "Decrease count": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "减少次数"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

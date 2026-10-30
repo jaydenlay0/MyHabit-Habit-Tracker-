@@ -39,7 +39,7 @@ final class Habit {
     }
     func adjustCount(by amount: Int, on date: Date = .now) {
         let key = Day.key(date)
-        let value = min(1_000_000, max(0, count(on: date) + amount))
+        let value = min(max(1, dailyTarget), max(0, count(on: date) + amount))
         var updated = counts
         updated[key] = value
         counts = updated
