@@ -167,6 +167,7 @@ struct BackupView: View {
                         .listRowSeparator(.hidden)
                 }
             }
+            .contentMargins(.bottom, 90, for: .scrollContent)
             .tracksNavigationScroll()
             .task {
                 _ = await notificationScheduler.reconcile(habits)
