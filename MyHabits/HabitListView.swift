@@ -7,6 +7,9 @@ struct HabitListView: View {
     @Query(sort: \Habit.order) private var habits: [Habit]
     @Environment(\.colorScheme) private var scheme
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.navigationBarCollapsed) private var updateNavigationScroll
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var headerHidden = false
     @State private var feedback = CompletionFeedback()
     @State private var now = Date.now
     @State private var counterToEdit: Habit?
@@ -34,6 +37,10 @@ struct HabitListView: View {
                 .padding(.horizontal, 32)
                 .padding(.top, 4)
                 .padding(.bottom, 12)
+                .frame(height: headerHidden ? 0 : nil, alignment: .top)
+                .opacity(headerHidden ? 0 : 1)
+                .clipped()
+                .accessibilityHidden(headerHidden)
                 List {
                     if visible.isEmpty {
                         ContentUnavailableView("Make room for a good habit", systemImage: "leaf", description: Text("Tap + to start your first daily practice."))
@@ -78,6 +85,12 @@ struct HabitListView: View {
                 }
                 .listRowSpacing(scheme == .dark ? 10 : nil)
                 .tracksNavigationScroll()
+                .environment(\.navigationBarCollapsed, { scrollingDown in
+                    updateNavigationScroll(scrollingDown)
+                    withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.22)) {
+                        headerHidden = scrollingDown
+                    }
+                })
                 .contentMargins(.top, 32, for: .scrollContent)
                 .scrollContentBackground(.hidden)
             }
