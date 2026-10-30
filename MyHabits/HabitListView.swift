@@ -10,6 +10,8 @@ struct HabitListView: View {
     @Environment(\.navigationBarCollapsed) private var updateNavigationScroll
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var headerHidden = false
+    @State private var reordering = false
+    @State private var editMode: EditMode = .inactive
     @State private var headerHeight: CGFloat = 170
     @State private var feedback = CompletionFeedback()
     @State private var now = Date.now
@@ -56,6 +58,17 @@ struct HabitListView: View {
                             }
                         }
                         .appHabitCardStyle()
+                        .simultaneousGesture(
+                            LongPressGesture(minimumDuration: 0.35)
+                                .sequenced(before: DragGesture(minimumDistance: 0))
+                                .onChanged { value in
+                                    if case .second(true, _) = value {
+                                        reordering = true
+                                        hideHeaderForReordering()
+                                    }
+                                }
+                                .onEnded { _ in reordering = false }
+                        )
 
                         .swipeActions {
                             Button("Archive") { pendingArchive = habit }.tint(.orange)
@@ -63,15 +76,20 @@ struct HabitListView: View {
                     }.onMove(perform: move)
                 }
                 .listRowSpacing(scheme == .dark ? 10 : nil)
+                .environment(\.editMode, $editMode)
                 .tracksNavigationScroll()
                 .environment(\.navigationBarCollapsed, { scrollingDown in
+                    guard !reordering && !editMode.isEditing else {
+                        hideHeaderForReordering()
+                        return
+                    }
                     updateNavigationScroll(scrollingDown)
                     guard headerHidden != scrollingDown else { return }
                     withAnimation(reduceMotion ? nil : .smooth(duration: 0.3)) {
                         headerHidden = scrollingDown
                     }
                 })
-                .contentMargins(.top, headerHeight + 32, for: .scrollContent)
+                .contentMargins(.top, reordering || editMode.isEditing ? 16 : headerHeight + 32, for: .scrollContent)
                 .scrollContentBackground(.hidden)
                 VStack(alignment: .center, spacing: 8) {
                     Text("MyHabits")
@@ -110,6 +128,10 @@ struct HabitListView: View {
             .onReceive(Timer.publish(every: 30, on: .main, in: .common).autoconnect()) { now = $0 }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
+            .environment(\.editMode, $editMode)
+            .onChange(of: editMode) { _, mode in
+                if mode.isEditing { hideHeaderForReordering() }
+            }
             .toolbar {
                 #if compiler(>=6.2)
                 if #available(iOS 26.0, *) {
@@ -180,7 +202,15 @@ struct HabitListView: View {
         else { feedback.complete(habit.id, at: now) }
     }
 
+    private func hideHeaderForReordering() {
+        guard !headerHidden else { return }
+        withAnimation(reduceMotion ? nil : .smooth(duration: 0.25)) {
+            headerHidden = true
+        }
+    }
+
     private func move(from source: IndexSet, to destination: Int) {
+        reordering = false
         var ordered = visible; ordered.move(fromOffsets: source, toOffset: destination)
         let hidden = habits.filter { $0.archived }
         for (index, habit) in (ordered + hidden).enumerated() { habit.order = index }
