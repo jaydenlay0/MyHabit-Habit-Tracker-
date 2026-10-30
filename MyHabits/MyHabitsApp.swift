@@ -56,7 +56,7 @@ private struct MainTabView: View {
     @Query(sort: \Habit.order) private var habits: [Habit]
     @State private var selectedTab: Tab = .home
     @State private var creating = false
-    @State private var barCollapsed = false
+    @State private var barHiddenByScroll = false
     @State private var barHidden = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -71,11 +71,11 @@ private struct MainTabView: View {
         }
         .environment(\.navigationBarCollapsed, { collapsed in
             withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.22)) {
-                barCollapsed = collapsed
+                barHiddenByScroll = collapsed
             }
         })
         .environment(\.setBottomNavigationHidden, { hidden in barHidden = hidden })
-        .onChange(of: selectedTab) { _, _ in barCollapsed = false; barHidden = false }
+        .onChange(of: selectedTab) { _, _ in barHiddenByScroll = false; barHidden = false }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if !barHidden {
                 HStack(spacing: 4) {
@@ -89,15 +89,19 @@ private struct MainTabView: View {
                         selectedTab = .settings
                     }
                 }
-                .padding(barCollapsed ? 4 : 6)
+                .padding(4)
                 .background(.regularMaterial, in: Capsule())
                 .overlay { Capsule().strokeBorder(AppTheme.border.opacity(0.5), lineWidth: 1) }
-                // Match the compact three-item floating bar used by the original UI.
-                .frame(maxWidth: barCollapsed ? 220 : 276)
+                .frame(maxWidth: 220)
                 .frame(height: 62, alignment: .bottom)
                 .padding(.horizontal, 16)
                 .padding(.top, 8)
                 .padding(.bottom, 4)
+                // Reserve the same inset while hidden so scrolling does not jump.
+                .opacity(barHiddenByScroll ? 0 : 1)
+                .offset(y: barHiddenByScroll && !reduceMotion ? 84 : 0)
+                .allowsHitTesting(!barHiddenByScroll)
+                .accessibilityHidden(barHiddenByScroll)
             }
         }
         .tint(AppTheme.accent)
@@ -107,17 +111,10 @@ private struct MainTabView: View {
     }
     private func navigationButton(_ title: String, symbol: String, selected: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            VStack(spacing: 3) {
-                Image(systemName: symbol).font(.system(size: barCollapsed ? 20 : 22, weight: .semibold))
-                if !barCollapsed {
-                    // Native tab labels keep a compact size even with larger body text.
-                    Text(LocalizedStringKey(title))
-                        .font(.system(size: 10, weight: .medium))
-                        .lineLimit(1)
-                }
-            }
+            Image(systemName: symbol)
+                .font(.system(size: 20, weight: .semibold))
             .foregroundStyle(selected ? AppTheme.accent : AppTheme.primaryText)
-            .frame(maxWidth: .infinity, minHeight: barCollapsed ? 44 : 50)
+            .frame(maxWidth: .infinity, minHeight: 44)
             .background(selected ? AppTheme.background : .clear, in: Capsule())
             .contentShape(Capsule())
         }
