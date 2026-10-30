@@ -144,7 +144,11 @@ struct HabitListView: View {
                 ToolbarItem(placement: .topBarLeading) { brandLogo }
                 #endif
                 ToolbarItemGroup(placement: .topBarTrailing) {
-                    EditButton()
+                    Button(editMode.isEditing ? "Done" : "Edit") {
+                        withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
+                            editMode = editMode.isEditing ? .inactive : .active
+                        }
+                    }
                 }
             }
             .sheet(item: $counterToEdit) { habit in
