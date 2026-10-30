@@ -15,7 +15,7 @@ for directory in ['Shared', 'MyHabits', 'MyHabitsWidget', 'MyHabitsTests']:
     for path in sorted((root/directory).iterdir()):
         if path.is_file():
             relative = str(path.relative_to(root))
-            kind = {'.swift':'sourcecode.swift', '.plist':'text.plist.xml', '.entitlements':'text.plist.entitlements', '.xcprivacy':'text.xml'}.get(path.suffix, 'text')
+            kind = {'.swift':'sourcecode.swift', '.plist':'text.plist.xml', '.entitlements':'text.plist.entitlements', '.xcprivacy':'text.xml', '.xcstrings':'text.json.xcstrings'}.get(path.suffix, 'text')
             files[relative] = add('file:'+relative, f'isa = PBXFileReference; lastKnownFileType = {kind}; path = {q(relative)}; sourceTree = "<group>";')
 asset_path = 'MyHabits/Assets.xcassets'
 files[asset_path] = add('file:'+asset_path, f'isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = {q(asset_path)}; sourceTree = "<group>";')
@@ -38,6 +38,7 @@ for name in products:
     if not is_test:
         resource_builds.append(add('privacy:'+name, f'isa = PBXBuildFile; fileRef = {files["MyHabits/PrivacyInfo.xcprivacy"]};'))
     if name in ['MyHabits', 'MyHabitsPersonal']:
+        resource_builds.append(add('localization:'+name, f'isa = PBXBuildFile; fileRef = {files["MyHabits/Localizable.xcstrings"]};'))
         resource_builds.append(add('assets:'+name, f'isa = PBXBuildFile; fileRef = {files[asset_path]};'))
     resources = add('resources:'+name, f'isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = {arr(resource_builds)}; runOnlyForDeploymentPostprocessing = 0;')
     phases = [sources, frameworks, resources]; dependencies = []
@@ -69,7 +70,7 @@ for mode in ['Debug','Release']:
     values = dict(SDKROOT='iphoneos', CLANG_ENABLE_MODULES='YES', CLANG_ENABLE_OBJC_ARC='YES', SWIFT_OPTIMIZATION_LEVEL='-Onone' if mode == 'Debug' else '-O', ENABLE_TESTABILITY='YES' if mode == 'Debug' else 'NO', DEBUG_INFORMATION_FORMAT='dwarf' if mode == 'Debug' else 'dwarf-with-dsym')
     configs.append(add('project-config:'+mode, f'isa = XCBuildConfiguration; buildSettings = {settings(values)}; name = {mode};'))
 config_list=add('project-configs', f'isa = XCConfigurationList; buildConfigurations = {arr(configs)}; defaultConfigurationIsVisible = 0; defaultConfigurationName = Release;')
-add('project', f'isa = PBXProject; attributes = {{BuildIndependentTargetsInParallel = YES; LastUpgradeCheck = 1600; }}; buildConfigurationList = {config_list}; compatibilityVersion = "Xcode 14.0"; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, Base); mainGroup = {main_group}; productRefGroup = {product_group}; projectDirPath = ""; projectRoot = ""; targets = {arr(targets)};')
+add('project', f'isa = PBXProject; attributes = {{BuildIndependentTargetsInParallel = YES; LastUpgradeCheck = 1600; }}; buildConfigurationList = {config_list}; compatibilityVersion = "Xcode 14.0"; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, "zh-Hans", Base); mainGroup = {main_group}; productRefGroup = {product_group}; projectDirPath = ""; projectRoot = ""; targets = {arr(targets)};')
 (root/'MyHabits.xcodeproj/project.pbxproj').write_text('// !$*UTF8*$!\n{ archiveVersion = 1; classes = {}; objectVersion = 56; objects = {\n'+'\n'.join(f'{key} = {{{body}}};' for key,body in objects.items())+f'\n}}; rootObject = {project_id}; }}\n')
 def ref(name): return f'<BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="{uid("target:"+name)}" BuildableName="{name}.{"app" if name in ["MyHabits", "MyHabitsPersonal"] else "xctest"}" BlueprintName="{name}" ReferencedContainer="container:MyHabits.xcodeproj"/>'
 scheme=f'''<?xml version="1.0" encoding="UTF-8"?>

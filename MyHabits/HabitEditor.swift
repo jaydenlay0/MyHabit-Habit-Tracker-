@@ -105,12 +105,12 @@ struct HabitEditor: View {
             .disabled(saving)
             .interactiveDismissDisabled(saving)
             .appScreenStyle()
-            .navigationTitle(habit == nil ? "New Habit" : "Edit habit")
+            .navigationTitle(LocalizedStringKey(habit == nil ? "New Habit" : "Edit habit"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.disabled(saving) }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(saving ? "Saving…" : "Save") { Task { await save() } }
+                    Button(LocalizedStringKey(saving ? "Saving…" : "Save")) { Task { await save() } }
                         .disabled(saving || name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || reminders.validationMessage != nil)
                 }
             }

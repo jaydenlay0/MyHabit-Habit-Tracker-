@@ -3,6 +3,7 @@ import SwiftData
 
 @main
 struct MyHabitsApp: App {
+    @AppStorage("appLanguage") private var appLanguage = "en"
     @AppStorage(AppAppearance.storageKey) private var appearance: AppAppearance = .system
     @State private var container: ModelContainer?
     @State private var failure: String?
@@ -37,6 +38,7 @@ struct MyHabitsApp: App {
                     ContentUnavailableView("Storage unavailable", systemImage: "externaldrive.badge.exclamationmark", description: Text(failure ?? "Unable to open local storage. Your data has not been reset."))
                 }
             }
+            .environment(\.locale, Locale(identifier: appLanguage))
             .preferredColorScheme(appearance.colorScheme)
         }
     }
@@ -109,7 +111,7 @@ private struct MainTabView: View {
                 Image(systemName: symbol).font(.system(size: barCollapsed ? 20 : 22, weight: .semibold))
                 if !barCollapsed {
                     // Native tab labels keep a compact size even with larger body text.
-                    Text(title)
+                    Text(LocalizedStringKey(title))
                         .font(.system(size: 10, weight: .medium))
                         .lineLimit(1)
                 }

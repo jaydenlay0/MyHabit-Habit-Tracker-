@@ -28,7 +28,7 @@ struct HabitDetailView: View {
                 if !habit.archived {
                     Button { toggleCheckIn(.now) } label: {
                         Label {
-                            Text(habit.isComplete(now) ? "Completed today · Undo" : "Check in today")
+                            Text(LocalizedStringKey(habit.isComplete(now) ? "Completed today · Undo" : "Check in today"))
                         } icon: {
                             HabitSymbol(name: feedback.showsTick(habit.id, on: now) ? "checkmark" : habit.symbol)
                         }
@@ -40,10 +40,10 @@ struct HabitDetailView: View {
                     Stepper("\(habit.count(on: now)) / \(habit.dailyTarget)", onIncrement: { adjustCounter(1) }, onDecrement: { adjustCounter(-1) })
                 }.appSectionStyle()
             }
-            Section(habit.hasStreakGoal ? "Streak goal" : "Current streak") {
+            Section(LocalizedStringKey(habit.hasStreakGoal ? "Streak goal" : "Current streak")) {
                 StreakGoalView(current: stats.current, goal: habit.streakGoal, colorHex: habit.colorHex)
                     .padding(.vertical, 6)
-                Button(habit.hasStreakGoal ? "Change or remove goal" : "Add a goal (optional)") { editing = true }
+                Button(LocalizedStringKey(habit.hasStreakGoal ? "Change or remove goal" : "Add a goal (optional)")) { editing = true }
             }.appSectionStyle()
             Section("Reminders") {
                 ReminderSummary(settings: habit.reminders)

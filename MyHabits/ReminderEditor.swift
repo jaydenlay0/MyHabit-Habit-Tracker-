@@ -1,6 +1,12 @@
 import SwiftUI
 
 struct ReminderEditor: View {
+    @Environment(\.locale) private var locale
+    private var localizedCalendar: Calendar {
+        var calendar = Calendar.current
+        calendar.locale = locale
+        return calendar
+    }
     @Environment(\.colorScheme) private var scheme
     @Binding var settings: HabitReminders
     private var weekdays: [Int] {
@@ -36,13 +42,13 @@ struct ReminderEditor: View {
                             if selected { settings.weekdays.removeAll { $0 == day } }
                             else { settings.weekdays.append(day) }
                         } label: {
-                            Text(Calendar.current.veryShortStandaloneWeekdaySymbols[day - 1])
+                            Text(localizedCalendar.veryShortStandaloneWeekdaySymbols[day - 1])
                                 .font(.subheadline.weight(.semibold))
                                 .frame(maxWidth: .infinity, minHeight: 44)
                                 .foregroundStyle(selected ? (scheme == .dark ? Color.black : Color.white) : AppTheme.secondaryText)
                                 .background(selected ? AppTheme.accent : Color.clear, in: RoundedRectangle(cornerRadius: 10))
                         }.buttonStyle(.plain)
-                            .accessibilityLabel(Calendar.current.weekdaySymbols[day - 1])
+                            .accessibilityLabel(localizedCalendar.weekdaySymbols[day - 1])
                             .accessibilityAddTraits(selected ? .isSelected : [])
                     }
                 }
@@ -78,7 +84,7 @@ struct ReminderEditor: View {
                     }
                 }
                 if let message = settings.validationMessage {
-                    Text(message).font(.caption).foregroundStyle(.red)
+                    Text(LocalizedStringKey(message)).font(.caption).foregroundStyle(.red)
                 }
             }
         } header: {
@@ -91,10 +97,12 @@ struct ReminderEditor: View {
 }
 
 struct ReminderSummary: View {
+    @Environment(\.locale) private var locale
     let settings: HabitReminders
     private var dayNames: String {
-        guard settings.weekdays.count != 7 else { return "Every day" }
-        let calendar: Calendar = .current
+        guard settings.weekdays.count != 7 else { return locale.identifier.hasPrefix("zh") ? "每天" : "Every day" }
+        var calendar: Calendar = .current
+        calendar.locale = locale
         let first: Int = calendar.firstWeekday
         let symbols: [String] = calendar.shortWeekdaySymbols
         var names: [String] = []
@@ -107,7 +115,8 @@ struct ReminderSummary: View {
         return names.joined(separator: ", ")
     }
     private var timeNames: String {
-        let calendar: Calendar = .current
+        var calendar: Calendar = .current
+        calendar.locale = locale
         var names: [String] = []
         for minute in settings.scheduledMinutes {
             let date: Date = calendar.date(bySettingHour: minute / 60, minute: minute % 60, second: 0, of: .now) ?? .now

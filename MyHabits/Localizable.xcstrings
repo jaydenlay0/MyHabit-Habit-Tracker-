@@ -1,0 +1,1086 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "Home": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "首页"
+          }
+        }
+      }
+    },
+    "Settings": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置"
+          }
+        }
+      }
+    },
+    "New Habit": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新建习惯"
+          }
+        }
+      }
+    },
+    "Edit habit": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编辑习惯"
+          }
+        }
+      }
+    },
+    "Habit": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "习惯"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        }
+      }
+    },
+    "Save": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存"
+          }
+        }
+      }
+    },
+    "Saving…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在保存…"
+          }
+        }
+      }
+    },
+    "OK": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "好"
+          }
+        }
+      }
+    },
+    "Done": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成"
+          }
+        }
+      }
+    },
+    "A small promise to yourself :)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "给自己的一个小承诺 :)"
+          }
+        }
+      }
+    },
+    "Habit name": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "习惯名称"
+          }
+        }
+      }
+    },
+    "Description": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "描述"
+          }
+        }
+      }
+    },
+    "Add a description…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加描述…"
+          }
+        }
+      }
+    },
+    "Icon": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "图标"
+          }
+        }
+      }
+    },
+    "Colour": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "颜色"
+          }
+        }
+      }
+    },
+    "Habit Tracking": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "习惯记录方式"
+          }
+        }
+      }
+    },
+    "Tracking type": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "记录方式"
+          }
+        }
+      }
+    },
+    "Yes/No": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "是／否"
+          }
+        }
+      }
+    },
+    "Counter": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "计数器"
+          }
+        }
+      }
+    },
+    "Use + and − to track your daily count. Reach your target to complete the habit.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用 + 和 − 记录每日次数。达到目标即可完成习惯。"
+          }
+        }
+      }
+    },
+    "Tap the habit icon to mark it complete for the day. Tap again to undo your check-in.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "点击习惯图标，标记今天已完成。再次点击可撤销打卡。"
+          }
+        }
+      }
+    },
+    "Set a Streak Goal": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置连续打卡目标"
+          }
+        }
+      }
+    },
+    "Streak Goal": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连续打卡目标"
+          }
+        }
+      }
+    },
+    "Goals are optional. Your streak is tracked either way. You can add, change or remove a goal later without losing check-ins.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目标为可选项。无论是否设置目标，都会记录连续打卡天数。你可以随时添加、更改或移除目标，不会丢失打卡记录。"
+          }
+        }
+      }
+    },
+    "Reminders": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "提醒"
+          }
+        }
+      }
+    },
+    "Every day": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每天"
+          }
+        }
+      }
+    },
+    "Use a time window": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用时间范围"
+          }
+        }
+      }
+    },
+    "From": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从"
+          }
+        }
+      }
+    },
+    "Until": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "至"
+          }
+        }
+      }
+    },
+    "Add reminder": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加提醒"
+          }
+        }
+      }
+    },
+    "Off": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭"
+          }
+        }
+      }
+    },
+    "Up to three reminders on each selected day. A time window spaces them evenly; a single reminder arrives at its midpoint. Delivery follows your local time and iPhone notification settings.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每个所选日期最多三次提醒。时间范围内的提醒会均匀分布；单次提醒将在中间时间发送。提醒遵循当地时间和 iPhone 通知设置。"
+          }
+        }
+      }
+    },
+    "Your data stays yours": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的数据由你掌控"
+          }
+        }
+      }
+    },
+    "Unlimited habits. No accounts, subscriptions, analytics, or cloud sync. Habits and check-ins are stored locally in the shared app container.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "习惯数量不限。无需账号、订阅、数据分析或云同步。习惯和打卡记录保存在设备本地。"
+          }
+        }
+      }
+    },
+    "Use backups to move your data or keep a safe copy. Backup files are plain JSON; store them somewhere you trust.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用备份转移数据或保存副本。备份文件为明文 JSON，请妥善保存。"
+          }
+        }
+      }
+    },
+    "Archived habits": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已归档习惯"
+          }
+        }
+      }
+    },
+    "Archived Habits": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已归档习惯"
+          }
+        }
+      }
+    },
+    "Archive storage": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档管理"
+          }
+        }
+      }
+    },
+    "Archive": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档"
+          }
+        }
+      }
+    },
+    "Archive habit": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档习惯"
+          }
+        }
+      }
+    },
+    "Delete archived habits": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除已归档习惯"
+          }
+        }
+      }
+    },
+    "Archived habits stay out of your daily focus. Open the archive to restore a habit or permanently delete it.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已归档习惯不会出现在每日列表中。打开归档列表可恢复或永久删除习惯。"
+          }
+        }
+      }
+    },
+    "Notifications": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通知"
+          }
+        }
+      }
+    },
+    "Reminders default to 10:00 am. Set up to three times per day, weekdays or a time window in New Habit or Edit.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "提醒默认时间为上午 10:00。新建或编辑习惯时，可设置每天最多三次提醒、指定星期或时间范围。"
+          }
+        }
+      }
+    },
+    "iOS supports 64 scheduled notification slots per app. Every-day reminders use fewer slots than individual weekdays. Focus modes and notification settings can delay delivery.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS 每个应用最多支持 64 个定时通知。每日提醒比指定星期的提醒占用更少名额。专注模式和通知设置可能延迟提醒。"
+          }
+        }
+      }
+    },
+    "Enable notifications": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "启用通知"
+          }
+        }
+      }
+    },
+    "Open iPhone notification settings": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开 iPhone 通知设置"
+          }
+        }
+      }
+    },
+    "Backups": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "备份"
+          }
+        }
+      }
+    },
+    "Export all habits": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导出所有习惯"
+          }
+        }
+      }
+    },
+    "Import backup": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导入备份"
+          }
+        }
+      }
+    },
+    "Import merges by habit ID. Matching habits are replaced by the backup; other habits are kept. Export first to preserve your current history.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导入时按习惯 ID 合并。相同习惯将被备份内容替换，其他习惯将保留。请先导出备份以保留当前记录。"
+          }
+        }
+      }
+    },
+    "Appearance": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外观"
+          }
+        }
+      }
+    },
+    "System": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跟随系统"
+          }
+        }
+      }
+    },
+    "Light": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "浅色"
+          }
+        }
+      }
+    },
+    "Dark": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "深色"
+          }
+        }
+      }
+    },
+    "System follows your iPhone’s appearance. Your choice is saved on this device.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“跟随系统”使用 iPhone 的外观设置。你的选择将保存在此设备上。"
+          }
+        }
+      }
+    },
+    "Language": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "语言"
+          }
+        }
+      }
+    },
+    "App language": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "应用语言"
+          }
+        }
+      }
+    },
+    "Choose the language used in MyHabits. Your habit names and descriptions stay as you wrote them.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择 MyHabits 的界面语言。习惯名称和描述将保留你输入的内容。"
+          }
+        }
+      }
+    },
+    "No archived habits": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂无已归档习惯"
+          }
+        }
+      }
+    },
+    "Habits you archive will appear here.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你归档的习惯将显示在这里。"
+          }
+        }
+      }
+    },
+    "Restore": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "恢复"
+          }
+        }
+      }
+    },
+    "Delete permanently": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久删除"
+          }
+        }
+      }
+    },
+    "Delete habit": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除习惯"
+          }
+        }
+      }
+    },
+    "Permanently delete this habit and all its check-ins? This cannot be undone.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久删除此习惯及其所有打卡记录？此操作无法撤销。"
+          }
+        }
+      }
+    },
+    "Permanently delete all archived habits and their check-ins? Active habits will be kept.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "永久删除所有已归档习惯及其打卡记录？进行中的习惯将保留。"
+          }
+        }
+      }
+    },
+    "Archive this habit? It will leave your daily list and widgets. You can restore it later from Settings → Archived habits.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "归档此习惯？它将从每日列表和小组件中移除。你可以稍后在“设置 → 已归档习惯”中恢复。"
+          }
+        }
+      }
+    },
+    "Delete this habit and all its check-ins?": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除此习惯及其所有打卡记录？"
+          }
+        }
+      }
+    },
+    "Import and merge": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导入并合并"
+          }
+        }
+      }
+    },
+    "Another Day, Another Opportunity.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新的一天，新的机会。"
+          }
+        }
+      }
+    },
+    "Make room for a good habit": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "为好习惯留出空间"
+          }
+        }
+      }
+    },
+    "Tap + to start your first daily practice.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "点击 + 开始你的第一个每日习惯。"
+          }
+        }
+      }
+    },
+    "Today's count": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日次数"
+          }
+        }
+      }
+    },
+    "Streak goal": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连续打卡目标"
+          }
+        }
+      }
+    },
+    "Current streak": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前连续天数"
+          }
+        }
+      }
+    },
+    "Change or remove goal": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更改或移除目标"
+          }
+        }
+      }
+    },
+    "Add a goal (optional)": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加目标（可选）"
+          }
+        }
+      }
+    },
+    "Your rhythm": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的节奏"
+          }
+        }
+      }
+    },
+    "Daily": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每日"
+          }
+        }
+      }
+    },
+    "Weekly": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每周"
+          }
+        }
+      }
+    },
+    "All-time statistics": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "历史统计"
+          }
+        }
+      }
+    },
+    "Longest streak": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最长连续天数"
+          }
+        }
+      }
+    },
+    "Completion": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成率"
+          }
+        }
+      }
+    },
+    "Completion includes every day since creation, including today. Your current streak stays alive until the end of today.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成率包含创建以来的每一天，包括今天。当前连续打卡记录将保持至今天结束。"
+          }
+        }
+      }
+    },
+    "Completed today · Undo": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日已完成 · 撤销"
+          }
+        }
+      }
+    },
+    "Check in today": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日打卡"
+          }
+        }
+      }
+    },
+    "Couldn’t save": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法保存"
+          }
+        }
+      }
+    },
+    "Habit saved": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "习惯已保存"
+          }
+        }
+      }
+    },
+    "Storage unavailable": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "存储不可用"
+          }
+        }
+      }
+    },
+    "Well done!": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "做得好！"
+          }
+        }
+      }
+    },
+    "%lld of %lld complete today": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天已完成 %1$lld／%2$lld"
+          }
+        }
+      }
+    },
+    "Daily target: %lld": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每日目标：%lld"
+          }
+        }
+      }
+    },
+    "%lld-day streak": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连续打卡 %lld 天"
+          }
+        }
+      }
+    },
+    "Reminder %lld": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "提醒 %lld"
+          }
+        }
+      }
+    },
+    "%lld days": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 天"
+          }
+        }
+      }
+    },
+    "Scheduled at: %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "提醒时间：%@"
+          }
+        }
+      }
+    },
+    "Every day · Since %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每天 · 开始于 %@"
+          }
+        }
+      }
+    },
+    "Each column is a week. Brighter means more completed days.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每列代表一周。颜色越亮，完成的天数越多。"
+          }
+        }
+      }
+    },
+    "12 weeks · Tap a day to update its check-in.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "12 周 · 点击日期更新打卡记录。"
+          }
+        }
+      }
+    },
+    "%lld-day streak · %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连续打卡 %lld 天 · %@"
+          }
+        }
+      }
+    },
+    "Choose valid reminder days and times.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请选择有效的提醒日期和时间。"
+          }
+        }
+      }
+    },
+    "Choose at least one weekday.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请至少选择一星期中的一天。"
+          }
+        }
+      }
+    },
+    "Choose an end time later than the start time, and one to three reminders. Time windows must stay within one day.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束时间须晚于开始时间，并设置一至三次提醒。时间范围须在同一天内。"
+          }
+        }
+      }
+    },
+    "Choose one to three reminder times.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请选择一至三个提醒时间。"
+          }
+        }
+      }
+    },
+    "Reminder times must be different. Widen the time window or choose distinct times.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "提醒时间不能重复。请扩大时间范围或选择不同时间。"
+          }
+        }
+      }
+    },
+    "%lld %@ per day": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每天 %lld 次提醒"
+          }
+        }
+      }
+    },
+    "Check in without opening MyHabits. Shows your first active habits in list order.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无需打开 MyHabits 即可打卡，按列表顺序显示习惯。"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

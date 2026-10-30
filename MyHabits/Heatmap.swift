@@ -61,31 +61,34 @@ struct HeatmapView: View {
                     }
                 }
             }
-            Text(weekly ? "Each column is a week. Brighter means more completed days." : "12 weeks · Tap a day to update its check-in.").font(.caption).foregroundStyle(AppTheme.secondaryText)
+            Text(LocalizedStringKey(weekly ? "Each column is a week. Brighter means more completed days." : "12 weeks · Tap a day to update its check-in.")).font(.caption).foregroundStyle(AppTheme.secondaryText)
         }
     }
 }
 
 struct StreakGoalView: View {
+    @Environment(\.locale) private var locale
+    private var chinese: Bool { locale.identifier.hasPrefix("zh") }
     let current: Int
     let goal: Int
     let colorHex: String
     private var progress: StreakGoalProgress { StreakGoalProgress(current: current, goal: goal) }
     private var status: String {
+        if chinese { return progress.reached ? "目标已达成！" : "距离目标还有 \(progress.remaining) 天" }
         if progress.reached { return "Goal reached!" }
         return "\(progress.remaining) \(progress.remaining == 1 ? "day" : "days") to goal"
     }
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             if goal > 0 {
-                Text("\(progress.current)-day streak · \(status)")
+                Text(chinese ? "连续打卡 \(progress.current) 天 · \(status)" : "\(progress.current)-day streak · \(status)")
                     .font(.caption.weight(.medium)).monospacedDigit()
                     .foregroundStyle(Color(habitHex: colorHex))
                     .fixedSize(horizontal: false, vertical: true)
                 ProgressView(value: progress.fraction)
                     .tint(Color(habitHex: colorHex))
                     .accessibilityHidden(true)
-                Text("Goal: \(progress.goal) consecutive \(progress.goal == 1 ? "day" : "days")")
+                Text(chinese ? "目标：连续打卡 \(progress.goal) 天" : "Goal: \(progress.goal) consecutive \(progress.goal == 1 ? "day" : "days")")
                     .font(.caption2).foregroundStyle(AppTheme.secondaryText)
             } else {
                 Text("\(max(0, current))-day streak")

@@ -86,6 +86,7 @@ struct BackupDocument: FileDocument {
 }
 struct BackupView: View {
     var showsDoneButton = true
+    @AppStorage("appLanguage") private var appLanguage = "en"
     @State private var notificationScheduler = ReminderScheduler.shared
     @AppStorage(AppAppearance.storageKey) private var appearance: AppAppearance = .system
     @Environment(\.modelContext) private var context
@@ -150,9 +151,19 @@ struct BackupView: View {
                     Text("Import merges by habit ID. Matching habits are replaced by the backup; other habits are kept. Export first to preserve your current history.").font(.caption).foregroundStyle(AppTheme.secondaryText)
                 }.appSectionStyle()
                 Section {
+                    Picker("App language", selection: $appLanguage) {
+                        Text(verbatim: "English").tag("en")
+                        Text(verbatim: "中文（简体）").tag("zh-Hans")
+                    }
+                } header: {
+                    Text("Language")
+                } footer: {
+                    Text("Choose the language used in MyHabits. Your habit names and descriptions stay as you wrote them.")
+                }.appSectionStyle()
+                Section {
                     Picker("Appearance", selection: $appearance) {
                         ForEach(AppAppearance.allCases) { option in
-                            Text(option.title).tag(option)
+                            Text(LocalizedStringKey(option.title)).tag(option)
                         }
                     }
                     .pickerStyle(.segmented)
