@@ -58,6 +58,15 @@ struct HabitListView: View {
                             }
                         }
                         .appHabitCardStyle()
+                        .simultaneousGesture(
+                            LongPressGesture(minimumDuration: 0.5, maximumDistance: 10)
+                                .onEnded { _ in
+                                    guard !editMode.isEditing else { return }
+                                    withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
+                                        editMode = .active
+                                    }
+                                }
+                        )
                         .swipeActions(edge: .trailing) {
                             Button { pendingDelete = habit } label: {
                                 Label("Delete habit", systemImage: "trash")
