@@ -76,7 +76,14 @@ struct HabitDetailView: View {
         .onDisappear { setBottomNavigationHidden(false) }
         .onReceive(Timer.publish(every: 30, on: .main, in: .common).autoconnect()) { now = $0 }
         .navigationTitle("Habit").navigationBarTitleDisplayMode(.inline)
-        .toolbar { Button("Edit") { editing = true } }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { editing = true } label: {
+                    Image(systemName: "square.and.pencil")
+                }
+                .accessibilityLabel("Edit habit")
+            }
+        }
         .sheet(isPresented: $editing) { HabitEditor(habit: habit) }
         .confirmationDialog("Delete this habit and all its check-ins?", isPresented: $deleting, titleVisibility: .visible) {
             Button("Delete permanently", role: .destructive) {
