@@ -184,8 +184,8 @@ struct HabitListView: View {
         Image("BrandMark")
             .resizable()
             .scaledToFit()
-            .frame(width: 44, height: 44)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .frame(width: 88, height: 88)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
             .accessibilityLabel("MyHabits logo")
             .allowsHitTesting(false)
     }
