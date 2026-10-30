@@ -100,7 +100,7 @@ struct HabitListView: View {
                     EditButton()
                 }
             }
-            .confirmationDialog("Archive this habit? It will leave your daily list and widgets. Archived habits cannot be browsed or restored in the app.", isPresented: Binding(get: { pendingArchive != nil }, set: { if !$0 { pendingArchive = nil } }), titleVisibility: .visible) {
+            .confirmationDialog("Archive this habit? It will leave your daily list and widgets. You can restore it later from Settings → Archived habits.", isPresented: Binding(get: { pendingArchive != nil }, set: { if !$0 { pendingArchive = nil } }), titleVisibility: .visible) {
                 Button("Archive habit") {
                     pendingArchive?.archived = true
                     if save() {

@@ -105,13 +105,17 @@ struct BackupView: View {
                     Text("Use backups to move your data or keep a safe copy. Backup files are plain JSON; store them somewhere you trust.").font(.caption).foregroundStyle(AppTheme.secondaryText)
                 }.appSectionStyle()
                 Section {
-                    LabeledContent("Archived habits", value: "\(habits.filter { $0.archived }.count)")
+                    NavigationLink {
+                        ArchivedHabitsView()
+                    } label: {
+                        LabeledContent("Archived habits", value: "\(habits.filter { $0.archived }.count)")
+                    }
                     Button("Delete archived habits", role: .destructive) { clearingArchive = true }
                         .disabled(!habits.contains { $0.archived })
                 } header: {
                     Text("Archive storage")
                 } footer: {
-                    Text("Archived habits stay out of your daily focus. They are kept in backups, but cannot be browsed or restored here.")
+                    Text("Archived habits stay out of your daily focus. Open the archive to restore a habit or permanently delete it.")
                 }.appSectionStyle()
                 .confirmationDialog("Permanently delete all archived habits and their check-ins? Active habits will be kept.", isPresented: $clearingArchive, titleVisibility: .visible) {
                     Button("Delete archived habits", role: .destructive) { deleteArchivedHabits() }
@@ -225,5 +229,76 @@ struct BackupView: View {
             }
         } catch { context.rollback(); message = error.localizedDescription }
         pending = nil
+    }
+}
+
+private struct ArchivedHabitsView: View {
+    @Environment(\.modelContext) private var context
+    @Query(sort: \Habit.order) private var habits: [Habit]
+    @State private var pendingDelete: Habit?
+    @State private var message: String?
+    private var archived: [Habit] { habits.filter { $0.archived } }
+
+    var body: some View {
+        List {
+            if archived.isEmpty {
+                ContentUnavailableView("No archived habits", systemImage: "archivebox", description: Text("Habits you archive will appear here."))
+                    .listRowBackground(Color.clear)
+            }
+            ForEach(archived) { habit in
+                Section {
+                    HStack(spacing: 14) {
+                        HabitSymbol(name: habit.symbol, size: 20)
+                            .font(.title3)
+                            .foregroundStyle(Color(habitHex: habit.colorHex))
+                            .frame(width: 44, height: 44)
+                            .background(Color(habitHex: habit.colorHex).opacity(0.14), in: RoundedRectangle(cornerRadius: 12))
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(habit.name).font(.headline)
+                            if let description = habit.habitDescription, !description.isEmpty {
+                                Text(description)
+                                    .font(.subheadline).foregroundStyle(AppTheme.secondaryText)
+                                    .lineLimit(2)
+                            }
+                        }
+                    }.padding(.vertical, 4)
+                    Button("Restore", systemImage: "arrow.uturn.backward") { restore(habit) }
+                    Button("Delete permanently", systemImage: "trash", role: .destructive) { pendingDelete = habit }
+                }.appSectionStyle()
+            }
+        }
+        .contentMargins(.bottom, 90, for: .scrollContent)
+        .appScreenStyle()
+        .navigationTitle("Archived Habits")
+        .navigationBarTitleDisplayMode(.inline)
+        .confirmationDialog("Permanently delete this habit and all its check-ins? This cannot be undone.", isPresented: Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } }), titleVisibility: .visible) {
+            Button("Delete permanently", role: .destructive) {
+                guard let habit = pendingDelete else { return }
+                pendingDelete = nil
+                context.delete(habit)
+                persist()
+            }
+            Button("Cancel", role: .cancel) { pendingDelete = nil }
+        }
+        .alert("Archive", isPresented: Binding(get: { message != nil }, set: { if !$0 { message = nil } })) {
+            Button("OK") {}
+        } message: { Text(message ?? "") }
+    }
+
+    private func restore(_ habit: Habit) {
+        habit.order = (habits.filter { !$0.archived }.map(\.order).max() ?? -1) + 1
+        habit.archived = false
+        persist()
+    }
+
+    private func persist() {
+        do {
+            try context.save()
+            WidgetCenter.shared.reloadAllTimelines()
+            let all = try context.fetch(FetchDescriptor<Habit>())
+            Task {
+                if let notice = await ReminderScheduler.shared.reconcile(all) { message = notice }
+            }
+        } catch { context.rollback(); message = error.localizedDescription }
     }
 }

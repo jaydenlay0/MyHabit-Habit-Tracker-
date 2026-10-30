@@ -61,7 +61,7 @@ struct HabitDetailView: View {
             }.appSectionStyle()
             Section {
                 Button("Archive habit") { archiving = true }
-                    .confirmationDialog("Archive this habit? It will leave your daily list and widgets. Archived habits cannot be browsed or restored in the app.", isPresented: $archiving, titleVisibility: .visible) {
+                    .confirmationDialog("Archive this habit? It will leave your daily list and widgets. You can restore it later from Settings → Archived habits.", isPresented: $archiving, titleVisibility: .visible) {
                         Button("Archive habit") {
                             habit.archived = true
                             if save() { refreshReminders(); dismiss() }
