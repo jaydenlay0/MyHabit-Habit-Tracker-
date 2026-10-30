@@ -16,6 +16,7 @@ struct HabitListView: View {
     @State private var now = Date.now
     @State private var counterToEdit: Habit?
     @State private var pendingArchive: Habit?
+    @State private var pendingDelete: Habit?
     @State private var errorMessage: String?
     private var visible: [Habit] { habits.filter { !$0.archived } }
     var body: some View {
@@ -57,8 +58,15 @@ struct HabitListView: View {
                             }
                         }
                         .appHabitCardStyle()
-                        .swipeActions {
-                            Button("Archive") { pendingArchive = habit }.tint(.orange)
+                        .swipeActions(edge: .trailing) {
+                            Button { pendingDelete = habit } label: {
+                                Label("Delete habit", systemImage: "trash")
+                            }.tint(.red)
+                        }
+                        .swipeActions(edge: .leading) {
+                            Button { pendingArchive = habit } label: {
+                                Label("Archive", systemImage: "archivebox")
+                            }.tint(.orange)
                         }
                     }.onMove(perform: move)
                 }
@@ -150,6 +158,17 @@ struct HabitListView: View {
                     pendingArchive = nil
                 }
                 Button("Cancel", role: .cancel) { pendingArchive = nil }
+            }
+            .confirmationDialog("Permanently delete this habit and all its check-ins? This cannot be undone.", isPresented: Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } }), titleVisibility: .visible) {
+                Button("Delete permanently", role: .destructive) {
+                    guard let habit = pendingDelete else { return }
+                    pendingDelete = nil
+                    context.delete(habit)
+                    if save() {
+                        Task { _ = await ReminderScheduler.shared.reconcile(habits) }
+                    }
+                }
+                Button("Cancel", role: .cancel) { pendingDelete = nil }
             }
             .alert("Couldn’t save", isPresented: Binding(get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } })) { Button("OK") {} } message: { Text(errorMessage ?? "") }
         }
