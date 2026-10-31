@@ -51,7 +51,8 @@ enum Palette {
     static let symbols = [
         "checkmark", "heart", "pencil", "book.closed", "drop", "moon",
         "figure.walk", "figure.mind.and.body", "figure.yoga", "figure.jumprope", "dumbbell", "basketball.fill",
-        "leaf", "pills.fill", "sun.max", "music.note", "airpodsmax", "cup.and.saucer"
+        "leaf", "pills.fill", "sun.max", "music.note", "airpodsmax", "cup.and.saucer",
+        "habit.bath", "habit.coding", "habit.studying", "habit.bed", "habit.robotVacuum", "habit.vacuum", "habit.cleaning"
     ]
     static func symbolName(_ symbol: String) -> String {
         let names = [
@@ -61,7 +62,9 @@ enum Palette {
             "cup.and.saucer": "Tea or coffee", "music.note": "Deodorant",
             "figure.mind.and.body": "Meditation", "figure.yoga": "Yoga",
             "basketball.fill": "Basketball", "figure.jumprope": "Skipping rope",
-            "pills.fill": "Pills", "airpodsmax": "AirPods Max headphones"
+            "pills.fill": "Pills", "airpodsmax": "AirPods Max headphones",
+            "habit.bath": "Shower / Bath", "habit.coding": "Coding", "habit.studying": "Studying",
+            "habit.bed": "Make Bed", "habit.robotVacuum": "Robot Vacuum", "habit.vacuum": "Vacuum", "habit.cleaning": "Cleaning"
         ]
         return names[symbol] ?? symbol
     }
