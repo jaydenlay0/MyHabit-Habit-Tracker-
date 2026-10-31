@@ -2,7 +2,7 @@ import SwiftUI
 
 // Original outline drawings, using the same 32-point canvas and rounded strokes.
 struct EverydayHabitSymbol: Shape {
-    static let identifiers = ["habit.bath", "habit.coding", "habit.studying", "habit.bed", "habit.robotVacuum", "habit.vacuum", "habit.cleaning"]
+    static let identifiers = ["habit.bath", "habit.coding", "habit.studying", "habit.bed", "habit.robotVacuum", "habit.vacuum", "habit.cleaning", "habit.retainer"]
     let name: String
 
     func path(in rect: CGRect) -> Path {
@@ -90,6 +90,23 @@ struct EverydayHabitSymbol: Shape {
             rounded(16, 24, 14, 6, 2)
             line([CGPoint(x: 18, y: 24), CGPoint(x: 21, y: 21), CGPoint(x: 30, y: 21), CGPoint(x: 27, y: 27), CGPoint(x: 18, y: 27)])
             line([CGPoint(x: 23, y: 12), CGPoint(x: 24.5, y: 16), CGPoint(x: 28, y: 17), CGPoint(x: 24.5, y: 18), CGPoint(x: 23, y: 21), CGPoint(x: 22, y: 18), CGPoint(x: 19, y: 17), CGPoint(x: 22, y: 16), CGPoint(x: 23, y: 12)])
+        case "habit.retainer":
+            // Horseshoe-shaped dental tray with individual tooth compartments.
+            path.move(to: CGPoint(x: 4, y: 5))
+            path.addCurve(to: CGPoint(x: 16, y: 29), control1: CGPoint(x: 1, y: 20), control2: CGPoint(x: 5, y: 29))
+            path.addCurve(to: CGPoint(x: 28, y: 5), control1: CGPoint(x: 27, y: 29), control2: CGPoint(x: 31, y: 20))
+            path.addQuadCurve(to: CGPoint(x: 23, y: 5), control: CGPoint(x: 25.5, y: 2))
+            path.addCurve(to: CGPoint(x: 16, y: 23), control1: CGPoint(x: 25, y: 17), control2: CGPoint(x: 23, y: 23))
+            path.addCurve(to: CGPoint(x: 9, y: 5), control1: CGPoint(x: 9, y: 23), control2: CGPoint(x: 7, y: 17))
+            path.addQuadCurve(to: CGPoint(x: 4, y: 5), control: CGPoint(x: 6.5, y: 2))
+            path.closeSubpath()
+            line([CGPoint(x: 3.5, y: 12), CGPoint(x: 8.5, y: 12)])
+            line([CGPoint(x: 4, y: 19), CGPoint(x: 9.5, y: 18)])
+            line([CGPoint(x: 8, y: 26), CGPoint(x: 12, y: 22)])
+            line([CGPoint(x: 16, y: 29), CGPoint(x: 16, y: 23)])
+            line([CGPoint(x: 24, y: 26), CGPoint(x: 20, y: 22)])
+            line([CGPoint(x: 28, y: 19), CGPoint(x: 22.5, y: 18)])
+            line([CGPoint(x: 28.5, y: 12), CGPoint(x: 23.5, y: 12)])
         default: break
         }
         let scale = min(rect.width, rect.height) / 32
