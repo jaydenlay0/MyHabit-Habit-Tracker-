@@ -19,6 +19,8 @@ struct HabitListView: View {
     @State private var pendingArchive: Habit?
     @State private var pendingDelete: Habit?
     @State private var errorMessage: String?
+    @State private var showingAllDone = false
+    @AppStorage("lastAllDoneDay") private var lastAllDoneDay = ""
     private var visible: [Habit] { habits.filter { !$0.archived } }
     var body: some View {
         NavigationStack {
@@ -32,18 +34,20 @@ struct HabitListView: View {
                     }
                     ForEach(visible) { habit in
                         HStack(spacing: 14) {
-                            Button { if habit.isCounter { adjustCounter(habit, by: 1) } else { toggleToday(habit) } } label: {
+                            Button { if habit.isQuantified { adjustCounter(habit, by: 1) } else { toggleToday(habit) } } label: {
                                 HabitCompletionIcon(habit: habit, today: now)
                             }.buttonStyle(.borderless)
-                                .accessibilityLabel(habit.isCounter ? "Increase \(habit.name) count" : "\(habit.isComplete(now) ? "Undo" : "Complete") \(habit.name) for today")
+                                .accessibilityLabel(habit.isMeasure ? "Edit \(habit.name) amount" : (habit.isCounter ? "Increase \(habit.name) count" : "\(habit.isComplete(now) ? "Undo" : "Complete") \(habit.name) for today"))
                                 .accessibilityValue(habit.isComplete(now) ? "Completed" : "Not completed")
                             NavigationLink {
                                 HabitDetailView(habit: habit)
                             } label: {
                                 VStack(alignment: .leading, spacing: 10) {
                                     Text(habit.name).font(.headline)
-                                    if habit.isCounter {
-                                        Text("\(habit.count(on: now)) / \(habit.dailyTarget) today")
+                                    Text(LocalizedStringKey(habit.isComplete(now) ? "Completed" : "Incomplete"))
+                                        .font(.caption2).foregroundStyle(AppTheme.secondaryText)
+                                    if habit.isQuantified {
+                                        Text(habit.progressLabel(on: now))
                                             .font(.subheadline).foregroundStyle(AppTheme.secondaryText)
                                     }
                                     StreakGoalView(current: HabitStats(habit: habit, today: now).current, goal: habit.streakGoal, colorHex: habit.colorHex)
@@ -90,7 +94,7 @@ struct HabitListView: View {
                             LazyVGrid(columns: layout == .grid ? Array(repeating: GridItem(.flexible(), spacing: 10), count: 3) : [GridItem(.flexible())], alignment: .leading, spacing: 14) {
                                 ForEach(visible) { habit in
                                     HabitLayoutCard(habit: habit, today: now, compact: layout == .grid) {
-                                        if habit.isCounter { adjustCounter(habit, by: 1) } else { toggleToday(habit) }
+                                        if habit.isQuantified { adjustCounter(habit, by: 1) } else { toggleToday(habit) }
                                     }
                                     .contextMenu {
                                         Button("Archive", systemImage: "archivebox") { pendingArchive = habit }
@@ -131,7 +135,7 @@ struct HabitListView: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.4)
                         .allowsTightening(true)
-                    Text("\(visible.filter { $0.isComplete(now) }.count) of \(visible.count) completed today").font(.subheadline).foregroundStyle(AppTheme.secondaryText)
+                    HabitProgressRing(habits: visible, today: now)
                 }
                 .frame(maxWidth: .infinity, alignment: .center)
                 .multilineTextAlignment(.center)
@@ -182,7 +186,8 @@ struct HabitListView: View {
                 }
             }
             .sheet(item: $counterToEdit) { habit in
-                CounterEditor(habit: habit, date: now)
+                if habit.isMeasure { MeasureEditor(habit: habit, date: now) }
+                else { CounterEditor(habit: habit, date: now) }
             }
             .confirmationDialog("Archive this habit? It will leave your daily list and widgets. You can restore it later from Settings → Archived habits.", isPresented: Binding(get: { pendingArchive != nil }, set: { if !$0 { pendingArchive = nil } }), titleVisibility: .visible) {
                 Button("Archive habit") {
@@ -208,6 +213,34 @@ struct HabitListView: View {
             .alert("Couldn’t save", isPresented: Binding(get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } })) { Button("OK") {} } message: { Text(errorMessage ?? "") }
         }
         .overlay { CompletionCelebration() }
+        .overlay(alignment: .top) {
+            if showingAllDone {
+                VStack(spacing: 8) {
+                    Image(systemName: "checkmark.seal.fill").font(.largeTitle).foregroundStyle(AppTheme.accent)
+                    Text("All habits completed!").font(.headline)
+                    Text("You kept your promises today. Take a moment to feel proud 💙")
+                        .font(.subheadline).multilineTextAlignment(.center)
+                }
+                .padding(20).background(.regularMaterial, in: RoundedRectangle(cornerRadius: 22))
+                .padding(24)
+                .transition(.opacity)
+                .allowsHitTesting(false)
+                .accessibilityAddTraits(.isStaticText)
+            }
+        }
+        .onChange(of: feedback.hapticTrigger) { _, _ in
+            let key = Day.key(.now)
+            let summary = HabitCompletionSummary(habits: visible, today: .now, weekly: false)
+            if summary.allDone && lastAllDoneDay != key {
+                lastAllDoneDay = key
+                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.25)) { showingAllDone = true }
+            }
+        }
+        .task(id: showingAllDone) {
+            guard showingAllDone else { return }
+            do { try await Task.sleep(for: .seconds(4)) } catch { return }
+            withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.25)) { showingAllDone = false }
+        }
         .environment(feedback)
         .sensoryFeedback(.success, trigger: feedback.hapticTrigger)
         .onChange(of: scenePhase) { _, phase in
@@ -228,6 +261,18 @@ struct HabitListView: View {
 
     private func adjustCounter(_ habit: Habit, by amount: Int) {
         now = .now
+        if habit.isMeasure {
+            if habit.measureTapAction == "enterTotal" || habit.isComplete(now) {
+                counterToEdit = habit
+                return
+            }
+            let wasComplete = habit.isComplete(now)
+            habit.setMeasured(habit.measured(on: now) + Double(amount), on: now)
+            guard save() else { return }
+            if !wasComplete && habit.isComplete(now) { feedback.complete(habit.id, at: now) }
+            else if wasComplete && !habit.isComplete(now) { feedback.undo(habit.id) }
+            return
+        }
         if amount > 0 && habit.count(on: now) >= habit.dailyTarget {
             counterToEdit = habit
             return

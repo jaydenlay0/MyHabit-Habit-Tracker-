@@ -26,7 +26,7 @@ struct HabitLayoutCard: View {
                     HabitCompletionIcon(habit: habit, today: today, size: compact ? 32 : 46, symbolSize: compact ? 16 : nil)
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(habit.isCounter ? "Increase count" : "Check in today")
+                .accessibilityLabel(habit.isMeasure ? "Enter total" : (habit.isCounter ? "Increase count" : "Check in today"))
                 NavigationLink { HabitDetailView(habit: habit) } label: {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(habit.name)
@@ -38,13 +38,13 @@ struct HabitLayoutCard: View {
                         }
                         if compact {
                             // Reserve the counter line in every tile to keep rows equal.
-                            Text(habit.isCounter ? "\(habit.count(on: today)) / \(habit.dailyTarget)" : " ")
+                            Text(habit.isQuantified ? habit.progressLabel(on: today) : " ")
                                 .font(.caption2)
                                 .foregroundStyle(Color(habitHex: habit.colorHex))
                                 .lineLimit(1)
-                                .accessibilityHidden(!habit.isCounter)
-                        } else if habit.isCounter {
-                            Text("\(habit.count(on: today)) / \(habit.dailyTarget)")
+                                .accessibilityHidden(!habit.isQuantified)
+                        } else if habit.isQuantified {
+                            Text(habit.progressLabel(on: today))
                                 .font(.caption2).foregroundStyle(Color(habitHex: habit.colorHex))
                         } else if !compact {
                             Text("Week \(yearRange.columns) · \(yearRange.year)")
@@ -55,6 +55,8 @@ struct HabitLayoutCard: View {
             }
             NavigationLink { HabitDetailView(habit: habit) } label: {
                 VStack(alignment: .leading, spacing: 8) {
+                    Text(LocalizedStringKey(habit.isComplete(today) ? "Completed" : "Incomplete"))
+                        .font(.caption2).foregroundStyle(AppTheme.secondaryText)
                     if compact {
                         Text(today, format: .dateTime.month(.abbreviated).year())
                             .font(.caption2).foregroundStyle(AppTheme.secondaryText)

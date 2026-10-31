@@ -12,6 +12,10 @@ struct HabitRecord: Codable {
     var trackingMode: String?
     var dailyTarget: Int?
     var counts: [String: Int]?
+    var measureUnit: String?
+    var measureTarget: Double?
+    var measureTapAction: String?
+    var measurements: [String: Double]?
     var habitDescription: String?
     var symbol: String
     var colorHex: String
@@ -25,6 +29,8 @@ struct HabitRecord: Codable {
     var resolvedStreakGoal: Int { streakGoal ?? 30 }
     init(_ habit: Habit) {
         trackingMode = habit.trackingMode; dailyTarget = habit.dailyTarget; counts = habit.counts
+        measureUnit = habit.measureUnit; measureTarget = habit.measureTarget
+        measureTapAction = habit.measureTapAction; measurements = habit.measurements
         habitDescription = habit.habitDescription
         id = habit.id; name = habit.name; symbol = habit.symbol; colorHex = habit.colorHex
         createdAt = habit.createdAt; order = habit.order; archived = habit.archived; days = habit.days; streakGoal = habit.streakGoal; reminders = habit.reminders
@@ -32,6 +38,8 @@ struct HabitRecord: Codable {
     func model() -> Habit {
         let habit = Habit(id: id, name: name, symbol: symbol, colorHex: colorHex, createdAt: createdAt, order: order, archived: archived, days: days, streakGoal: resolvedStreakGoal)
         habit.trackingMode = trackingMode ?? "yesNo"; habit.dailyTarget = dailyTarget ?? 1; habit.counts = counts ?? [:]
+        habit.measureUnit = measureUnit ?? "mL"; habit.measureTarget = measureTarget ?? 1000
+        habit.measureTapAction = measureTapAction ?? "enterTotal"; habit.measurements = measurements ?? [:]
         habit.habitDescription = habitDescription
         habit.reminders = reminders ?? HabitReminders()
         return habit
@@ -50,7 +58,7 @@ struct HabitBackup: Codable {
         parser.dateFormat = "yyyy-MM-dd"; parser.isLenient = false
         for habit in habits {
             guard !habit.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, habit.name.count <= 80,
-                  ["yesNo", "counter"].contains(habit.trackingMode ?? "yesNo"),
+                  ["yesNo", "counter", "measure"].contains(habit.trackingMode ?? "yesNo"),
                   (1...10000).contains(habit.dailyTarget ?? 1),
                   (habit.counts ?? [:]).values.allSatisfy({ (0...1_000_000).contains($0) }),
                   Palette.symbols.contains(habit.symbol),
@@ -58,12 +66,20 @@ struct HabitBackup: Codable {
                   habit.createdAt <= Date.now,
                   (0...3650).contains(habit.resolvedStreakGoal),
                   Set(habit.days).count == habit.days.count else { throw BackupError.invalid("Invalid habit fields.") }
+            let target = habit.measureTarget ?? 1000
+            guard target.isFinite, target > 0, target <= 1_000_000,
+                  !(habit.measureUnit ?? "mL").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                  (habit.measureUnit ?? "mL").count <= 20,
+                  ["enterTotal", "addOne"].contains(habit.measureTapAction ?? "enterTotal"),
+                  (habit.measurements ?? [:]).values.allSatisfy({ $0.isFinite && $0 >= 0 && $0 <= 1_000_000 }) else {
+                throw BackupError.invalid("Invalid measurement settings.")
+            }
             if let reminders = habit.reminders {
                 guard reminders.hasValidStoredValues, reminders.validationMessage == nil else {
                     throw BackupError.invalid(reminders.validationMessage ?? "Invalid reminder settings.")
                 }
             }
-            let recordedDays = Set(habit.days).union((habit.counts ?? [:]).keys)
+            let recordedDays = Set(habit.days).union((habit.counts ?? [:]).keys).union((habit.measurements ?? [:]).keys)
             for day in recordedDays {
                 guard day.range(of: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$", options: .regularExpression) != nil,
                       let date = parser.date(from: day), parser.string(from: date) == day,
@@ -228,6 +244,8 @@ struct BackupView: View {
             for record in backup.habits {
                 if let habit = existing[record.id] {
                     habit.trackingMode = record.trackingMode ?? "yesNo"; habit.dailyTarget = record.dailyTarget ?? 1; habit.counts = record.counts ?? [:]
+                    habit.measureUnit = record.measureUnit ?? "mL"; habit.measureTarget = record.measureTarget ?? 1000
+                    habit.measureTapAction = record.measureTapAction ?? "enterTotal"; habit.measurements = record.measurements ?? [:]
                     habit.habitDescription = record.habitDescription
                     habit.name = record.name; habit.symbol = record.symbol; habit.colorHex = record.colorHex
                     habit.createdAt = record.createdAt; habit.order = record.order; habit.archived = record.archived; habit.days = record.days; habit.streakGoal = record.resolvedStreakGoal; habit.reminders = record.reminders ?? HabitReminders()

@@ -11,6 +11,10 @@ struct HabitEditor: View {
     @State private var habitDescription: String
     @State private var trackingMode: String
     @State private var dailyTarget: Int
+    @State private var measureUnit: String
+    @State private var measureTarget: Double
+    @State private var measureTapAction: String
+    @State private var discarding = false
     @State private var symbol: String
     @State private var hasStreakGoal: Bool
     @State private var streakGoal: Int
@@ -26,6 +30,9 @@ struct HabitEditor: View {
         _habitDescription = State(initialValue: habit?.habitDescription ?? "")
         _trackingMode = State(initialValue: habit?.trackingMode ?? "yesNo")
         _dailyTarget = State(initialValue: habit?.dailyTarget ?? 1)
+        _measureUnit = State(initialValue: habit?.measureUnit ?? "mL")
+        _measureTarget = State(initialValue: habit?.measureTarget ?? 1000)
+        _measureTapAction = State(initialValue: habit?.measureTapAction ?? "enterTotal")
         _symbol = State(initialValue: habit?.symbol ?? "checkmark")
         _hasStreakGoal = State(initialValue: habit?.hasStreakGoal ?? false)
         _streakGoal = State(initialValue: habit.flatMap { $0.hasStreakGoal ? $0.streakGoal : nil } ?? 30)
@@ -66,20 +73,7 @@ struct HabitEditor: View {
                         }
                     }
                 }.appSectionStyle()
-                Section("Habit Tracking") {
-                    Picker("Tracking type", selection: $trackingMode) {
-                        Text("Yes/No").tag("yesNo")
-                        Text("Counter").tag("counter")
-                    }.pickerStyle(.segmented)
-                    if trackingMode == "counter" {
-                        Stepper("Daily target: \(dailyTarget)", value: $dailyTarget, in: 1...10000)
-                        Text("Use + and − to track your daily count. Reach your target to complete the habit.")
-                            .font(.caption).foregroundStyle(AppTheme.secondaryText)
-                    } else {
-                        Text("Tap the habit icon to mark it complete for the day. Tap again to undo your check-in.")
-                            .font(.caption).foregroundStyle(AppTheme.secondaryText)
-                    }
-                }.appSectionStyle()
+                trackingSection
                 Section {
                     Toggle("Streak Goal", isOn: $hasStreakGoal)
                     if hasStreakGoal {
@@ -103,16 +97,20 @@ struct HabitEditor: View {
 
             }
             .disabled(saving)
-            .interactiveDismissDisabled(saving)
+            .interactiveDismissDisabled(saving || hasChanges)
             .appScreenStyle()
             .navigationTitle(LocalizedStringKey(habit == nil ? "New Habit" : "Edit habit"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.disabled(saving) }
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { if hasChanges { discarding = true } else { dismiss() } }.disabled(saving) }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(LocalizedStringKey(saving ? "Saving…" : "Save")) { Task { await save() } }
-                        .disabled(saving || name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || reminders.validationMessage != nil)
+                        .disabled(saving || name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || reminders.validationMessage != nil || !validMeasurement)
                 }
+            }
+            .confirmationDialog("Discard unsaved changes?", isPresented: $discarding, titleVisibility: .visible) {
+                Button("Discard changes", role: .destructive) { dismiss() }
+                Button("Keep editing", role: .cancel) {}
             }
             .alert(reminderNotice == nil ? "Couldn’t save" : "Habit saved", isPresented: Binding(get: { failure != nil || reminderNotice != nil }, set: { visible in
                 if !visible {
@@ -124,6 +122,53 @@ struct HabitEditor: View {
             } message: { Text(failure ?? reminderNotice ?? "") }
         }
     }
+    private var trackingSection: some View {
+    Section("Habit Tracking") {
+        Picker("Tracking type", selection: $trackingMode) {
+            Text("Yes/No").tag("yesNo")
+            Text("Counter").tag("counter")
+            Text("Measure").tag("measure")
+        }.pickerStyle(.segmented)
+        if trackingMode == "measure" {
+            Text("Track an amount with a unit, such as 2 L of water, 7.5 km or 30 minutes. Reaching your daily goal completes the habit.")
+                .font(.caption).foregroundStyle(AppTheme.secondaryText)
+            TextField("Unit", text: $measureUnit)
+                .onChange(of: measureUnit) { _, value in measureUnit = String(value.prefix(20)) }
+            Picker("Unit presets", selection: $measureUnit) {
+                ForEach(["mL", "L", "km", "minutes"], id: \.self) { unit in Text(verbatim: unit).tag(unit) }
+                if !["mL", "L", "km", "minutes"].contains(measureUnit) { Text("Custom").tag(measureUnit) }
+            }
+            TextField("Daily goal", value: $measureTarget, format: .number)
+                .keyboardType(.decimalPad)
+            Picker("On tap", selection: $measureTapAction) {
+                Text("Add 1").tag("addOne")
+                Text("Enter total").tag("enterTotal")
+            }.pickerStyle(.segmented)
+        } else if trackingMode == "counter" {
+            Stepper("Daily target: \(dailyTarget)", value: $dailyTarget, in: 1...10000)
+            Text("Use + and − to track your daily count. Reach your target to complete the habit.")
+                .font(.caption).foregroundStyle(AppTheme.secondaryText)
+        } else {
+            Text("Tap the habit icon to mark it complete for the day. Tap again to undo your check-in.")
+                .font(.caption).foregroundStyle(AppTheme.secondaryText)
+        }
+    }.appSectionStyle()
+    }
+
+    private var validMeasurement: Bool {
+        trackingMode != "measure" || (measureTarget.isFinite && measureTarget > 0 && measureTarget <= 1_000_000 && !measureUnit.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+    }
+    private var hasChanges: Bool {
+        if name != (habit?.name ?? "") || habitDescription != (habit?.habitDescription ?? "") { return true }
+        if symbol != (habit?.symbol ?? "checkmark") || color != (habit?.colorHex ?? Palette.defaultColor) { return true }
+        if trackingMode != (habit?.trackingMode ?? "yesNo") || dailyTarget != (habit?.dailyTarget ?? 1) { return true }
+        if hasStreakGoal != (habit?.hasStreakGoal ?? false) { return true }
+        let originalGoal = habit.flatMap { $0.hasStreakGoal ? $0.streakGoal : nil } ?? 30
+        if streakGoal != originalGoal || reminders != (habit?.reminders ?? HabitReminders()) { return true }
+        if measureUnit != (habit?.measureUnit ?? "mL") || measureTarget != (habit?.measureTarget ?? 1000) { return true }
+        return measureTapAction != (habit?.measureTapAction ?? "enterTotal")
+    }
+
     private static func limitedDescription(_ value: String) -> String {
         let capped = String(value.prefix(300))
         let words = capped.split(whereSeparator: { $0.isWhitespace })
@@ -131,7 +176,7 @@ struct HabitEditor: View {
     }
 
     @MainActor private func save() async {
-        guard !saving else { return }
+        guard !saving, validMeasurement else { return }
         guard reminders.validationMessage == nil else { failure = reminders.validationMessage; return }
         saving = true
         defer { saving = false }
@@ -156,6 +201,10 @@ struct HabitEditor: View {
             saved.habitDescription = description.isEmpty ? nil : description
             saved.trackingMode = trackingMode
             saved.dailyTarget = dailyTarget
+            let unit = measureUnit.trimmingCharacters(in: .whitespacesAndNewlines)
+            saved.measureUnit = unit.isEmpty ? "mL" : unit
+            saved.measureTarget = measureTarget.isFinite && measureTarget > 0 && measureTarget <= 1_000_000 ? measureTarget : 1000
+            saved.measureTapAction = measureTapAction
             saved.reminders = reminders
             try context.save()
             WidgetCenter.shared.reloadAllTimelines()

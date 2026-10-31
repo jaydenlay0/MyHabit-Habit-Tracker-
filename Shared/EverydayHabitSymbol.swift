@@ -42,13 +42,13 @@ struct EverydayHabitSymbol: Shape {
             path.addQuadCurve(to: CGPoint(x: 4, y: 5), control: CGPoint(x: 10, y: 2))
             path.addLine(to: CGPoint(x: 4, y: 25))
             path.addQuadCurve(to: CGPoint(x: 16, y: 28), control: CGPoint(x: 11, y: 24))
-            path.addQuadCurve(to: CGPoint(x: 27, y: 25), control: CGPoint(x: 21, y: 24))
-            path.addLine(to: CGPoint(x: 27, y: 5))
-            path.addQuadCurve(to: CGPoint(x: 16, y: 7), control: CGPoint(x: 21, y: 2))
+            path.addQuadCurve(to: CGPoint(x: 25, y: 25), control: CGPoint(x: 20, y: 24))
+            path.addLine(to: CGPoint(x: 25, y: 5))
+            path.addQuadCurve(to: CGPoint(x: 16, y: 7), control: CGPoint(x: 20, y: 2))
             line([CGPoint(x: 16, y: 7), CGPoint(x: 16, y: 28)])
             for y in [CGFloat(11), 15, 19] {
                 line([CGPoint(x: 7, y: y), CGPoint(x: 12, y: y + 0.5)])
-                line([CGPoint(x: 20, y: y + 0.5), CGPoint(x: 24, y: y)])
+                line([CGPoint(x: 19, y: y + 0.5), CGPoint(x: 22, y: y)])
             }
             line([CGPoint(x: 29, y: 9), CGPoint(x: 29, y: 24), CGPoint(x: 30, y: 27), CGPoint(x: 31, y: 24), CGPoint(x: 31, y: 9), CGPoint(x: 29, y: 9)])
         case "habit.bed":

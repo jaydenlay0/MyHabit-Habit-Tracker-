@@ -9,6 +9,68 @@ import UserNotifications
 
 final class MyHabitsTests: XCTestCase {
     func date(_ offset: Int) -> Date { Day.adding(offset, to: .now) }
+    func testMeasureDecimalCompletionUndoAndBackup() throws {
+        let habit = Habit(name: "Water")
+        habit.trackingMode = "measure"; habit.measureUnit = "L"; habit.measureTarget = 2.5
+        habit.setMeasured(1.25)
+        XCTAssertFalse(habit.isComplete())
+        XCTAssertEqual(habit.measured(), 1.25)
+        habit.setMeasured(3)
+        XCTAssertEqual(habit.measured(), 2.5)
+        XCTAssertTrue(habit.isComplete())
+        habit.setMeasured(.nan)
+        XCTAssertEqual(habit.measured(), 2.5)
+        habit.setMeasured(1.5)
+        XCTAssertFalse(habit.isComplete())
+        let data = try JSONEncoder().encode(HabitBackup(habits: [HabitRecord(habit)]))
+        let decoded = try JSONDecoder().decode(HabitBackup.self, from: data).validated().habits[0].model()
+        XCTAssertTrue(decoded.isMeasure)
+        XCTAssertEqual(decoded.measureUnit, "L")
+        XCTAssertEqual(decoded.measureTarget, 2.5)
+        XCTAssertEqual(decoded.measured(), 1.5)
+        decoded.toggle(); XCTAssertTrue(decoded.isComplete())
+        decoded.toggle(); XCTAssertEqual(decoded.measured(), 0)
+        habit.measureTarget = 0.8
+        habit.setMeasured(0.1 + 0.7)
+        XCTAssertTrue(habit.isComplete())
+    }
+
+    func testMeasurePersistenceAndLegacyBackup() throws {
+        let container = try ModelContainer(for: Habit.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let context = ModelContext(container)
+        let habit = Habit(name: "Run")
+        habit.trackingMode = "measure"; habit.measureUnit = "km"; habit.measureTarget = 7.5
+        habit.setMeasured(3.25)
+        context.insert(habit); try context.save()
+        let other = ModelContext(container)
+        let loaded = try XCTUnwrap(other.fetch(FetchDescriptor<Habit>()).first)
+        XCTAssertEqual(loaded.measured(), 3.25)
+        var backup = HabitBackup(habits: [HabitRecord(loaded)])
+        backup.habits[0].measureTarget = -1
+        XCTAssertThrowsError(try backup.validated())
+        let record = HabitRecord(Habit(name: "Legacy"))
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(with: JSONEncoder().encode(record)) as? [String: Any])
+        for key in ["measureUnit", "measureTarget", "measureTapAction", "measurements"] { object.removeValue(forKey: key) }
+        let legacy = try JSONDecoder().decode(HabitRecord.self, from: JSONSerialization.data(withJSONObject: object)).model()
+        XCTAssertFalse(legacy.isMeasure)
+        XCTAssertEqual(legacy.measureUnit, "mL")
+    }
+
+    func testCompletionRingExcludesArchivedAndPreCreationDays() {
+        let today = Day.calendar.startOfDay(for: .now)
+        let older = Habit(name: "Read", createdAt: Day.adding(-10, to: today), days: [Day.key(today)])
+        let new = Habit(name: "Water", createdAt: today, days: [Day.key(today)])
+        let archived = Habit(name: "Old", archived: true)
+        let daily = HabitCompletionSummary(habits: [older, new, archived], today: today, weekly: false)
+        XCTAssertEqual(daily.completed, 2); XCTAssertEqual(daily.total, 2); XCTAssertTrue(daily.allDone)
+        let start = Day.calendar.dateInterval(of: .weekOfYear, for: today)!.start
+        let elapsed = Day.calendar.dateComponents([.day], from: start, to: today).day! + 1
+        let weekly = HabitCompletionSummary(habits: [older, new, archived], today: today, weekly: true)
+        XCTAssertEqual(weekly.total, elapsed + 1)
+        XCTAssertEqual(weekly.completed, 2)
+        XCTAssertFalse(HabitCompletionSummary(habits: [], today: today, weekly: false).allDone)
+    }
+
     func testYearHeatmapIncludesOnlyElapsedWeeksAndResetsInJanuary() throws {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(secondsFromGMT: 0)!

@@ -15,7 +15,8 @@ struct CheckInIntent: AppIntent {
         let context = ModelContext(container)
         let descriptor = FetchDescriptor<Habit>(predicate: #Predicate { $0.id == id })
         if let habit = try context.fetch(descriptor).first, !habit.archived {
-            if habit.isCounter { habit.adjustCount(by: 1) } else { habit.toggle() }
+            if habit.isMeasure { habit.setMeasured(habit.measured() + 1) }
+            else if habit.isCounter { habit.adjustCount(by: 1) } else { habit.toggle() }
             try context.save(); SharedStore.markWidgetWrite()
         }
         WidgetCenter.shared.reloadAllTimelines()

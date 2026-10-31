@@ -9,6 +9,10 @@ final class Habit {
     var trackingMode: String = "yesNo"
     var dailyTarget: Int = 1
     var counterData: Data? = nil
+    var measureUnit: String = "mL"
+    var measureTarget: Double = 1000
+    var measureTapAction: String = "enterTotal"
+    var measureData: Data? = nil
     var symbol: String
     var colorHex: String
     var createdAt: Date
@@ -25,6 +29,37 @@ final class Habit {
         self.id = id; self.name = name; self.symbol = symbol; self.colorHex = colorHex
         self.createdAt = createdAt; self.order = order; self.archived = archived; self.days = days
         self.streakGoal = streakGoal
+    }
+    var isMeasure: Bool { trackingMode == "measure" }
+    var isQuantified: Bool { isCounter || isMeasure }
+    func progressLabel(on date: Date = .now) -> String {
+        isMeasure ? measurementLabel(on: date) : "\(count(on: date)) / \(dailyTarget)"
+    }
+    var measurements: [String: Double] {
+        get {
+            guard let measureData else { return [:] }
+            return (try? JSONDecoder().decode([String: Double].self, from: measureData)) ?? [:]
+        }
+        set { measureData = try? JSONEncoder().encode(newValue) }
+    }
+    func measured(on date: Date = .now) -> Double {
+        measurements[Day.key(date)] ?? (isComplete(date) ? measureTarget : 0)
+    }
+    func setMeasured(_ value: Double, on date: Date = .now) {
+        guard value.isFinite, measureTarget.isFinite, measureTarget > 0 else { return }
+        let clamped = min(measureTarget, max(0, value))
+        let tolerance = max(1, measureTarget) * 1e-10
+        let value = abs(clamped - measureTarget) <= tolerance ? measureTarget : clamped
+        var updated = measurements
+        updated[Day.key(date)] = value
+        measurements = updated
+        days.removeAll { $0 == Day.key(date) }
+        if value >= measureTarget { days.append(Day.key(date)) }
+    }
+    func measurementLabel(on date: Date = .now) -> String {
+        let amount = measured(on: date).formatted(.number.precision(.fractionLength(0...2)))
+        let goal = measureTarget.formatted(.number.precision(.fractionLength(0...2)))
+        return "\(amount) / \(goal) \(measureUnit)"
     }
     var isCounter: Bool { trackingMode == "counter" }
     var counts: [String: Int] {
@@ -50,6 +85,10 @@ final class Habit {
 
     func isComplete(_ date: Date = .now) -> Bool { days.contains(Day.key(date)) }
     func toggle(_ date: Date = .now) {
+        if isMeasure {
+            setMeasured(isComplete(date) ? 0 : measureTarget, on: date)
+            return
+        }
         if isCounter {
             if isComplete(date) { adjustCount(by: -count(on: date), on: date) }
             else { adjustCount(by: max(1, dailyTarget) - count(on: date), on: date) }

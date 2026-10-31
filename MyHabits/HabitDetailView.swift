@@ -11,6 +11,8 @@ struct HabitDetailView: View {
     @State private var now = Date.now
     @State private var editing = false
     @State private var editingCounter = false
+    @State private var editingMeasure = false
+    @State private var measureDate = Date.now
     @State private var deleting = false
     @State private var archiving = false
     @State private var weekly = false
@@ -26,6 +28,9 @@ struct HabitDetailView: View {
                 if let description = habit.habitDescription, !description.isEmpty {
                     Text(description).font(.subheadline).foregroundStyle(AppTheme.secondaryText)
                 }
+                LabeledContent("Status") {
+                    Text(LocalizedStringKey(habit.isComplete(now) ? "Completed" : "Incomplete"))
+                }
                 if !habit.archived {
                     Button { toggleCheckIn(.now) } label: {
                         Label {
@@ -36,6 +41,12 @@ struct HabitDetailView: View {
                     }.tint(Color(habitHex: habit.colorHex))
                 }
             }.appSectionStyle()
+            if habit.isMeasure {
+                Section("Measure") {
+                    Text(habit.measurementLabel(on: now))
+                    Button("Enter total") { measureDate = .now; editingMeasure = true }
+                }.appSectionStyle()
+            }
             if habit.isCounter {
                 Section("Today's count") {
                     Stepper("\(habit.count(on: now)) / \(habit.dailyTarget)", onIncrement: { adjustCounter(1) }, onDecrement: { adjustCounter(-1) })
@@ -44,7 +55,6 @@ struct HabitDetailView: View {
             Section(LocalizedStringKey(habit.hasStreakGoal ? "Streak goal" : "Current streak")) {
                 StreakGoalView(current: stats.current, goal: habit.streakGoal, colorHex: habit.colorHex)
                     .padding(.vertical, 6)
-                Button(LocalizedStringKey(habit.hasStreakGoal ? "Change or remove goal" : "Add a goal (optional)")) { editing = true }
             }.appSectionStyle()
             Section("Reminders") {
                 ReminderSummary(settings: habit.reminders)
@@ -86,6 +96,7 @@ struct HabitDetailView: View {
             }
         }
         .sheet(isPresented: $editing) { HabitEditor(habit: habit) }
+        .sheet(isPresented: $editingMeasure) { MeasureEditor(habit: habit, date: measureDate) }
         .sheet(isPresented: $editingCounter) { CounterEditor(habit: habit, date: now) }
         .confirmationDialog("Delete this habit and all its check-ins?", isPresented: $deleting, titleVisibility: .visible) {
             Button("Delete permanently", role: .destructive) {
@@ -114,6 +125,7 @@ struct HabitDetailView: View {
         else if wasComplete && !habit.isComplete(now) { feedback.undo(habit.id) }
     }
     private func toggleCheckIn(_ date: Date) {
+        if habit.isMeasure { measureDate = date; editingMeasure = true; return }
         now = .now
         let isToday = Day.key(date) == Day.key(now)
         let wasComplete = habit.isComplete(date)
