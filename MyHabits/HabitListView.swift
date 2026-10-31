@@ -7,7 +7,6 @@ struct HabitListView: View {
     @State private var brandFrame: CGRect = .zero
     @Environment(\.modelContext) private var context
     @Query(sort: \Habit.order) private var habits: [Habit]
-    @Environment(\.colorScheme) private var scheme
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.navigationBarCollapsed) private var updateNavigationScroll
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -91,6 +90,8 @@ struct HabitListView: View {
                         }
                     }.onMove(perform: move)
                 }
+                .listStyle(.plain)
+                .padding(.horizontal, 16)
                 } else {
                     ScrollView {
                         if visible.isEmpty {
@@ -115,7 +116,7 @@ struct HabitListView: View {
                     }
                 }
                 }
-                .listRowSpacing(scheme == .dark ? 10 : nil)
+                .listRowSpacing(10)
                 .environment(\.editMode, $editMode)
                 .tracksNavigationScroll()
                 .environment(\.navigationBarCollapsed, { scrollingDown in
@@ -257,9 +258,7 @@ struct HabitListView: View {
     }
     private var brandLogo: some View {
         Button { openAppUpdates(brandFrame) } label: {
-            Image("BrandMark")
-                .resizable()
-                .scaledToFit()
+            AppBrandMark()
                 .frame(width: 56, height: 56)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
                 .offset(x: -8)

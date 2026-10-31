@@ -1,7 +1,11 @@
 [
   {
     "id": "current-release",
-    "title": "Restore subtle habit outlines while keeping rounded corners continuous."
+    "title": "Use white-backed green branding in Light mode and consistent Home insets across appearances."
+  },
+  {
+    "id": "8672256",
+    "title": "Restore subtle card borders while preserving unclipped rounded corners"
   },
   {
     "id": "2f8605b",

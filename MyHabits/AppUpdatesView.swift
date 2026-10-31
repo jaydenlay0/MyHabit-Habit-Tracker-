@@ -10,6 +10,22 @@ extension EnvironmentValues {
     }
 }
 
+struct AppBrandMark: View {
+    @Environment(\.colorScheme) private var scheme
+    var body: some View {
+        ZStack {
+            if scheme == .light {
+                Color.white
+                BrandLightning().fill(Color(habitHex: "63D6A3"))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+            } else {
+                Image("BrandMark").resizable().scaledToFit()
+            }
+        }.aspectRatio(1, contentMode: .fit)
+    }
+}
+
 private struct UpdateEntry: Decodable, Identifiable {
     let id: String
     let title: String
@@ -29,7 +45,7 @@ struct AppUpdatesView: View {
             List {
                 Section {
                     HStack(spacing: 14) {
-                        Image("BrandMark").resizable().scaledToFit()
+                        AppBrandMark()
                             .frame(width: 56, height: 56).clipShape(RoundedRectangle(cornerRadius: 12))
                         VStack(alignment: .leading, spacing: 4) {
                             Text("MyHabits").font(.title2.bold())
