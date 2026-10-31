@@ -125,7 +125,7 @@ struct BackupView: View {
                 Section("Notifications") {
                     Text("Reminders default to 10:00 am. Set up to three times per day, weekdays or a time window in New Habit or Edit.")
                         .font(.subheadline)
-                    Text("iOS supports 64 scheduled notification slots per app. Every-day reminders use fewer slots than individual weekdays. Focus modes and notification settings can delay delivery.")
+                    Text("Reminder messages rotate through four phrases. MyHabits schedules the next 64 reminders and refills them when you open the app. Open it regularly so reminders continue. Focus modes and notification settings can delay delivery.")
                         .font(.caption).foregroundStyle(AppTheme.secondaryText)
                     if let notice = notificationScheduler.notice {
                         Text(notice).font(.caption).foregroundStyle(AppTheme.secondaryText)

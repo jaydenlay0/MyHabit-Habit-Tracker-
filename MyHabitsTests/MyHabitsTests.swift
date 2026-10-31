@@ -266,18 +266,30 @@ final class MyHabitsTests: XCTestCase {
         var daily = HabitReminders(); daily.enabled = true; daily.times = [600, 840, 1080]
         let id = UUID()
         let requests = try ReminderScheduler.requests(for: [ReminderDefinition(id: id, name: "Read", settings: daily)])
-        XCTAssertEqual(requests.count, 3)
+        XCTAssertEqual(requests.count, 64)
         for request in requests {
             let trigger = try XCTUnwrap(request.trigger as? UNCalendarNotificationTrigger)
-            XCTAssertTrue(trigger.repeats); XCTAssertNil(trigger.dateComponents.weekday)
+            XCTAssertFalse(trigger.repeats); XCTAssertNotNil(trigger.dateComponents.year)
             XCTAssertNil(trigger.dateComponents.timeZone)
             XCTAssertEqual(request.content.title, "Read")
         }
+        for (index, request) in requests.enumerated() {
+            XCTAssertEqual(request.content.body, ReminderScheduler.messages[index % 4])
+        }
+        let rotated = try ReminderScheduler.requests(for: [ReminderDefinition(id: id, name: "Read", settings: daily)], startingIndex: 2)
+        XCTAssertEqual(rotated[0].content.body, ReminderScheduler.messages[2])
+        let now = Date.now
+        let plan: [[String: Double]] = [
+            ["scheduledAt": now.timeIntervalSince1970 - 10, "rotationIndex": 3, "ordinal": 0],
+            ["scheduledAt": now.timeIntervalSince1970 + 60, "rotationIndex": 0, "ordinal": 1]
+        ]
+        XCTAssertEqual(ReminderScheduler.rotationIndex(after: plan, now: now, fallback: 2), 0)
+        XCTAssertEqual(ReminderScheduler.rotationIndex(after: [], now: now, fallback: 2), 2)
         var weekdays = daily; weekdays.weekdays = [2, 4, 6]
         let weekly = try ReminderScheduler.requests(for: [ReminderDefinition(id: id, name: "Read", settings: weekdays)])
-        XCTAssertEqual(weekly.count, 9)
-        XCTAssertEqual(Set(weekly.map(\.identifier)).count, 9)
-        let days = weekly.compactMap { ($0.trigger as? UNCalendarNotificationTrigger)?.dateComponents.weekday }
+        XCTAssertEqual(weekly.count, 64)
+        XCTAssertEqual(Set(weekly.map(\.identifier)).count, 64)
+        let days = weekly.compactMap { ($0.trigger as? UNCalendarNotificationTrigger)?.nextTriggerDate() }.map { Calendar.current.component(.weekday, from: $0) }
         XCTAssertEqual(Set(days), Set([2, 4, 6]))
         XCTAssertEqual(requests[0].identifier, try ReminderScheduler.requests(for: [ReminderDefinition(id: id, name: "Renamed", settings: daily)])[0].identifier)
     }
@@ -294,7 +306,7 @@ final class MyHabitsTests: XCTestCase {
     @MainActor func testNotificationCapacityExplainsOverflow() throws {
         var settings = HabitReminders(); settings.enabled = true; settings.times = [600, 840, 1080]
         let definitions = (0..<21).map { ReminderDefinition(id: UUID(), name: "Habit \($0)", settings: settings) }
-        XCTAssertEqual(try ReminderScheduler.requests(for: definitions).count, 63)
+        XCTAssertEqual(try ReminderScheduler.requests(for: definitions).count, 64)
         XCTAssertThrowsError(try ReminderScheduler.requests(for: definitions + [ReminderDefinition(id: UUID(), name: "Extra", settings: settings)]))
     }
     @MainActor func testReminderSettingsPersistAndRoundTripInBackup() throws {
