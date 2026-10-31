@@ -65,12 +65,6 @@ extension EnvironmentValues {
     }
 }
 
-private struct NavigationScrollSample: Equatable {
-    let offset: CGFloat
-    let viewportHeight: CGFloat
-    let topInset: CGFloat
-}
-
 private struct NavigationScrollTracking: ViewModifier {
     @Environment(\.navigationBarCollapsed) private var setCollapsed
     @State private var anchor: CGFloat = 0
@@ -78,18 +72,10 @@ private struct NavigationScrollTracking: ViewModifier {
 
     @ViewBuilder func body(content: Content) -> some View {
         if #available(iOS 18.0, *) {
-            content.onScrollGeometryChange(for: NavigationScrollSample.self) { geometry in
+            content.onScrollGeometryChange(for: CGFloat.self) { geometry in
                 let maximum = max(0, geometry.contentSize.height + geometry.contentInsets.top + geometry.contentInsets.bottom - geometry.containerSize.height)
-                let offset = min(maximum, max(0, geometry.contentOffset.y + geometry.contentInsets.top))
-                return NavigationScrollSample(offset: offset, viewportHeight: geometry.containerSize.height, topInset: geometry.contentInsets.top)
-            } action: { previous, current in
-                let offset = current.offset
-                // Header expansion changes the viewport, not the user's scroll direction.
-                guard abs(current.viewportHeight - previous.viewportHeight) < 0.5,
-                      abs(current.topInset - previous.topInset) < 0.5 else {
-                    anchor = offset
-                    return
-                }
+                return min(maximum, max(0, geometry.contentOffset.y + geometry.contentInsets.top))
+            } action: { _, offset in
                 if offset <= 1 {
                     anchor = offset
                     if collapsed { collapsed = false; setCollapsed(false) }

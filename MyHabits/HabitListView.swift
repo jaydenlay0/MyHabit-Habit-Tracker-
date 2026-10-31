@@ -26,12 +26,13 @@ struct HabitListView: View {
     private var visible: [Habit] { habits.filter { !$0.archived } }
     var body: some View {
         NavigationStack {
-            ScrollViewReader { scrollProxy in
+            ZStack(alignment: .top) {
+                ScrollViewReader { scrollProxy in
                 Group {
                 if layout == .list || editMode.isEditing {
                 List {
                     Color.clear
-                        .frame(height: 12)
+                        .frame(height: headerHeight + 12)
                         .id("home.top")
                         .listRowInsets(EdgeInsets())
                         .listRowBackground(Color.clear)
@@ -98,7 +99,7 @@ struct HabitListView: View {
                     ScrollView {
                         if visible.isEmpty {
                             ContentUnavailableView("Make room for a good habit", systemImage: "leaf", description: Text("Tap + to start your first daily practice."))
-                                .padding(.top, 16)
+                                .padding(.top, headerHeight + 16)
                                 .id("home.top")
                         } else {
                             LazyVGrid(columns: layout == .grid ? Array(repeating: GridItem(.flexible(), spacing: 10), count: 3) : [GridItem(.flexible())], alignment: .leading, spacing: 14) {
@@ -113,7 +114,7 @@ struct HabitListView: View {
                                 }
                             }
                             .padding(.horizontal, 16)
-                            .padding(.top, 16)
+                            .padding(.top, headerHeight + 16)
                             .padding(.bottom, 90)
                             .id("home.top")
                         }
@@ -143,8 +144,7 @@ struct HabitListView: View {
                         scrollProxy.scrollTo("home.top", anchor: .top)
                     }
                 }
-            }
-            .safeAreaInset(edge: .top, spacing: 0) {
+                }
                 VStack(alignment: .center, spacing: 6) {
                     Text("MyHabits")
                         .font(.largeTitle.bold())
@@ -163,16 +163,14 @@ struct HabitListView: View {
                 .padding(.horizontal, 32)
                 .padding(.top, 4)
                 .padding(.bottom, 12)
-                .fixedSize(horizontal: false, vertical: true)
+                .background(AppTheme.background)
                 .background {
                     GeometryReader { geometry in
                         Color.clear.preference(key: HomeHeaderHeightKey.self, value: geometry.size.height)
                     }
                 }
-                .frame(height: headerHidden ? 0 : headerHeight, alignment: .top)
+                .offset(y: headerHidden && !reduceMotion ? -headerHeight - 16 : 0)
                 .opacity(headerHidden ? 0 : 1)
-                .clipped()
-                .background(AppTheme.background)
                 .allowsHitTesting(!headerHidden)
                 .accessibilityHidden(headerHidden)
             }
