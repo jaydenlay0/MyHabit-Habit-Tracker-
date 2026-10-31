@@ -12,6 +12,7 @@ struct HabitEditor: View {
     @State private var trackingMode: String
     @State private var dailyTarget: Int
     @State private var measureUnit: String
+    @State private var unitPreset: String
     @State private var measureTarget: Double
     @State private var measureTapAction: String
     @State private var discarding = false
@@ -30,7 +31,9 @@ struct HabitEditor: View {
         _habitDescription = State(initialValue: habit?.habitDescription ?? "")
         _trackingMode = State(initialValue: habit?.trackingMode ?? "yesNo")
         _dailyTarget = State(initialValue: habit?.dailyTarget ?? 1)
-        _measureUnit = State(initialValue: habit?.measureUnit ?? "mL")
+        let initialUnit = habit?.measureUnit ?? "mL"
+        _measureUnit = State(initialValue: initialUnit)
+        _unitPreset = State(initialValue: ["mL", "L", "km", "minutes"].contains(initialUnit) ? initialUnit : "custom")
         _measureTarget = State(initialValue: habit?.measureTarget ?? 1000)
         _measureTapAction = State(initialValue: habit?.measureTapAction ?? "enterTotal")
         _symbol = State(initialValue: habit?.symbol ?? "checkmark")
@@ -133,10 +136,16 @@ struct HabitEditor: View {
             Text("Track an amount with a unit, such as 2 L of water, 7.5 km or 30 minutes. Reaching your daily goal completes the habit.")
                 .font(.caption).foregroundStyle(AppTheme.secondaryText)
             TextField("Unit", text: $measureUnit)
-                .onChange(of: measureUnit) { _, value in measureUnit = String(value.prefix(20)) }
-            Picker("Unit presets", selection: $measureUnit) {
+                .onChange(of: measureUnit) { _, value in
+                    measureUnit = String(value.prefix(20))
+                    if !["mL", "L", "km", "minutes"].contains(measureUnit) { unitPreset = "custom" }
+                }
+            Picker("Unit presets", selection: $unitPreset) {
                 ForEach(["mL", "L", "km", "minutes"], id: \.self) { unit in Text(verbatim: unit).tag(unit) }
-                if !["mL", "L", "km", "minutes"].contains(measureUnit) { Text("Custom").tag(measureUnit) }
+                Text("Custom").tag("custom")
+            }
+            .onChange(of: unitPreset) { _, value in
+                if value != "custom" { measureUnit = value }
             }
             TextField("Daily goal", value: $measureTarget, format: .number)
                 .keyboardType(.decimalPad)
