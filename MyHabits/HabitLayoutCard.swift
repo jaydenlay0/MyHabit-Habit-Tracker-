@@ -34,7 +34,14 @@ struct HabitLayoutCard: View {
                         if !compact, let description = habit.habitDescription, !description.isEmpty {
                             Text(description).font(.subheadline).lineLimit(1).foregroundStyle(AppTheme.secondaryText)
                         }
-                        if habit.isCounter {
+                        if compact {
+                            // Reserve the counter line in every tile to keep rows equal.
+                            Text(habit.isCounter ? "\(habit.count(on: today)) / \(habit.dailyTarget)" : " ")
+                                .font(.caption2)
+                                .foregroundStyle(Color(habitHex: habit.colorHex))
+                                .lineLimit(1)
+                                .accessibilityHidden(!habit.isCounter)
+                        } else if habit.isCounter {
                             Text("\(habit.count(on: today)) / \(habit.dailyTarget)")
                                 .font(.caption2).foregroundStyle(Color(habitHex: habit.colorHex))
                         } else if !compact {
