@@ -28,22 +28,20 @@ private struct AppSectionStyle: ViewModifier {
 }
 
 private struct AppHabitCardStyle: ViewModifier {
-    @Environment(\.colorScheme) private var scheme
-    @ViewBuilder func body(content: Content) -> some View {
-        if scheme == .dark {
-            content
-                .listRowBackground(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(AppTheme.surface)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 16)
-                                .strokeBorder(AppTheme.border, lineWidth: 1)
-                        }
-                )
-                .listRowSeparator(.hidden)
-        } else {
-            content
-        }
+    func body(content: Content) -> some View {
+        content
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(AppTheme.surface, in: RoundedRectangle(cornerRadius: 20))
+            .overlay {
+                RoundedRectangle(cornerRadius: 20)
+                    .strokeBorder(Color.white, lineWidth: 1)
+            }
+            // Keep the outline inside the List's own rounded clipping boundary.
+            .padding(4)
+            .listRowInsets(EdgeInsets())
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
     }
 }
 

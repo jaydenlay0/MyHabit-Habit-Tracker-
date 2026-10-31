@@ -1,7 +1,11 @@
 [
   {
     "id": "current-release",
-    "title": "Remove separate plus and minus buttons from counter habits on Home."
+    "title": "Give habit cards a continuous solid-white outline, including rounded corners."
+  },
+  {
+    "id": "44eec74",
+    "title": "Remove separate Home counter increment and decrement controls"
   },
   {
     "id": "cce525c",

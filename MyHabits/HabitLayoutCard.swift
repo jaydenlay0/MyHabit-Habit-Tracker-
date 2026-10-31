@@ -76,7 +76,7 @@ struct HabitLayoutCard: View {
         .background(AppTheme.surface, in: RoundedRectangle(cornerRadius: compact ? 18 : 22))
         .overlay {
             RoundedRectangle(cornerRadius: compact ? 18 : 22)
-                .strokeBorder(Color(habitHex: habit.colorHex).opacity(0.18), lineWidth: 1)
+                .strokeBorder(Color.white, lineWidth: 1)
         }
     }
 }
