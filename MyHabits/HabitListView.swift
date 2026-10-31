@@ -11,6 +11,7 @@ struct HabitListView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var headerHidden = false
     @State private var editMode: EditMode = .inactive
+    @AppStorage("habitHomeLayout") private var layout: HabitHomeLayout = .list
     @State private var headerHeight: CGFloat = 170
     @State private var feedback = CompletionFeedback()
     @State private var now = Date.now
@@ -22,6 +23,8 @@ struct HabitListView: View {
     var body: some View {
         NavigationStack {
             ZStack(alignment: .top) {
+                Group {
+                if layout == .list || editMode.isEditing {
                 List {
                     if visible.isEmpty {
                         ContentUnavailableView("Make room for a good habit", systemImage: "leaf", description: Text("Tap + to start your first daily practice."))
@@ -78,6 +81,28 @@ struct HabitListView: View {
                             }.tint(.orange)
                         }
                     }.onMove(perform: move)
+                }
+                } else {
+                    ScrollView {
+                        if visible.isEmpty {
+                            ContentUnavailableView("Make room for a good habit", systemImage: "leaf", description: Text("Tap + to start your first daily practice."))
+                        } else {
+                            LazyVGrid(columns: layout == .grid ? Array(repeating: GridItem(.flexible(), spacing: 10), count: 3) : [GridItem(.flexible())], alignment: .leading, spacing: 14) {
+                                ForEach(visible) { habit in
+                                    HabitLayoutCard(habit: habit, today: now, compact: layout == .grid) {
+                                        if habit.isCounter { adjustCounter(habit, by: 1) } else { toggleToday(habit) }
+                                    }
+                                    .contextMenu {
+                                        Button("Archive", systemImage: "archivebox") { pendingArchive = habit }
+                                        Button("Delete habit", systemImage: "trash", role: .destructive) { pendingDelete = habit }
+                                    }
+                                }
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.bottom, 90)
+                        }
+                    }
+                }
                 }
                 .listRowSpacing(scheme == .dark ? 10 : nil)
                 .environment(\.editMode, $editMode)
@@ -148,6 +173,18 @@ struct HabitListView: View {
                 ToolbarItem(placement: .topBarLeading) { brandLogo }
                 #endif
                 ToolbarItemGroup(placement: .topBarTrailing) {
+                    Menu {
+                        Picker("Habit layout", selection: $layout) {
+                            ForEach(HabitHomeLayout.allCases) { option in
+                                Label(LocalizedStringKey(option.title), systemImage: option.symbol).tag(option)
+                            }
+                        }
+                    } label: {
+                        Image(systemName: layout.symbol)
+                    }
+                    .accessibilityLabel("Habit layout")
+                    .disabled(editMode.isEditing)
+
                     Button(editMode.isEditing ? "Done" : "Edit") {
                         withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
                             editMode = editMode.isEditing ? .inactive : .active
