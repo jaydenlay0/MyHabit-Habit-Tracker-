@@ -30,6 +30,12 @@ struct HabitListView: View {
                 Group {
                 if layout == .list || editMode.isEditing {
                 List {
+                    Color.clear
+                        .frame(height: headerHeight + 12)
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                        .accessibilityHidden(true)
                     if visible.isEmpty {
                         ContentUnavailableView("Make room for a good habit", systemImage: "leaf", description: Text("Tap + to start your first daily practice."))
                             .listRowBackground(Color.clear)
@@ -92,6 +98,7 @@ struct HabitListView: View {
                     ScrollView {
                         if visible.isEmpty {
                             ContentUnavailableView("Make room for a good habit", systemImage: "leaf", description: Text("Tap + to start your first daily practice."))
+                                .padding(.top, headerHeight + 16)
                         } else {
                             LazyVGrid(columns: layout == .grid ? Array(repeating: GridItem(.flexible(), spacing: 10), count: 3) : [GridItem(.flexible())], alignment: .leading, spacing: 14) {
                                 ForEach(visible) { habit in
@@ -105,6 +112,7 @@ struct HabitListView: View {
                                 }
                             }
                             .padding(.horizontal, 16)
+                            .padding(.top, headerHeight + 16)
                             .padding(.bottom, 90)
                         }
                     }
@@ -124,13 +132,13 @@ struct HabitListView: View {
                         headerHidden = scrollingDown
                     }
                 })
-                .contentMargins(.top, headerHeight + 32, for: .scrollContent)
+                .contentMargins(.top, 0, for: .scrollContent)
                 .scrollContentBackground(.hidden)
-                VStack(alignment: .center, spacing: 8) {
+                VStack(alignment: .center, spacing: 6) {
                     Text("MyHabits")
                         .font(.largeTitle.bold())
                         .accessibilityAddTraits(.isHeader)
-                        .padding(.bottom, 20)
+                        .padding(.bottom, 4)
                     Text(now, format: .dateTime.weekday(.wide).month(.wide).day()).font(.subheadline).foregroundStyle(AppTheme.secondaryText)
                     Text("Another Day, Another Opportunity.")
                         .font(.title2.bold())
