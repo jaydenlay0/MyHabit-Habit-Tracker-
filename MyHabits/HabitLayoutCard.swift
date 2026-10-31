@@ -23,7 +23,7 @@ struct HabitLayoutCard: View {
         VStack(alignment: .leading, spacing: compact ? 12 : 8) {
             HStack(spacing: compact ? 7 : 12) {
                 Button(action: checkIn) {
-                    HabitCompletionIcon(habit: habit, today: today, size: compact ? 32 : 46)
+                    HabitCompletionIcon(habit: habit, today: today, size: compact ? 32 : 46, symbolSize: compact ? 16 : nil)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(habit.isCounter ? "Increase count" : "Check in today")

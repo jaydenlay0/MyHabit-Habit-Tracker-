@@ -47,6 +47,7 @@ struct HabitCompletionIcon: View {
     let habit: Habit
     let today: Date
     var size: CGFloat = 46
+    var symbolSize: CGFloat? = nil
     @Environment(CompletionFeedback.self) private var feedback
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -55,13 +56,13 @@ struct HabitCompletionIcon: View {
         let tick = complete && feedback.showsTick(habit.id, on: today)
         let moment = feedback.moments[habit.id]
         ZStack {
-            HabitSymbol(name: habit.symbol, size: size > 46 ? 24 : 18).opacity(tick ? 0 : 1)
+            HabitSymbol(name: habit.symbol, size: symbolSize ?? (size > 46 ? 24 : 18)).opacity(tick ? 0 : 1)
             Image(systemName: "checkmark").opacity(tick ? 1 : 0)
         }
-            .font(size > 46 ? .title2 : .headline)
+            .font(symbolSize.map { .system(size: $0, weight: .semibold) } ?? (size > 46 ? .title2 : .headline))
             .frame(width: size, height: size)
             .foregroundStyle(complete ? Palette.selectionInk(habit.colorHex) : Color(habitHex: habit.colorHex))
-            .background(Color(habitHex: habit.colorHex).opacity(complete ? 1 : 0.14), in: RoundedRectangle(cornerRadius: 14))
+            .background(Color(habitHex: habit.colorHex).opacity(complete ? 1 : 0.14), in: RoundedRectangle(cornerRadius: size <= 32 ? 10 : 14))
             .animation(reduceMotion ? nil : .easeInOut(duration: 0.45), value: tick)
             .animation(reduceMotion ? nil : .easeInOut(duration: 0.45), value: complete)
             .accessibilityHidden(true)
