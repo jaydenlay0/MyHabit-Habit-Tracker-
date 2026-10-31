@@ -1,7 +1,11 @@
 [
   {
     "id": "current-release",
-    "title": "Show counter progress and completed together on one line in the habit list."
+    "title": "Remove separate plus and minus buttons from counter habits on Home."
+  },
+  {
+    "id": "cce525c",
+    "title": "Combine counter progress and completion text on one compact line"
   },
   {
     "id": "c9867a2",

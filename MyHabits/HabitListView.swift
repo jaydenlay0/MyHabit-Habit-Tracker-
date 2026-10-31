@@ -67,15 +67,7 @@ struct HabitListView: View {
                                     MiniHeatmap(habit: habit, today: now)
                                 }.padding(.vertical, 8)
                             }
-                            if habit.isCounter {
-                                VStack(spacing: 12) {
-                                    Button { adjustCounter(habit, by: 1) } label: { Image(systemName: "plus.circle.fill").font(.title2) }
-                                        .accessibilityLabel(habit.isComplete(now) ? "Edit \(habit.name) count" : "Increase \(habit.name) count")
-                                    Button { adjustCounter(habit, by: -1) } label: { Image(systemName: "minus.circle").font(.title2) }
-                                        .disabled(habit.count(on: now) == 0)
-                                        .accessibilityLabel("Decrease \(habit.name) count")
-                                }.buttonStyle(.borderless).tint(Color(habitHex: habit.colorHex))
-                            }
+
                         }
                         .appHabitCardStyle()
                         .simultaneousGesture(
