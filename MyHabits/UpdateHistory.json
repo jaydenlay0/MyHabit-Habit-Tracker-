@@ -1,7 +1,11 @@
 [
   {
     "id": "current-release",
-    "title": "Tighten the Home title/date spacing and keep the first habit clear of the header."
+    "title": "Update the supporter acknowledgement to Teresa C."
+  },
+  {
+    "id": "773a5c1",
+    "title": "Tighten Home header spacing and reserve actual content space below it"
   },
   {
     "id": "3cd26fd",

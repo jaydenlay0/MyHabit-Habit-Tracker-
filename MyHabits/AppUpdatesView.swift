@@ -41,7 +41,7 @@ struct AppUpdatesView: View {
                     LabeledContent("Created by", value: "Jayden Lay")
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Supporters").font(.headline)
-                        Text(verbatim: "Teresa Chen <3")
+                        Text(verbatim: "Teresa C")
                             .font(.subheadline)
                         Text("Thank you for supporting MyHabits 💙")
                             .font(.caption).foregroundStyle(AppTheme.secondaryText)
