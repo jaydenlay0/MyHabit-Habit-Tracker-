@@ -1,7 +1,19 @@
 [
   {
     "id": "current-release",
-    "title": "Always offer Custom in unit presets when creating or editing Measure habits."
+    "title": "Move Cards and Grid slightly below the Home header and fix layout-menu order to List, Cards, Grid."
+  },
+  {
+    "id": "3fefe90",
+    "title": "Revert \"Keep all habit layouts below the Home header using a real safe-area inset\""
+  },
+  {
+    "id": "953d77e",
+    "title": "Keep all habit layouts below the Home header using a real safe-area inset"
+  },
+  {
+    "id": "d9337fe",
+    "title": "Always include Custom in measurement unit presets"
   },
   {
     "id": "e2993ed",

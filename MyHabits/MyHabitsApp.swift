@@ -101,7 +101,7 @@ private struct MainTabView: View {
                     }
                     Menu {
                         Picker("Habit layout", selection: $layout) {
-                            ForEach(HabitHomeLayout.allCases) { option in
+                            ForEach([HabitHomeLayout.list, .cards, .grid]) { option in
                                 Label(LocalizedStringKey(option.title), systemImage: option.symbol).tag(option)
                             }
                         }
@@ -112,6 +112,7 @@ private struct MainTabView: View {
                             .frame(maxWidth: .infinity, minHeight: 44)
                             .contentShape(Capsule())
                     }
+                    .menuOrder(.fixed)
                     .accessibilityLabel("Habit layout")
                     navigationButton("Settings", symbol: "gearshape.fill", selected: selectedTab == .settings) {
                         selectedTab = .settings

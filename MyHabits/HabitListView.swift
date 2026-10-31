@@ -99,7 +99,7 @@ struct HabitListView: View {
                     ScrollView {
                         if visible.isEmpty {
                             ContentUnavailableView("Make room for a good habit", systemImage: "leaf", description: Text("Tap + to start your first daily practice."))
-                                .padding(.top, headerHeight + 16)
+                                .padding(.top, headerHeight + 24)
                                 .id("home.top")
                         } else {
                             LazyVGrid(columns: layout == .grid ? Array(repeating: GridItem(.flexible(), spacing: 10), count: 3) : [GridItem(.flexible())], alignment: .leading, spacing: 14) {
@@ -114,7 +114,7 @@ struct HabitListView: View {
                                 }
                             }
                             .padding(.horizontal, 16)
-                            .padding(.top, headerHeight + 16)
+                            .padding(.top, headerHeight + 24)
                             .padding(.bottom, 90)
                             .id("home.top")
                         }
