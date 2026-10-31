@@ -1,7 +1,11 @@
 [
   {
     "id": "current-release",
-    "title": "Always offer Custom in unit presets when creating or editing Measure habits."
+    "title": "Reserve real header space in List, Cards and Grid to prevent overlap in Light and Dark mode."
+  },
+  {
+    "id": "d9337fe",
+    "title": "Always include Custom in measurement unit presets"
   },
   {
     "id": "e2993ed",
