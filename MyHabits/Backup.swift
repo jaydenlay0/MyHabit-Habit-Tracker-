@@ -102,6 +102,9 @@ struct BackupDocument: FileDocument {
 }
 struct BackupView: View {
     var showsDoneButton = true
+    var scrollToTopRequest = 0
+    @State private var showingArchive = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @AppStorage("appLanguage") private var appLanguage = "en"
     @State private var notificationScheduler = ReminderScheduler.shared
     @AppStorage(AppAppearance.storageKey) private var appearance: AppAppearance = .system
@@ -116,15 +119,15 @@ struct BackupView: View {
     @State private var message: String?
     var body: some View {
         NavigationStack {
+            ScrollViewReader { scrollProxy in
             Form {
                 Section("Your data stays yours") {
                     Text("Unlimited habits. No accounts, subscriptions, analytics, or cloud sync. Habits and check-ins are stored locally in the shared app container.")
                     Text("Use backups to move your data or keep a safe copy. Backup files are plain JSON; store them somewhere you trust.").font(.caption).foregroundStyle(AppTheme.secondaryText)
                 }.appSectionStyle()
+                .id("settings.top")
                 Section {
-                    NavigationLink {
-                        ArchivedHabitsView()
-                    } label: {
+                    Button { showingArchive = true } label: {
                         LabeledContent("Archived habits", value: "\(habits.filter { $0.archived }.count)")
                     }
                     Button("Delete archived habits", role: .destructive) { clearingArchive = true }
@@ -199,6 +202,12 @@ struct BackupView: View {
                 }
             }
             .contentMargins(.bottom, 90, for: .scrollContent)
+            .onChange(of: scrollToTopRequest) { _, _ in
+                showingArchive = false
+                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.3)) {
+                    scrollProxy.scrollTo("settings.top", anchor: .top)
+                }
+            }
             .tracksNavigationScroll()
             .task {
                 _ = await notificationScheduler.reconcile(habits)
@@ -228,6 +237,8 @@ struct BackupView: View {
                 Button("Cancel", role: .cancel) { pending = nil }
             }
             .alert("Settings", isPresented: Binding(get: { message != nil }, set: { if !$0 { message = nil } })) { Button("OK") {} } message: { Text(message ?? "") }
+            .navigationDestination(isPresented: $showingArchive) { ArchivedHabitsView() }
+            }
         }
     }
     private func deleteArchivedHabits() {

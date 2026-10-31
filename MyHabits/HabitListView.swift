@@ -3,6 +3,7 @@ import SwiftData
 import WidgetKit
 
 struct HabitListView: View {
+    var scrollToTopRequest = 0
     @Environment(\.openAppUpdates) private var openAppUpdates
     @State private var brandFrame: CGRect = .zero
     @Environment(\.modelContext) private var context
@@ -26,11 +27,13 @@ struct HabitListView: View {
     var body: some View {
         NavigationStack {
             ZStack(alignment: .top) {
+                ScrollViewReader { scrollProxy in
                 Group {
                 if layout == .list || editMode.isEditing {
                 List {
                     Color.clear
                         .frame(height: headerHeight + 12)
+                        .id("home.top")
                         .listRowInsets(EdgeInsets())
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
@@ -97,6 +100,7 @@ struct HabitListView: View {
                         if visible.isEmpty {
                             ContentUnavailableView("Make room for a good habit", systemImage: "leaf", description: Text("Tap + to start your first daily practice."))
                                 .padding(.top, headerHeight + 16)
+                                .id("home.top")
                         } else {
                             LazyVGrid(columns: layout == .grid ? Array(repeating: GridItem(.flexible(), spacing: 10), count: 3) : [GridItem(.flexible())], alignment: .leading, spacing: 14) {
                                 ForEach(visible) { habit in
@@ -112,6 +116,7 @@ struct HabitListView: View {
                             .padding(.horizontal, 16)
                             .padding(.top, headerHeight + 16)
                             .padding(.bottom, 90)
+                            .id("home.top")
                         }
                     }
                 }
@@ -132,6 +137,14 @@ struct HabitListView: View {
                 })
                 .contentMargins(.top, 0, for: .scrollContent)
                 .scrollContentBackground(.hidden)
+                .onChange(of: scrollToTopRequest) { _, _ in
+                    headerHidden = false
+                    updateNavigationScroll(false)
+                    withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.3)) {
+                        scrollProxy.scrollTo("home.top", anchor: .top)
+                    }
+                }
+                }
                 VStack(alignment: .center, spacing: 6) {
                     Text("MyHabits")
                         .font(.largeTitle.bold())

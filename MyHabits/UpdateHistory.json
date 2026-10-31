@@ -1,7 +1,11 @@
 [
   {
     "id": "current-release",
-    "title": "Centre the sun habit icon using its visible image bounds."
+    "title": "Tap Home or Settings in the bottom bar to smoothly return that page to the top."
+  },
+  {
+    "id": "23b25f5",
+    "title": "Centre sun habit symbols independently of text baseline metrics"
   },
   {
     "id": "8d39e0f",

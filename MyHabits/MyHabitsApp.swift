@@ -57,6 +57,8 @@ private struct MainTabView: View {
     @State private var selectedTab: Tab = .home
     @AppStorage("habitHomeLayout") private var layout: HabitHomeLayout = .list
     @State private var creating = false
+    @State private var homeScrollRequest = 0
+    @State private var settingsScrollRequest = 0
     @State private var showingUpdates = false
     @State private var updatesOrigin = CGRect.zero
     @State private var barHiddenByScroll = false
@@ -65,10 +67,10 @@ private struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            HabitListView()
+            HabitListView(scrollToTopRequest: homeScrollRequest)
                 .tag(Tab.home)
                 .toolbar(.hidden, for: .tabBar)
-            BackupView(showsDoneButton: false)
+            BackupView(showsDoneButton: false, scrollToTopRequest: settingsScrollRequest)
                 .tag(Tab.settings)
                 .toolbar(.hidden, for: .tabBar)
         }
@@ -91,6 +93,8 @@ private struct MainTabView: View {
                 HStack(spacing: 4) {
                     navigationButton("Home", symbol: "house.fill", selected: selectedTab == .home) {
                         selectedTab = .home
+                        barHiddenByScroll = false
+                        homeScrollRequest += 1
                     }
                     navigationButton("New Habit", symbol: "plus", selected: false) {
                         creating = true
@@ -111,6 +115,8 @@ private struct MainTabView: View {
                     .accessibilityLabel("Habit layout")
                     navigationButton("Settings", symbol: "gearshape.fill", selected: selectedTab == .settings) {
                         selectedTab = .settings
+                        barHiddenByScroll = false
+                        settingsScrollRequest += 1
                     }
                 }
                 .padding(4)
