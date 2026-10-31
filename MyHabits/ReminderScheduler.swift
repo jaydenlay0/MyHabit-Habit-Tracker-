@@ -55,7 +55,16 @@ final class ReminderScheduler {
         "Another day, another opportunity. Let's keep it going!",
         "MyHabits misses you 👀",
         "Your habit called. It's asking for you ⚡",
-        "There's still A LOT of time to reach your daily goal"
+        "There's still A LOT of time to reach your daily goal",
+        "Extend your streak! You got this!",
+        "Your streak would look even better with today added 🔥",
+        "A little effort now. A proud moment later.",
+        "Hey, remember that promise to yourself? 👀",
+        "Your future self is cheering you on ⚡",
+        "Plot twist: you still have time for your habit.",
+        "One check-in closer to a stronger you.",
+        "Small steps count. Yours is waiting.",
+        "You showed up before. You can do it again 💙"
     ]
     private static let rotationKey = "reminderRotationIndex"
     private static let planKey = "reminderRotationPlan"

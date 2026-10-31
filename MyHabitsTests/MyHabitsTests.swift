@@ -274,13 +274,13 @@ final class MyHabitsTests: XCTestCase {
             XCTAssertEqual(request.content.title, "Read")
         }
         for (index, request) in requests.enumerated() {
-            XCTAssertEqual(request.content.body, ReminderScheduler.messages[index % 4])
+            XCTAssertEqual(request.content.body, ReminderScheduler.messages[index % ReminderScheduler.messages.count])
         }
         let rotated = try ReminderScheduler.requests(for: [ReminderDefinition(id: id, name: "Read", settings: daily)], startingIndex: 2)
         XCTAssertEqual(rotated[0].content.body, ReminderScheduler.messages[2])
         let now = Date.now
         let plan: [[String: Double]] = [
-            ["scheduledAt": now.timeIntervalSince1970 - 10, "rotationIndex": 3, "ordinal": 0],
+            ["scheduledAt": now.timeIntervalSince1970 - 10, "rotationIndex": Double(ReminderScheduler.messages.count - 1), "ordinal": 0],
             ["scheduledAt": now.timeIntervalSince1970 + 60, "rotationIndex": 0, "ordinal": 1]
         ]
         XCTAssertEqual(ReminderScheduler.rotationIndex(after: plan, now: now, fallback: 2), 0)

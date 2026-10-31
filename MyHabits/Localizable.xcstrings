@@ -1121,12 +1121,12 @@
         }
       }
     },
-    "Reminder messages rotate through four phrases. MyHabits schedules the next 64 reminders and refills them when you open the app. Open it regularly so reminders continue. Focus modes and notification settings can delay delivery.": {
+    "Reminder messages rotate through 13 phrases. MyHabits schedules the next 64 reminders and refills them when you open the app. Open it regularly so reminders continue. Focus modes and notification settings can delay delivery.": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "提醒文案按四句话循环。MyHabits 会预先安排接下来的 64 条提醒，并在打开应用时补充。请定期打开应用以继续接收提醒。专注模式和通知设置可能延迟提醒。"
+            "value": "提醒文案按 13 句话循环。MyHabits 会预先安排接下来的 64 条提醒，并在打开应用时补充。请定期打开应用以继续接收提醒。专注模式和通知设置可能延迟提醒。"
           }
         }
       }
