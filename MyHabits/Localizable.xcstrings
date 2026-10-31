@@ -1190,6 +1190,26 @@
           }
         }
       }
+    },
+    "Year-to-date consistency heatmap": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今年截至今日的打卡热力图"
+          }
+        }
+      }
+    },
+    "Week %lld · %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %lld 周 · %@"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -9,6 +9,19 @@ import UserNotifications
 
 final class MyHabitsTests: XCTestCase {
     func date(_ offset: Int) -> Date { Day.adding(offset, to: .now) }
+    func testYearHeatmapIncludesOnlyElapsedWeeksAndResetsInJanuary() throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        calendar.firstWeekday = 2
+        let january = try XCTUnwrap(calendar.date(from: DateComponents(year: 2026, month: 1, day: 1)))
+        let october = try XCTUnwrap(calendar.date(from: DateComponents(year: 2026, month: 10, day: 31)))
+        let nextJanuary = try XCTUnwrap(calendar.date(from: DateComponents(year: 2027, month: 1, day: 1)))
+        XCTAssertEqual(YearToDateHeatmapRange(today: january, calendar: calendar).columns, 1)
+        XCTAssertEqual(YearToDateHeatmapRange(today: october, calendar: calendar).columns, 44)
+        XCTAssertEqual(YearToDateHeatmapRange(today: nextJanuary, calendar: calendar).columns, 1)
+        XCTAssertEqual(YearToDateHeatmapRange(today: nextJanuary, calendar: calendar).year, "2027")
+    }
+
     func testCounterTargetUndoAndBackup() throws {
         let habit = Habit(name: "Water")
         habit.trackingMode = "counter"; habit.dailyTarget = 3

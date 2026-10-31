@@ -17,8 +17,10 @@ struct HabitLayoutCard: View {
     let compact: Bool
     let checkIn: () -> Void
 
+    private var yearRange: YearToDateHeatmapRange { YearToDateHeatmapRange(today: today) }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: compact ? 12 : 16) {
+        VStack(alignment: .leading, spacing: compact ? 12 : 8) {
             HStack(spacing: compact ? 7 : 12) {
                 Button(action: checkIn) {
                     HabitCompletionIcon(habit: habit, today: today, size: compact ? 32 : 46)
@@ -45,7 +47,7 @@ struct HabitLayoutCard: View {
                             Text("\(habit.count(on: today)) / \(habit.dailyTarget)")
                                 .font(.caption2).foregroundStyle(Color(habitHex: habit.colorHex))
                         } else if !compact {
-                            Text(today, format: .dateTime.month(.wide).year())
+                            Text("Week \(yearRange.columns) · \(yearRange.year)")
                                 .font(.caption).foregroundStyle(AppTheme.secondaryText)
                         }
                     }.frame(maxWidth: .infinity, alignment: .leading)
@@ -57,12 +59,17 @@ struct HabitLayoutCard: View {
                         Text(today, format: .dateTime.month(.abbreviated).year())
                             .font(.caption2).foregroundStyle(AppTheme.secondaryText)
                     }
-                    HabitCardHeatmap(habit: habit, today: today, monthly: compact)
-                        .aspectRatio(compact ? 7.0 / 6.0 : 12.0 / 7.0, contentMode: .fit)
+                    if compact {
+                        HabitCardHeatmap(habit: habit, today: today, monthly: true)
+                            .aspectRatio(7.0 / 6.0, contentMode: .fit)
+                    } else {
+                        HabitCardHeatmap(habit: habit, today: today, monthly: false)
+                            .frame(height: 70)
+                    }
                 }
             }.buttonStyle(.plain)
         }
-        .padding(compact ? 10 : 18)
+        .padding(compact ? 10 : 12)
         .frame(maxWidth: .infinity, alignment: .topLeading)
         .background(AppTheme.surface, in: RoundedRectangle(cornerRadius: compact ? 18 : 22))
         .overlay {
@@ -82,19 +89,23 @@ private struct HabitCardHeatmap: View {
         let calendar = Day.calendar
         let monthStart = calendar.dateInterval(of: .month, for: today)?.start ?? today
         let leading = (calendar.component(.weekday, from: monthStart) - calendar.firstWeekday + 7) % 7
-        let start = monthly ? Day.adding(-leading, to: monthStart) : Day.adding(-83, to: today)
+        let yearRange = YearToDateHeatmapRange(today: today)
+        let start = monthly ? Day.adding(-leading, to: monthStart) : yearRange.start
         let completed = Set(habit.days)
         let todayKey = Day.key(today)
-        let columns = monthly ? 7 : 12
+        let columns = monthly ? 7 : yearRange.columns
         let rows = monthly ? 6 : 7
         Canvas { context, size in
-            let gap: CGFloat = monthly ? 3 : 4
-            let cellWidth = (size.width - CGFloat(columns - 1) * gap) / CGFloat(columns)
-            let cellHeight = (size.height - CGFloat(rows - 1) * gap) / CGFloat(rows)
+            let gap: CGFloat = monthly ? 3 : 2
+            let availableWidth = (size.width - CGFloat(columns - 1) * gap) / CGFloat(columns)
+            let availableHeight = (size.height - CGFloat(rows - 1) * gap) / CGFloat(rows)
+            let cellWidth = monthly ? availableWidth : min(availableWidth, availableHeight)
+            let cellHeight = monthly ? availableHeight : cellWidth
             guard cellWidth > 0, cellHeight > 0 else { return }
             for index in 0..<(columns * rows) {
                 let date = Day.adding(index, to: start)
                 if monthly && !calendar.isDate(date, equalTo: today, toGranularity: .month) { continue }
+                if !monthly && (date < yearRange.firstDay || date > calendar.startOfDay(for: today)) { continue }
                 let column = monthly ? index % columns : index / rows
                 let row = monthly ? index / columns : index % rows
                 let rect = CGRect(x: CGFloat(column) * (cellWidth + gap), y: CGFloat(row) * (cellHeight + gap), width: cellWidth, height: cellHeight)
@@ -108,6 +119,22 @@ private struct HabitCardHeatmap: View {
             }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(monthly ? "Monthly consistency heatmap" : "12-week consistency heatmap")
+        .accessibilityLabel(monthly ? "Monthly consistency heatmap" : "Year-to-date consistency heatmap")
+    }
+}
+
+struct YearToDateHeatmapRange {
+    let firstDay: Date
+    let start: Date
+    let columns: Int
+    let year: String
+
+    init(today: Date, calendar: Calendar = .current) {
+        firstDay = calendar.dateInterval(of: .year, for: today)?.start ?? calendar.startOfDay(for: today)
+        let leading = (calendar.component(.weekday, from: firstDay) - calendar.firstWeekday + 7) % 7
+        start = calendar.date(byAdding: .day, value: -leading, to: firstDay) ?? firstDay
+        let elapsed = calendar.dateComponents([.day], from: start, to: calendar.startOfDay(for: today)).day ?? 0
+        columns = max(1, elapsed / 7 + 1)
+        year = String(calendar.component(.year, from: today))
     }
 }
