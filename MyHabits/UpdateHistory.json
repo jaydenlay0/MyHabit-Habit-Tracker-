@@ -1,7 +1,11 @@
 [
   {
     "id": "current-release",
-    "title": "Update the supporter acknowledgement to Teresa C."
+    "title": "Add a heart to the Teresa C supporter acknowledgement."
+  },
+  {
+    "id": "21eae2a",
+    "title": "Update supporter display name to Teresa C"
   },
   {
     "id": "773a5c1",
