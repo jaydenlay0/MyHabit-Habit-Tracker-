@@ -23,6 +23,12 @@ struct HabitSymbol: View {
                 .stroke(style: StrokeStyle(lineWidth: size * 0.075, lineCap: .round, lineJoin: .round))
                 .frame(width: size, height: size)
                 .scaleEffect(1.3)
+        } else if name == "sun.max" {
+            // Centre the visible rays rather than using text-baseline symbol metrics.
+            Image(systemName: name)
+                .resizable()
+                .scaledToFit()
+                .frame(width: size * 1.15, height: size * 1.15, alignment: .center)
         } else {
             Image(systemName: name)
         }

@@ -1,7 +1,11 @@
 [
   {
     "id": "current-release",
-    "title": "Blend the lightning logo background into the Light-mode grey screen."
+    "title": "Centre the sun habit icon using its visible image bounds."
+  },
+  {
+    "id": "8d39e0f",
+    "title": "Blend Light-mode lightning branding into the app background"
   },
   {
     "id": "036e274",
