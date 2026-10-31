@@ -158,6 +158,7 @@ struct HabitListView: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .environment(\.editMode, $editMode)
+            .onChange(of: layout) { _, _ in editMode = .inactive }
             .onChange(of: editMode) { _, mode in
                 if mode.isEditing { hideHeaderForReordering() }
             }
@@ -173,18 +174,6 @@ struct HabitListView: View {
                 ToolbarItem(placement: .topBarLeading) { brandLogo }
                 #endif
                 ToolbarItemGroup(placement: .topBarTrailing) {
-                    Menu {
-                        Picker("Habit layout", selection: $layout) {
-                            ForEach(HabitHomeLayout.allCases) { option in
-                                Label(LocalizedStringKey(option.title), systemImage: option.symbol).tag(option)
-                            }
-                        }
-                    } label: {
-                        Image(systemName: layout.symbol)
-                    }
-                    .accessibilityLabel("Habit layout")
-                    .disabled(editMode.isEditing)
-
                     Button(editMode.isEditing ? "Done" : "Edit") {
                         withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) {
                             editMode = editMode.isEditing ? .inactive : .active

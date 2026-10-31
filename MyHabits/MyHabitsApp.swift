@@ -55,6 +55,7 @@ private struct MainTabView: View {
     private enum Tab: Hashable { case home, settings }
     @Query(sort: \Habit.order) private var habits: [Habit]
     @State private var selectedTab: Tab = .home
+    @AppStorage("habitHomeLayout") private var layout: HabitHomeLayout = .list
     @State private var creating = false
     @State private var barHiddenByScroll = false
     @State private var barHidden = false
@@ -76,6 +77,7 @@ private struct MainTabView: View {
             }
         })
         .environment(\.setBottomNavigationHidden, { hidden in barHidden = hidden })
+        .onChange(of: layout) { _, _ in selectedTab = .home; barHiddenByScroll = false }
         .onChange(of: selectedTab) { _, _ in barHiddenByScroll = false; barHidden = false }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if !barHidden {
@@ -86,6 +88,20 @@ private struct MainTabView: View {
                     navigationButton("New Habit", symbol: "plus", selected: false) {
                         creating = true
                     }
+                    Menu {
+                        Picker("Habit layout", selection: $layout) {
+                            ForEach(HabitHomeLayout.allCases) { option in
+                                Label(LocalizedStringKey(option.title), systemImage: option.symbol).tag(option)
+                            }
+                        }
+                    } label: {
+                        Image(systemName: layout.symbol)
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundStyle(AppTheme.primaryText)
+                            .frame(maxWidth: .infinity, minHeight: 44)
+                            .contentShape(Capsule())
+                    }
+                    .accessibilityLabel("Habit layout")
                     navigationButton("Settings", symbol: "gearshape.fill", selected: selectedTab == .settings) {
                         selectedTab = .settings
                     }
@@ -93,7 +109,7 @@ private struct MainTabView: View {
                 .padding(4)
                 .background(.regularMaterial, in: Capsule())
                 .overlay { Capsule().strokeBorder(AppTheme.border.opacity(0.5), lineWidth: 1) }
-                .frame(maxWidth: 220)
+                .frame(maxWidth: 276)
                 .frame(height: 62, alignment: .bottom)
                 .padding(.horizontal, 16)
                 .padding(.top, 8)
