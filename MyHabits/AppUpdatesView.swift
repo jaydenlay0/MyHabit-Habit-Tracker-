@@ -15,7 +15,7 @@ struct AppBrandMark: View {
     var body: some View {
         ZStack {
             if scheme == .light {
-                Color.white
+                AppTheme.background
                 BrandLightning().fill(Color(habitHex: "63D6A3"))
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)

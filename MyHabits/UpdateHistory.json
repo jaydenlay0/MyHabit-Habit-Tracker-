@@ -1,7 +1,11 @@
 [
   {
     "id": "current-release",
-    "title": "Use white-backed green branding in Light mode and consistent Home insets across appearances."
+    "title": "Blend the lightning logo background into the Light-mode grey screen."
+  },
+  {
+    "id": "036e274",
+    "title": "Adapt lightning branding for Light mode and unify Home layout spacing"
   },
   {
     "id": "8672256",
