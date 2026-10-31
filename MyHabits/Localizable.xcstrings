@@ -1470,6 +1470,96 @@
           }
         }
       }
+    },
+    "What’s New & Supporters": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新与支持者"
+          }
+        }
+      }
+    },
+    "Small promises. Shared support.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "小小的承诺，共同的支持。"
+          }
+        }
+      }
+    },
+    "The people behind MyHabits": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MyHabits 背后的伙伴"
+          }
+        }
+      }
+    },
+    "Created by": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "创作者"
+          }
+        }
+      }
+    },
+    "Supporters": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支持者"
+          }
+        }
+      }
+    },
+    "A space to thank the people who help MyHabits grow. Supporter names will appear here as they are added.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "感谢帮助 MyHabits 成长的每一个人。支持者姓名将在添加后显示于此。"
+          }
+        }
+      }
+    },
+    "Update history": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新记录"
+          }
+        }
+      }
+    },
+    "Newest updates appear first.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最新更新显示在最前。"
+          }
+        }
+      }
+    },
+    "Thank you for supporting MyHabits 💙": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "感谢你支持 MyHabits 💙"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

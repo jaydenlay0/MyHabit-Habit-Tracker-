@@ -57,6 +57,8 @@ private struct MainTabView: View {
     @State private var selectedTab: Tab = .home
     @AppStorage("habitHomeLayout") private var layout: HabitHomeLayout = .list
     @State private var creating = false
+    @State private var showingUpdates = false
+    @State private var updatesOrigin = CGRect.zero
     @State private var barHiddenByScroll = false
     @State private var barHidden = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -70,6 +72,11 @@ private struct MainTabView: View {
                 .tag(Tab.settings)
                 .toolbar(.hidden, for: .tabBar)
         }
+        .environment(\.openAppUpdates, { origin in
+            guard !showingUpdates else { return }
+            updatesOrigin = origin
+            showingUpdates = true
+        })
         .environment(\.navigationBarCollapsed, { collapsed in
             guard barHiddenByScroll != collapsed else { return }
             withAnimation(reduceMotion ? nil : .smooth(duration: 0.3)) {
@@ -122,6 +129,12 @@ private struct MainTabView: View {
             }
         }
         .tint(AppTheme.accent)
+        .accessibilityHidden(showingUpdates)
+        .overlay {
+            if showingUpdates {
+                AppUpdatesReveal(origin: updatesOrigin) { showingUpdates = false }
+            }
+        }
         .sheet(isPresented: $creating) {
             HabitEditor(nextOrder: (habits.map(\.order).max() ?? -1) + 1)
         }

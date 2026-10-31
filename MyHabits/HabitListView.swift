@@ -3,6 +3,8 @@ import SwiftData
 import WidgetKit
 
 struct HabitListView: View {
+    @Environment(\.openAppUpdates) private var openAppUpdates
+    @State private var brandFrame: CGRect = .zero
     @Environment(\.modelContext) private var context
     @Query(sort: \Habit.order) private var habits: [Habit]
     @Environment(\.colorScheme) private var scheme
@@ -249,14 +251,19 @@ struct HabitListView: View {
         }
     }
     private var brandLogo: some View {
-        Image("BrandMark")
-            .resizable()
-            .scaledToFit()
-            .frame(width: 56, height: 56)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .offset(x: -8)
-            .accessibilityLabel("MyHabits logo")
-            .allowsHitTesting(false)
+        Button { openAppUpdates(brandFrame) } label: {
+            Image("BrandMark")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 56, height: 56)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .offset(x: -8)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("What’s New & Supporters")
+        .onGeometryChange(for: CGRect.self) { geometry in
+            geometry.frame(in: .global).offsetBy(dx: -8, dy: 0)
+        } action: { brandFrame = $0 }
     }
 
     private func adjustCounter(_ habit: Habit, by amount: Int) {

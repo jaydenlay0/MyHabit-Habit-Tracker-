@@ -1,0 +1,358 @@
+[
+  {
+    "id": "current-release",
+    "title": "Open update history and supporters with an expanding lightning animation."
+  },
+  {
+    "id": "05a9675",
+    "title": "Add Measure habits, progress rings, completion status and safe editor cancellation"
+  },
+  {
+    "id": "45e248f",
+    "title": "Add a dental retainer icon matched to everyday habit symbol sizing"
+  },
+  {
+    "id": "b880f47",
+    "title": "Move habit layout selection from the toolbar into bottom navigation"
+  },
+  {
+    "id": "e836715",
+    "title": "Fit habit symbols within compact grid icon tiles with consistent padding"
+  },
+  {
+    "id": "8307bd6",
+    "title": "Enlarge the seven everyday habit icons by thirty percent"
+  },
+  {
+    "id": "91a0871",
+    "title": "Add seven everyday habit icons for hygiene, study and cleaning"
+  },
+  {
+    "id": "7ccb427",
+    "title": "Show elapsed weeks of the year in shorter habit cards"
+  },
+  {
+    "id": "dafbb24",
+    "title": "Keep grid habit cards equal by reserving the counter subtitle line"
+  },
+  {
+    "id": "debe643",
+    "title": "Add selectable card and compact grid habit layouts with consistency heatmaps"
+  },
+  {
+    "id": "ab726b1",
+    "title": "Expand reminder rotation to thirteen selected messages"
+  },
+  {
+    "id": "c21fe14",
+    "title": "Rotate reminder messages with a rolling queue of scheduled notifications"
+  },
+  {
+    "id": "fc5ef48",
+    "title": "Enter Home reorder mode after a stationary long press on a habit"
+  },
+  {
+    "id": "855272d",
+    "title": "Reduce Home logo size and shift it toward the left edge"
+  },
+  {
+    "id": "db1b23e",
+    "title": "Use lightning bolt branding and double the Home logo size"
+  },
+  {
+    "id": "b26f8bb",
+    "title": "Use completed today in the Home summary"
+  },
+  {
+    "id": "d88a074",
+    "title": "Use left swipe for confirmed deletion and right swipe for archive"
+  },
+  {
+    "id": "ecc3f3c",
+    "title": "Capitalize the habit name section heading"
+  },
+  {
+    "id": "816770c",
+    "title": "Remove competing long press drag gesture to restore normal scrolling"
+  },
+  {
+    "id": "0a28acd",
+    "title": "Toggle habit reordering explicitly from the Home Edit button"
+  },
+  {
+    "id": "284e283",
+    "title": "Keep Home summary out of the way while reordering habits"
+  },
+  {
+    "id": "e64c417",
+    "title": "Smooth scrolling chrome transitions without resizing the habit list"
+  },
+  {
+    "id": "bde5fe1",
+    "title": "Hide Home summary on downward scrolling and reveal it on upward scrolling"
+  },
+  {
+    "id": "7c6dd0d",
+    "title": "Default to compact navigation and slide it away when scrolling down"
+  },
+  {
+    "id": "a00fd35",
+    "title": "Preserve scroll view identity when changing appearance"
+  },
+  {
+    "id": "045fea6",
+    "title": "Cap daily counters at their goal and open a count editor after completion"
+  },
+  {
+    "id": "7a910fb",
+    "title": "Swap New Habit and Settings in bottom navigation"
+  },
+  {
+    "id": "d4fc9bb",
+    "title": "Add saved English and Simplified Chinese interface language selection"
+  },
+  {
+    "id": "691f75d",
+    "title": "Add compact archived habit previews with restore and permanent delete"
+  },
+  {
+    "id": "039dbfe",
+    "title": "Keep Settings credit clear of the floating navigation bar"
+  },
+  {
+    "id": "23bcfb5",
+    "title": "Add Jayden Lay credit at the bottom of Settings"
+  },
+  {
+    "id": "f599aec",
+    "title": "Use pencil and notepad icon for editing habit details"
+  },
+  {
+    "id": "6ea5ab1",
+    "title": "Hide bottom navigation while viewing habit details"
+  },
+  {
+    "id": "639bd36",
+    "title": "Enlarge Home branding and hide its circular toolbar background"
+  },
+  {
+    "id": "6aaf0b9",
+    "title": "Show the MyHabits tick logo at the top left of Home"
+  },
+  {
+    "id": "7fc1eac",
+    "title": "Match bottom bar labels and spacing to the original native appearance"
+  },
+  {
+    "id": "d165048",
+    "title": "Shrink bottom navigation on downward scrolling and expand on upward scrolling"
+  },
+  {
+    "id": "c12a2b7",
+    "title": "Match bottom navigation width to the original compact tab bar"
+  },
+  {
+    "id": "d69bfea",
+    "title": "Open New Habit directly without switching to an empty tab"
+  },
+  {
+    "id": "ea521af",
+    "title": "Use compact Settings title to remove large top gap"
+  },
+  {
+    "id": "02d4acb",
+    "title": "Add bottom navigation for Home, Settings and New Habit"
+  },
+  {
+    "id": "87eeb23",
+    "title": "Move icon and colour choices directly below description"
+  },
+  {
+    "id": "d21c0ba",
+    "title": "Limit habit descriptions to 50 words or 300 characters"
+  },
+  {
+    "id": "070a1cc",
+    "title": "Use compact description field with a 50-word limit"
+  },
+  {
+    "id": "d5299cf",
+    "title": "Use compact inline title in habit editor to remove header gap"
+  },
+  {
+    "id": "66e0c03",
+    "title": "Scale deodorant spray habit icon to 1.5 times its size"
+  },
+  {
+    "id": "f9c5110",
+    "title": "Replace music habit icon with reference-inspired deodorant spray"
+  },
+  {
+    "id": "da01e8f",
+    "title": "Arrange habit icons into the requested three rows"
+  },
+  {
+    "id": "5366d41",
+    "title": "Simplify reminders section heading"
+  },
+  {
+    "id": "baef3b0",
+    "title": "Enlarge toothbrush habit symbol slightly more"
+  },
+  {
+    "id": "6874748",
+    "title": "Simplify description section heading"
+  },
+  {
+    "id": "98b38f3",
+    "title": "Explain Yes/No habit tracking in the editor"
+  },
+  {
+    "id": "43c7efd",
+    "title": "Increase toothbrush icon size slightly"
+  },
+  {
+    "id": "6337093",
+    "title": "Enlarge toothbrush icon while preserving its shape"
+  },
+  {
+    "id": "c1831d4",
+    "title": "Add Yes/No and Counter habit tracking with daily targets"
+  },
+  {
+    "id": "fcab6e0",
+    "title": "Add optional habit descriptions to editor, details and backups"
+  },
+  {
+    "id": "1255fd2",
+    "title": "Enlarge toothbrush symbol and align toothpaste with brush head"
+  },
+  {
+    "id": "b16c186",
+    "title": "Balance toothbrush base and match habit icon sizing"
+  },
+  {
+    "id": "52e0beb",
+    "title": "Redraw brushing teeth icon to match the provided reference"
+  },
+  {
+    "id": "41b5d36",
+    "title": "Add mint tick app icon for both MyHabits app targets"
+  },
+  {
+    "id": "12f2483",
+    "title": "Replace leaf habit option with a toothbrush and toothpaste icon"
+  },
+  {
+    "id": "3cc0212",
+    "title": "Revert \"Reduce settings startup work and optimise Personal Team device runs\""
+  },
+  {
+    "id": "c44cd2b",
+    "title": "Reduce settings startup work and optimise Personal Team device runs"
+  },
+  {
+    "id": "bfa7b1c",
+    "title": "Add app-only Personal Team build for free iPhone installation"
+  },
+  {
+    "id": "c7a5dfb",
+    "title": "Order habit colour shades from darkest to lightest"
+  },
+  {
+    "id": "b1d6564",
+    "title": "Simplify reminder formatting expressions to avoid Swift type-check timeout"
+  },
+  {
+    "id": "91a908c",
+    "title": "Add optional local habit reminders with weekdays and time windows"
+  },
+  {
+    "id": "7d79abf",
+    "title": "Add GitHub-inspired charcoal dark theme across app screens"
+  },
+  {
+    "id": "d4bc3d9",
+    "title": "Halve confetti count and widen its vertical falling spread"
+  },
+  {
+    "id": "c7b9e7b",
+    "title": "Double confetti coverage to 384 pieces per independent shower"
+  },
+  {
+    "id": "5d993ec",
+    "title": "Let completion confetti showers overlap independently"
+  },
+  {
+    "id": "85a95e0",
+    "title": "Double confetti to 192 pieces spread across the screen"
+  },
+  {
+    "id": "beb5c7c",
+    "title": "Use bright completed background while showing the completion tick"
+  },
+  {
+    "id": "04fdef3",
+    "title": "Restore smaller confetti pieces and double particle count"
+  },
+  {
+    "id": "0402c1e",
+    "title": "Crossfade completion tick into habit icon and brighten its background"
+  },
+  {
+    "id": "e1e672f",
+    "title": "Double confetti particle dimensions"
+  },
+  {
+    "id": "28f49d8",
+    "title": "Raise home summary and make confetti fall from top to bottom"
+  },
+  {
+    "id": "abddc85",
+    "title": "Capitalise New Habit editor heading"
+  },
+  {
+    "id": "1184d91",
+    "title": "Celebrate successful check-ins and centre the MyHabits heading"
+  },
+  {
+    "id": "95fe95d",
+    "title": "Centre home summary and keep daily heading on one line"
+  },
+  {
+    "id": "293db3b",
+    "title": "Update home heading to Another Day Another Opportunity"
+  },
+  {
+    "id": "02b5d68",
+    "title": "Group 24 habit colours into six four-shade families"
+  },
+  {
+    "id": "1986c75",
+    "title": "Update habit editor headings and streak goal toggle wording"
+  },
+  {
+    "id": "417ee6b",
+    "title": "Expand habit palette to 24 colours"
+  },
+  {
+    "id": "824651a",
+    "title": "Make streak goals optional and disabled for new habits"
+  },
+  {
+    "id": "134f4f0",
+    "title": "Move archive management to settings and expand habit colours and icons"
+  },
+  {
+    "id": "86d376e",
+    "title": "Add editable streak goals with remaining-day counters and backup support"
+  },
+  {
+    "id": "08512c9",
+    "title": "Add persistent System Light and Dark appearance settings"
+  },
+  {
+    "id": "498b60e",
+    "title": "Add native MyHabits iOS app with widgets and local backups"
+  }
+]

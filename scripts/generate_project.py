@@ -38,6 +38,7 @@ for name in products:
     if not is_test:
         resource_builds.append(add('privacy:'+name, f'isa = PBXBuildFile; fileRef = {files["MyHabits/PrivacyInfo.xcprivacy"]};'))
     if name in ['MyHabits', 'MyHabitsPersonal']:
+        resource_builds.append(add('history:'+name, f'isa = PBXBuildFile; fileRef = {files["MyHabits/UpdateHistory.json"]};'))
         resource_builds.append(add('localization:'+name, f'isa = PBXBuildFile; fileRef = {files["MyHabits/Localizable.xcstrings"]};'))
         resource_builds.append(add('assets:'+name, f'isa = PBXBuildFile; fileRef = {files[asset_path]};'))
     resources = add('resources:'+name, f'isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = {arr(resource_builds)}; runOnlyForDeploymentPostprocessing = 0;')
