@@ -38,18 +38,21 @@ struct EverydayHabitSymbol: Shape {
             line([CGPoint(x: 20, y: 12), CGPoint(x: 23, y: 15), CGPoint(x: 20, y: 18)])
             line([CGPoint(x: 18, y: 10), CGPoint(x: 14, y: 20)])
         case "habit.studying":
-            path.move(to: CGPoint(x: 16, y: 7))
-            path.addQuadCurve(to: CGPoint(x: 4, y: 5), control: CGPoint(x: 10, y: 2))
-            path.addLine(to: CGPoint(x: 4, y: 25))
-            path.addQuadCurve(to: CGPoint(x: 16, y: 28), control: CGPoint(x: 11, y: 24))
-            path.addQuadCurve(to: CGPoint(x: 25, y: 25), control: CGPoint(x: 20, y: 24))
-            path.addLine(to: CGPoint(x: 25, y: 5))
-            path.addQuadCurve(to: CGPoint(x: 16, y: 7), control: CGPoint(x: 20, y: 2))
-            line([CGPoint(x: 16, y: 7), CGPoint(x: 16, y: 28)])
+            // Mirror both pages around the spine at x = 12, leaving room for the pen.
+            path.move(to: CGPoint(x: 12, y: 7))
+            path.addQuadCurve(to: CGPoint(x: 1, y: 5), control: CGPoint(x: 6.5, y: 2))
+            path.addLine(to: CGPoint(x: 1, y: 25))
+            path.addQuadCurve(to: CGPoint(x: 12, y: 28), control: CGPoint(x: 6.5, y: 24))
+            path.addQuadCurve(to: CGPoint(x: 23, y: 25), control: CGPoint(x: 17.5, y: 24))
+            path.addLine(to: CGPoint(x: 23, y: 5))
+            path.addQuadCurve(to: CGPoint(x: 12, y: 7), control: CGPoint(x: 17.5, y: 2))
+            path.closeSubpath()
+            line([CGPoint(x: 12, y: 7), CGPoint(x: 12, y: 28)])
             for y in [CGFloat(11), 15, 19] {
-                line([CGPoint(x: 7, y: y), CGPoint(x: 12, y: y + 0.5)])
-                line([CGPoint(x: 19, y: y + 0.5), CGPoint(x: 22, y: y)])
+                line([CGPoint(x: 4, y: y), CGPoint(x: 9, y: y + 0.5)])
+                line([CGPoint(x: 15, y: y + 0.5), CGPoint(x: 20, y: y)])
             }
+            // Six canvas points separate the book edge from the pen.
             line([CGPoint(x: 29, y: 9), CGPoint(x: 29, y: 24), CGPoint(x: 30, y: 27), CGPoint(x: 31, y: 24), CGPoint(x: 31, y: 9), CGPoint(x: 29, y: 9)])
         case "habit.bed":
             rounded(4, 5, 24, 16, 2)
