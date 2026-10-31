@@ -1,7 +1,11 @@
 [
   {
     "id": "current-release",
-    "title": "Give habit cards a continuous solid-white outline, including rounded corners."
+    "title": "Restore subtle habit outlines while keeping rounded corners continuous."
+  },
+  {
+    "id": "2f8605b",
+    "title": "Draw continuous white habit card outlines without clipped corners"
   },
   {
     "id": "44eec74",

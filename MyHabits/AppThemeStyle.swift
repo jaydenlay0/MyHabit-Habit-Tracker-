@@ -35,7 +35,7 @@ private struct AppHabitCardStyle: ViewModifier {
             .background(AppTheme.surface, in: RoundedRectangle(cornerRadius: 20))
             .overlay {
                 RoundedRectangle(cornerRadius: 20)
-                    .strokeBorder(Color.white, lineWidth: 1)
+                    .strokeBorder(AppTheme.border, lineWidth: 1)
             }
             // Keep the outline inside the List's own rounded clipping boundary.
             .padding(4)
