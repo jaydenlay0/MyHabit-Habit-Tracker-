@@ -52,9 +52,14 @@ struct HabitListView: View {
                             } label: {
                                 VStack(alignment: .leading, spacing: 10) {
                                     Text(habit.name).font(.headline)
-                                    Text(LocalizedStringKey(habit.isComplete(now) ? "Completed" : "Incomplete"))
-                                        .font(.caption2).foregroundStyle(AppTheme.secondaryText)
-                                    if habit.isQuantified {
+                                    if habit.isCounter {
+                                        Text("\(habit.count(on: now))/\(habit.dailyTarget) completed")
+                                            .font(.caption2).foregroundStyle(AppTheme.secondaryText)
+                                    } else {
+                                        Text(LocalizedStringKey(habit.isComplete(now) ? "Completed" : "Incomplete"))
+                                            .font(.caption2).foregroundStyle(AppTheme.secondaryText)
+                                    }
+                                    if habit.isMeasure {
                                         Text(habit.progressLabel(on: now))
                                             .font(.subheadline).foregroundStyle(AppTheme.secondaryText)
                                     }

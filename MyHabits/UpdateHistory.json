@@ -1,7 +1,11 @@
 [
   {
     "id": "current-release",
-    "title": "Add a heart to the Teresa C supporter acknowledgement."
+    "title": "Show counter progress and completed together on one line in the habit list."
+  },
+  {
+    "id": "c9867a2",
+    "title": "Add heart emoji to Teresa C supporter acknowledgement"
   },
   {
     "id": "21eae2a",

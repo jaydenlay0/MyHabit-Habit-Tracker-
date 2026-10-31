@@ -1560,6 +1560,16 @@
           }
         }
       }
+    },
+    "%lld/%lld completed": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已完成 %1$lld/%2$lld"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
